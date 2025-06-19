@@ -14,6 +14,8 @@
       --text-dark: #f4f4f4;
       --link-light: #0066cc;
       --link-dark: #66ccff;
+      --accent-light: #ccc;
+      --accent-dark: #444;
     }
 
     body {
@@ -45,17 +47,21 @@
       top: 20px;
       right: 20px;
       padding: 8px 12px;
-      background: #ccc;
+      background: var(--accent-light);
       border-radius: 6px;
       cursor: pointer;
       font-size: 14px;
-      z-index: 10001;
       border: none;
-      outline: none;
+      z-index: 10001;
       transition: background 0.2s;
     }
+
+    body.dark .toggle-theme {
+      background: var(--accent-dark);
+    }
+
     .toggle-theme:hover {
-      background: #bbb;
+      opacity: 0.9;
     }
 
     .qr img {
@@ -90,43 +96,45 @@
     }
 
     @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
+      to { transform: rotate(360deg); }
     }
 
-    /* WebCoin Wallet */
-    #webcoin-wallet {
-      margin-top: 40px;
+    .wallet {
+      margin-top: 30px;
       padding: 20px;
-      border: 2px dashed #888;
-      border-radius: 12px;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid #aaa;
+      border-radius: 8px;
+      display: inline-block;
+      background: rgba(255,255,255,0.05);
     }
 
-    #webcoin-wallet button {
-      margin-top: 10px;
-      padding: 8px 14px;
-      border: none;
-      border-radius: 5px;
-      background: #4caf50;
-      color: white;
+    .wallet h2 {
+      margin-bottom: 10px;
+    }
+
+    .wallet .balance {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .wallet button {
+      padding: 8px 16px;
       font-size: 14px;
       cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background-color: #06c;
+      color: white;
     }
 
-    #webcoin-wallet button:hover {
-      background: #43a047;
+    .wallet button:hover {
+      background-color: #0057a6;
     }
   </style>
 </head>
 <body>
-  <div id="preloader">
-    <div class="loader"></div>
-  </div>
+  <div id="preloader"><div class="loader"></div></div>
 
   <button class="toggle-theme" onclick="toggleTheme()">Сменить тему</button>
 
@@ -139,13 +147,13 @@
     <p><a href="https://t.me/Webkurierbot" target="_blank" rel="noopener">Наш Telegram-бот</a></p>
   </div>
 
-  <div id="webcoin-wallet">
-    <h2>WebCoin: <span id="balance">0</span> 🪙</h2>
-    <button onclick="earnCoin()">Получить монету</button>
+  <div class="wallet">
+    <h2>WebCoin-кошелёк</h2>
+    <div class="balance" id="webcoin-balance">Баланс: 0 WKC</div>
+    <button onclick="addCoins(10)">+10 WKC</button>
   </div>
 
   <script>
-    // Theme
     function toggleTheme() {
       document.body.classList.toggle('dark');
       try {
@@ -153,31 +161,35 @@
       } catch(e) {}
     }
 
-    try {
-      if (localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark');
-      }
-    } catch(e) {}
+    function addCoins(amount) {
+      let current = parseInt(localStorage.getItem('webcoin') || '0');
+      current += amount;
+      localStorage.setItem('webcoin', current);
+      document.getElementById('webcoin-balance').textContent = `Баланс: ${current} WKC`;
+    }
 
-    // Preloader
+    function loadTheme() {
+      try {
+        if (localStorage.getItem('theme') === 'dark') {
+          document.body.classList.add('dark');
+        }
+      } catch(e) {}
+    }
+
+    function loadWebCoin() {
+      const coins = parseInt(localStorage.getItem('webcoin') || '0');
+      document.getElementById('webcoin-balance').textContent = `Баланс: ${coins} WKC`;
+    }
+
     window.addEventListener('load', () => {
+      loadTheme();
+      loadWebCoin();
       const preloader = document.getElementById('preloader');
       preloader.style.opacity = '0';
       setTimeout(() => {
         preloader.style.display = 'none';
       }, 500);
     });
-
-    // WebCoin Wallet
-    const balanceEl = document.getElementById('balance');
-    let coins = parseInt(localStorage.getItem('webcoins')) || 0;
-    balanceEl.textContent = coins;
-
-    function earnCoin() {
-      coins++;
-      balanceEl.textContent = coins;
-      localStorage.setItem('webcoins', coins);
-    }
   </script>
 </body>
 </html>
