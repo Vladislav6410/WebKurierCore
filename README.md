@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WebKurierCore</title>
+  <meta name="description" content="Автономная HTML-система доступа WebKurier: поддержка QR, ISO, офлайн-режим.">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <style>
     :root {
       --bg-light: #f4f4f4;
@@ -48,6 +50,12 @@
       cursor: pointer;
       font-size: 14px;
       z-index: 10001;
+      border: none;
+      outline: none;
+      transition: background 0.2s;
+    }
+    .toggle-theme:hover {
+      background: #bbb;
     }
 
     .qr img {
@@ -93,26 +101,30 @@
     <div class="loader"></div>
   </div>
 
-  <div class="toggle-theme" onclick="toggleTheme()">Сменить тему</div>
+  <button class="toggle-theme" onclick="toggleTheme()">Сменить тему</button>
 
   <h1>WebKurierCore</h1>
   <p>Автономная HTML-система доступа WebKurier</p>
   <p>Поддержка: QR, ISO, офлайн-режим</p>
 
   <div class="qr">
-    <img src="webkurier_qr.png" alt="QR для доступа" width="200" />
-    <p><a href="https://t.me/Webkurierbot" target="_blank">Наш Telegram-бот</a></p>
+    <img src="webkurier_qr.png" alt="QR-код для доступа к WebKurierBot" width="200" />
+    <p><a href="https://t.me/Webkurierbot" target="_blank" rel="noopener">Наш Telegram-бот</a></p>
   </div>
 
   <script>
     function toggleTheme() {
       document.body.classList.toggle('dark');
-      localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+      try {
+        localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+      } catch(e) {}
     }
 
-    if (localStorage.getItem('theme') === 'dark') {
-      document.body.classList.add('dark');
-    }
+    try {
+      if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark');
+      }
+    } catch(e) {}
 
     window.addEventListener('load', () => {
       const preloader = document.getElementById('preloader');
@@ -124,3 +136,4 @@
   </script>
 </body>
 </html>
+
