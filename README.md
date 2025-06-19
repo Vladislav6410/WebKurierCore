@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WebKurierCore</title>
-  <meta name="description" content="Автономная HTML-система доступа WebKurier: поддержка QR, ISO, офлайн-режим.">
+  <meta name="description" content="Автономная HTML-система доступа WebKurier: поддержка QR, ISO, офлайн-режим, WebCoin.">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <style>
     :root {
@@ -94,6 +94,33 @@
         transform: rotate(360deg);
       }
     }
+
+    /* WebCoin Wallet */
+    #webcoin-wallet {
+      margin-top: 40px;
+      padding: 20px;
+      border: 2px dashed #888;
+      border-radius: 12px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    #webcoin-wallet button {
+      margin-top: 10px;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 5px;
+      background: #4caf50;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #webcoin-wallet button:hover {
+      background: #43a047;
+    }
   </style>
 </head>
 <body>
@@ -112,7 +139,13 @@
     <p><a href="https://t.me/Webkurierbot" target="_blank" rel="noopener">Наш Telegram-бот</a></p>
   </div>
 
+  <div id="webcoin-wallet">
+    <h2>WebCoin: <span id="balance">0</span> 🪙</h2>
+    <button onclick="earnCoin()">Получить монету</button>
+  </div>
+
   <script>
+    // Theme
     function toggleTheme() {
       document.body.classList.toggle('dark');
       try {
@@ -126,6 +159,7 @@
       }
     } catch(e) {}
 
+    // Preloader
     window.addEventListener('load', () => {
       const preloader = document.getElementById('preloader');
       preloader.style.opacity = '0';
@@ -133,6 +167,17 @@
         preloader.style.display = 'none';
       }, 500);
     });
+
+    // WebCoin Wallet
+    const balanceEl = document.getElementById('balance');
+    let coins = parseInt(localStorage.getItem('webcoins')) || 0;
+    balanceEl.textContent = coins;
+
+    function earnCoin() {
+      coins++;
+      balanceEl.textContent = coins;
+      localStorage.setItem('webcoins', coins);
+    }
   </script>
 </body>
 </html>
