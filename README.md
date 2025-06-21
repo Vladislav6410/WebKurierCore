@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WebKurierCore</title>
-  <meta name="description" content="Автономная HTML-система доступа WebKurier: поддержка QR, ISO, офлайн-режим, WebCoin.">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <style>
     :root {
       --bg-light: #f4f4f4;
@@ -62,10 +60,6 @@
 
     .toggle-theme:hover {
       opacity: 0.9;
-    }
-
-    .qr img {
-      margin-top: 20px;
     }
 
     #preloader {
@@ -131,6 +125,34 @@
     .wallet button:hover {
       background-color: #0057a6;
     }
+
+    .terminal {
+      margin-top: 40px;
+      text-align: left;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 15px;
+      background: #111;
+      color: #0f0;
+      font-family: monospace;
+      border-radius: 8px;
+      min-height: 200px;
+      overflow: auto;
+      white-space: pre-wrap;
+    }
+
+    .terminal-input {
+      width: 100%;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 14px;
+      border: none;
+      outline: none;
+      background: #222;
+      color: #0f0;
+      border-top: 1px solid #0f0;
+    }
   </style>
 </head>
 <body>
@@ -141,11 +163,7 @@
   <h1>WebKurierCore</h1>
   <p>Автономная HTML-система доступа WebKurier</p>
   <p>Поддержка: QR, ISO, офлайн-режим</p>
-
-  <div class="qr">
-    <img src="webkurier_qr.png" alt="QR-код для доступа к WebKurierBot" width="200" />
-    <p><a href="https://t.me/Webkurierbot" target="_blank" rel="noopener">Наш Telegram-бот</a></p>
-  </div>
+  <p><a href="https://t.me/WebKurierBot" target="_blank">Наш Telegram-бот</a></p>
 
   <div class="wallet">
     <h2>WebCoin-кошелёк</h2>
@@ -153,12 +171,15 @@
     <button onclick="addCoins(10)">+10 WKC</button>
   </div>
 
+  <div class="terminal" id="terminal-output">Добро пожаловать в WebKurier Terminal</div>
+  <input class="terminal-input" id="terminal-input" placeholder="Введите команду..." onkeydown="handleTerminal(event)" />
+
   <script>
     function toggleTheme() {
       document.body.classList.toggle('dark');
       try {
         localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-      } catch(e) {}
+      } catch (e) {}
     }
 
     function addCoins(amount) {
@@ -173,12 +194,39 @@
         if (localStorage.getItem('theme') === 'dark') {
           document.body.classList.add('dark');
         }
-      } catch(e) {}
+      } catch (e) {}
     }
 
     function loadWebCoin() {
       const coins = parseInt(localStorage.getItem('webcoin') || '0');
       document.getElementById('webcoin-balance').textContent = `Баланс: ${coins} WKC`;
+    }
+
+    function handleTerminal(event) {
+      if (event.key === 'Enter') {
+        const input = event.target.value.trim();
+        if (input) {
+          const output = document.getElementById('terminal-output');
+          output.textContent += `\n> ${input}`;
+          // Пример ответа:
+          if (input === 'помощь') {
+            output.textContent += "\nДоступные команды: помощь, время, webcoin, сброс";
+          } else if (input === 'время') {
+            output.textContent += `\nВремя: ${new Date().toLocaleTimeString()}`;
+          } else if (input === 'webcoin') {
+            const wkc = localStorage.getItem('webcoin') || '0';
+            output.textContent += `\nВаш баланс: ${wkc} WKC`;
+          } else if (input === 'сброс') {
+            localStorage.removeItem('webcoin');
+            output.textContent += `\nБаланс сброшен.`;
+            loadWebCoin();
+          } else {
+            output.textContent += "\nНеизвестная команда.";
+          }
+        }
+        event.target.value = '';
+        output.scrollTop = output.scrollHeight;
+      }
     }
 
     window.addEventListener('load', () => {
