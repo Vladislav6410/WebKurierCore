@@ -1,121 +1,135 @@
-<title>WebKurierCore</title> <style> :root { --bg-light: #f4f4f4; --bg-dark: #121212; --text-light: #333; --text-dark: #f4f4f4; --link-light: #0066cc; --link-dark: #66ccff; --accent-light: #ccc; --accent-dark: #444; }
-body {
-  font-family: Arial, sans-serif;
-  background-color: var(--bg-light);
-  color: var(--text-light);
-  text-align: center;
-  padding: 40px;
-  margin: 0;
-  transition: background-color 0.3s, color 0.3s;
-}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebKurierCore</title>
+  <meta name="description" content="Автономная HTML-система доступа WebKurier: поддержка QR, ISO, офлайн-режим.">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <style>
+    :root {
+      --bg-light: #f4f4f4;
+      --bg-dark: #121212;
+      --text-light: #333;
+      --text-dark: #f4f4f4;
+      --link-light: #0066cc;
+      --link-dark: #66ccff;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      text-align: center;
+      padding: 40px;
+      margin: 0;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+    h1 { margin-bottom: 0.5em; }
+    #terminal {
+      margin-top: 2em;
+      padding: 1em;
+      border: 1px solid #999;
+      background: #000;
+      color: #0f0;
+      font-family: monospace;
+      white-space: pre-wrap;
+      min-height: 120px;
+    }
+    input {
+      margin-top: 10px;
+      padding: 6px;
+      width: 80%;
+      max-width: 300px;
+    }
+    .qr {
+      margin: 1em auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>WebKurierCore</h1>
+  <p>Добро пожаловать в автономную HTML-систему доступа!</p>
 
-body.dark {
-  background-color: var(--bg-dark);
-  color: var(--text-dark);
-}
+  <div class="qr">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?data=https://vladislav6410.github.io/webkuriercore/&size=150x150" alt="QR-код для доступа" />
+  </div>
 
-a {
-  color: var(--link-light);
-  text-decoration: none;
-}
+  <h3>Терминал WebKurier</h3>
+  <div id="terminal">WebKurier Terminal ready.\nType "help" to begin.</div>
+  <input type="text" id="commandInput" placeholder="Введите команду (ping, info, help)" />
 
-body.dark a {
-  color: var(--link-dark);
-}
+  <h3>WebCoin-кошелёк</h3>
+  <p>Ваш баланс: <span id="balance">0</span> WKC</p>
 
-.toggle-theme {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 8px 12px;
-  background: var(--accent-light);
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  border: none;
-  z-index: 10001;
-  transition: background 0.2s;
-}
+  <button onclick="addCoins(10)">+10 WKC</button>
+  <button onclick="resetCoins()">Сброс</button>
+  <br><br>
+  <button onclick="toggleTheme()">Переключить тему</button>
 
-body.dark .toggle-theme {
-  background: var(--accent-dark);
-}
+  <script>
+    const terminal = document.getElementById('terminal');
+    const input = document.getElementById('commandInput');
 
-.toggle-theme:hover {
-  opacity: 0.9;
-}
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const cmd = input.value.trim().toLowerCase();
+        handleCommand(cmd);
+        input.value = '';
+      }
+    });
 
-.qr img {
-  margin-top: 20px;
-}
+    function handleCommand(cmd) {
+      switch (cmd) {
+        case 'ping':
+          writeTerminal('pong');
+          break;
+        case 'help':
+          writeTerminal('Доступные команды:\n- ping\n- info\n- help');
+          break;
+        case 'info':
+          writeTerminal('WebKurierCore v1.0\nАвтономный доступ и кошелёк');
+          break;
+        default:
+          writeTerminal('Неизвестная команда');
+      }
+    }
 
-#preloader {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: var(--bg-light);
-  z-index: 9999;
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.5s ease;
-}
+    function writeTerminal(text) {
+      terminal.textContent += '\n' + text;
+      terminal.scrollTop = terminal.scrollHeight;
+    }
 
-body.dark #preloader {
-  background: var(--bg-dark);
-}
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+    }
 
-.loader {
-  width: 40px;
-  height: 40px;
-  border: 5px solid #ccc;
-  border-top-color: #333;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
+    function getBalance() {
+      return parseInt(localStorage.getItem('wkcbalance') || '0', 10);
+    }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+    function updateBalanceDisplay() {
+      document.getElementById('balance').textContent = getBalance();
+    }
 
-.wallet {
-  margin-top: 30px;
-  padding: 20px;
-  border: 1px solid #aaa;
-  border-radius: 8px;
-  display: inline-block;
-  background: rgba(255,255,255,0.05);
-}
+    function addCoins(amount) {
+      const current = getBalance();
+      localStorage.setItem('wkcbalance', current + amount);
+      updateBalanceDisplay();
+    }
 
-.wallet h2 {
-  margin-bottom: 10px;
-}
+    function resetCoins() {
+      localStorage.setItem('wkcbalance', 0);
+      updateBalanceDisplay();
+    }
 
-.wallet .balance {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.wallet button {
-  padding: 8px 16px;
-  font-size: 14px;
-  cursor: pointer;
-  border: none;
-  border-radius: 6px;
-  background-color: #06c;
-  color: white;
-}
-
-.wallet button:hover {
-  background-color: #0057a6;
-}
-
-</style>
-Сменить тему
-WebKurierCore
+    updateBalanceDisplay();
+  </script>
+</body>
+</html>
 
 
 
