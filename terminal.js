@@ -1,79 +1,96 @@
-// === WebKurier Terminal v2.1 — CLI-интерфейс с WebCoin ===
+const WALLET_KEY = "webcoin_balance";
 
-const terminalInput = document.getElementById("terminal-input");
-const terminalLog = document.getElementById("terminal-log");
-
-// Словарь команд
-const commands = {
-  help: () => {
-    return `📘 Команды:\n` +
-           `• help — показать команды\n` +
-           `• ping — проверка связи\n` +
-           `• info — информация о системе\n` +
-           `• balance — баланс WebCoin\n` +
-           `• add — добавить 10 WKC\n` +
-           `• reset — сбросить баланс\n` +
-           `• clear — очистить терминал\n` +
-           `• date — текущая дата и время`;
-  },
-  ping: () => "Pong 🟢",
-  info: () => "WebKurierCore v1.0 — автономный терминал и WebCoin",
-  balance: () => {
-    const coins = localStorage.getItem("webcoin_balance") || "0";
-    return `Баланс: ${coins} WKC`;
-  },
-  add: () => {
-    let coins = parseInt(localStorage.getItem("webcoin_balance") || "0");
-    coins += 10;
-    localStorage.setItem("webcoin_balance", coins);
-    updateBalanceUI();
-    return `✅ Добавлено 10 WKC. Новый баланс: ${coins} WKC`;
-  },
-  reset: () => {
-    localStorage.setItem("webcoin_balance", "0");
-    updateBalanceUI();
-    return `🔁 Баланс сброшен до 0 WKC`;
-  },
-  clear: () => {
-    terminalLog.innerHTML = '';
-    return null;
-  },
-  date: () => new Date().toLocaleString("ru-RU")
-};
-
-// Обработка ввода команды
-function handleCommand(event) {
-  if (event.key === "Enter") {
-    const cmd = terminalInput.value.trim().toLowerCase();
-    if (!cmd) return;
-
-    printToTerminal(`> ${cmd}`);
-
-    if (commands[cmd]) {
-      const result = commands[cmd]();
-      if (result) printToTerminal(result);
-    } else {
-      printToTerminal(`⛔ Неизвестная команда: "${cmd}". Напиши "help"`);
-    }
-
-    terminalInput.value = '';
-    terminalLog.scrollTop = terminalLog.scrollHeight;
-  }
+// Получение текущего баланса
+function getBalance() {
+  return parseInt(localStorage.getItem(WALLET_KEY) || "0", 10);
 }
 
-// Вывод текста в терминал
-function printToTerminal(text) {
-  terminalLog.innerHTML += `<div>${text}</div>`;
+// Установка нового баланса
+function setBalance(amount) {
+  localStorage.setItem(WALLET_KEY, amount);
+  updateBalanceUI();
 }
 
-// Обновление UI-баланса в блоке WebCoin
+// Добавление монет
+function addCoins(amount) {
+  const current = getBalance();
+  setBalance(current + amount);
+}
+
+// Сброс баланса
+function resetWallet() {
+  setBalance(0);
+}
+
+// Обновление HTML-интерфейса (если элемент есть на странице)
 function updateBalanceUI() {
-  const balanceElement = document.getElementById("wallet-balance");
-  if (balanceElement) {
-    const coins = localStorage.getItem("webcoin_balance") || "0";
-    balanceElement.innerText = `${coins} WKC`;
+  const el = document.getElementById("wallet-balance");
+  if (el) {
+    el.textContent = getBalance() + " WebCoin";
   }
 }
 
-// Инициализация (обновим баланс при загрузке)
-updateBalanceUI();
+// Обработка терминальных команд с аргументами
+function handleWalletCommand(command) {
+  const parts = command.trim().split(/\s+/);
+  const cmd = parts[0];
+  const arg = parts[1];
+
+  switch (cmd) {
+    case "/add":
+      const amount = parseInt(arg || "10", 10); // по умолчанию 10
+      if (isNaN(amount) || amount <= 0) {
+        return "Ошибка: введите положительное число для добавления.";
+      }
+      addCoins(amount);
+      return `Добавлено ${amount} WebCoin.`;
+
+    case "/reset":
+      resetWallet();
+      return "Баланс сброшен.";
+
+    case "/balance":
+      return "Текущий баланс: " + getBalance() + " WebCoin.";
+
+    default:
+      return "Неизвестная команда. Используйте: /add [n], /reset, /balance.";
+  }
+}
+
+// Инициализация интерфейса
+document.addEventListener("DOMContentLoaded", () => {
+  updateBalanceUI();
+
+  // Кнопки
+  const addBtn = document.getElementById("add-coins");
+  if (addBtn) addBtn.onclick = () => addCoins(10);
+
+  const resetBtn = document.getElementById("reset-wallet");
+  if (resetBtn) resetBtn.onclick = resetWallet;
+
+  // Терминал
+  const executeBtn = document.getElementById("execute-command");
+  const input = document.getElementById("terminal-input");
+  const output = document.getElementById("terminal-output");
+
+  function runCommand() {
+    const cmd = input.value.trim();
+    if (!cmd) return;
+    const result = handleWalletCommand(cmd);
+    if (result && output) output.textContent = result;
+    updateBalanceUI();
+    input.value = "";
+  }
+
+  if (executeBtn) {
+    executeBtn.onclick = runCommand;
+  }
+
+  if (input) {
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        runCommand();
+      }
+    });
+  }
+});
