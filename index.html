@@ -2,37 +2,64 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>WebKurierCore</title>
-  <meta name="description" content="Автономная HTML-система доступа WebKurier: терминал, WebCoin-кошелёк, офлайн-доступ, поддержка Telegram и QR.">
+  <meta name="description" content="WebKurier: терминал, кошелёк, офлайн-доступ">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>🌐 WebKurierCore</h1>
-  <p>Добро пожаловать в автономную HTML-систему доступа!</p>
+  <!-- Прелоадер -->
+  <div id="preloader"><div class="loader"></div></div>
 
-  <h2>💰 Баланс WebCoin:</h2>
-  <p id="balance">0</p>
-  <div id="wallet-buttons">
-    <button onclick="addCoins(10)">+10 WebCoin</button>
+  <!-- Кнопка темы -->
+  <button class="toggle-theme" onclick="toggleTheme()">Сменить тему</button>
+
+  <h1>🌐 WebKurierCore</h1>
+  <p>Добро пожаловать в автономный интерфейс WebKurier: терминал, кошелёк, Telegram-связь.</p>
+
+  <!-- Секция кошелька -->
+  <div class="wallet">
+    <h2>💰 WebCoin-кошелёк</h2>
+    <div class="balance" id="webcoin-balance">Баланс: 0 WKC</div>
+    <button onclick="addCoins(10)">+10 WKC</button>
     <button onclick="resetCoins()">Сброс</button>
   </div>
 
-  <h2>🖥️ Терминал WebKurier</h2>
-  <div id="terminal-container">
-    <pre id="terminal-output">WebKurier Terminal ready.\nType "help" to begin.</pre>
-    <input id="terminal-input" type="text" placeholder="Введите команду..." autofocus />
+  <!-- Секция терминала -->
+  <div class="terminal" id="terminal-block">
+    <div>> WebKurier Terminal v1.0</div>
+    <input type="text" id="terminal-input" placeholder="Введи команду..." autocomplete="off" onkeydown="handleCommand(event)">
+    <div id="terminal-log"></div>
   </div>
 
+  <!-- Telegram-ссылка -->
   <h2>🔗 Telegram</h2>
   <a href="https://t.me/WebKurierBot" target="_blank">@WebKurierBot</a>
-<!-- WebCoin Кошелёк -->
-<div id="wallet-section">
-  <p id="wallet-balance">0 WebCoin</p>
-  <button id="add-coins">+10</button>
-  <button id="reset-wallet">Сброс</button>
-</div>
+
+  <!-- Скрипты -->
   <script src="wallet.js"></script>
   <script src="terminal.js"></script>
+  <script>
+    // Прелоадер и инициализация
+    window.addEventListener('load', () => {
+      if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark');
+      }
+      const coins = parseInt(localStorage.getItem('webcoin') || '0');
+      document.getElementById('webcoin-balance').textContent = `Баланс: ${coins} WKC`;
+      document.getElementById('preloader').style.opacity = '0';
+      setTimeout(() => {
+        document.getElementById('preloader').style.display = 'none';
+        document.getElementById('terminal-input').focus();
+      }, 500);
+    });
+
+    // Переключение темы
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    }
+  </script>
 </body>
 </html>
