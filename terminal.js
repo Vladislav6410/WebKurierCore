@@ -1,48 +1,53 @@
-// === WebKurier Terminal — v1.0 ===
+// === WebKurier Terminal v2.0 — CLI-интерфейс ===
 
-// Команды терминала
+const terminalInput = document.getElementById("terminal-input");
+const terminalLog = document.getElementById("terminal-log");
+
+// Словарь команд
 const commands = {
-  ping: () => appendOutput("Pong 🟢"),
-  help: () => appendOutput("Доступные команды: ping, help, info, balance"),
-  info: () => appendOutput("WebKurierCore v1.0 — терминал, кошелёк, офлайн-доступ"),
+  help: () => {
+    return `📘 Команды:\n` +
+           `• help — показать команды\n` +
+           `• ping — проверка связи\n` +
+           `• info — информация о системе\n` +
+           `• balance — баланс WebCoin\n` +
+           `• clear — очистить терминал\n` +
+           `• date — текущая дата и время`;
+  },
+  ping: () => "Pong 🟢",
+  info: () => "WebKurierCore v1.0 — автономный терминал и WebCoin",
   balance: () => {
-    const coins = parseInt(localStorage.getItem('webcoin') || '0');
-    appendOutput(`Баланс: ${coins} WKC`);
-  }
+    const coins = localStorage.getItem("webcoin_balance") || "0";
+    return `Баланс: ${coins} WKC`;
+  },
+  clear: () => {
+    terminalLog.innerHTML = '';
+    return null;
+  },
+  date: () => new Date().toLocaleString("ru-RU")
 };
 
-// Обработчик команды (по Enter)
+// Обработка ввода команды
 function handleCommand(event) {
   if (event.key === "Enter") {
-    const input = document.getElementById("terminal-input");
-    const log = document.getElementById("terminal-log");
-    const cmd = input.value.trim().toLowerCase();
+    const cmd = terminalInput.value.trim().toLowerCase();
     if (!cmd) return;
 
-    log.innerHTML += `<div>&gt; ${cmd}</div>`;
+    printToTerminal(`> ${cmd}`);
 
     if (commands[cmd]) {
-      commands[cmd]();
+      const result = commands[cmd]();
+      if (result) printToTerminal(result);
     } else {
-      appendOutput(`Неизвестная команда: "${cmd}". Напиши "help"`);
+      printToTerminal(`⛔ Неизвестная команда: "${cmd}". Напиши "help"`);
     }
 
-    log.scrollTop = log.scrollHeight;
-    input.value = "";
+    terminalInput.value = '';
+    terminalLog.scrollTop = terminalLog.scrollHeight;
   }
 }
 
-// Добавить текст в терминал
-function appendOutput(text) {
-  const log = document.getElementById("terminal-log");
-  log.innerHTML += `<div>${text}</div>`;
-  log.scrollTop = log.scrollHeight;
+// Вывод текста в терминал
+function printToTerminal(text) {
+  terminalLog.innerHTML += `<div>${text}</div>`;
 }
-
-// Автофокус при загрузке
-window.addEventListener("load", () => {
-  const input = document.getElementById("terminal-input");
-  if (input) {
-    setTimeout(() => input.focus(), 500);
-  }
-});
