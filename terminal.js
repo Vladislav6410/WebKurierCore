@@ -1,64 +1,75 @@
-// Простой терминал WebKurier
-document.addEventListener('DOMContentLoaded', function () {
-  const terminal = document.createElement('div');
-  terminal.id = 'terminal';
-  terminal.style.backgroundColor = '#000';
-  terminal.style.color = '#0f0';
-  terminal.style.padding = '10px';
-  terminal.style.fontFamily = 'monospace';
-  terminal.style.height = '200px';
-  terminal.style.overflowY = 'auto';
+const terminal = document.getElementById('terminal');
+const input = document.getElementById('terminal-input');
 
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.placeholder = 'Type a command...';
-  input.style.width = '100%';
-  input.style.fontFamily = 'monospace';
-  input.style.backgroundColor = '#111';
-  input.style.color = '#0f0';
-  input.style.border = '1px solid #0f0';
-  input.style.padding = '5px';
+function printToTerminal(text) {
+  const line = document.createElement('div');
+  line.textContent = text;
+  terminal.appendChild(line);
+  terminal.scrollTop = terminal.scrollHeight;
+}
 
-  document.body.appendChild(terminal);
-  document.body.appendChild(input);
+function handleCommand(cmd) {
+  const parts = cmd.trim().split(' ');
+  const command = parts[0].toLowerCase();
+  const arg = parts[1] ? parseInt(parts[1], 10) : 0;
 
-  function print(text) {
-    const line = document.createElement('div');
-    line.textContent = text;
-    terminal.appendChild(line);
-    terminal.scrollTop = terminal.scrollHeight;
-  }
+  switch (command) {
+    case '/ping':
+      printToTerminal('pong!');
+      break;
+    case '/help':
+      printToTerminal('Команды: /ping, /help, /info, /add [число], /reset, /balance');
+      break;
+    case '/info':
+      printToTerminal('WebKurier Terminal v1.0');
+      break;
+    case '/add':
+      if (!isNaN(arg)) {
+        addCoins(arg);
+        print
 
-  print('WebKurier Terminal ready.');
-  print('Type "help" to begin.');
+Отлично! Это готовый стиль `CSS` для оформления терминала и кошелька. Он заменит или дополнит твой `styles.css`.
 
-  input.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') {
-      const command = input.value.trim();
-      print('> ' + command);
-      processCommand(command);
-      input.value = '';
-    }
-  });
+---
 
-  function processCommand(cmd) {
-    switch (cmd.toLowerCase()) {
-      case 'help':
-        print('Available commands: help, info, add 10, clear');
-        break;
-      case 'info':
-        print('WebKurierCore Terminal v1.0');
-        break;
-      case 'add 10':
-        addCoins(10);
-        print('Добавлено 10 WKC.');
-        displayBalance();
-        break;
-      case 'clear':
-        terminal.innerHTML = '';
-        break;
-      default:
-        print('Unknown command.');
-    }
-  }
-});
+### 🔧 Шаг 2: Обновим `styles.css` (замена всего файла)
+
+🔁 **Заменить весь файл `styles.css` этим содержимым:**
+
+```css
+#terminal-container {
+  background-color: black;
+  color: lime;
+  padding: 10px;
+  font-family: monospace;
+  margin: 20px auto;
+  width: 90%;
+  max-width: 600px;
+  border-radius: 10px;
+}
+
+#terminal-output {
+  white-space: pre-wrap;
+  margin-bottom: 10px;
+}
+
+#terminal-input {
+  width: 100%;
+  padding: 5px;
+  background-color: black;
+  color: lime;
+  border: 1px solid #333;
+  font-family: monospace;
+}
+
+#wallet-buttons {
+  margin: 20px;
+  text-align: center;
+}
+
+#wallet-buttons button {
+  margin: 5px;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+}
