@@ -1,4 +1,8 @@
-# WebKurierCore
+![Stars](https://img.shields.io/github/stars/Vladislav6410/WebKurierCore?style=social)
+![Forks](https://img.shields.io/github/forks/Vladislav6410/WebKurierCore?style=social)
+![License](https://img.shields.io/github/license/Vladislav6410/WebKurierCore)
+
+🌐 [Открыть WebKurierCore онлайн](https://vladislav6410.github.io/WebKurierCore/)WebKurierCore
 
 🌐 HTML-интерфейс для автономного доступа к WebKurier: терминал, WebCoin-кошелёк, офлайн-доступ и поддержка QR.
 
