@@ -1,4 +1,4 @@
-// === WebKurier Terminal v2.0 — CLI-интерфейс ===
+// === WebKurier Terminal v2.1 — CLI-интерфейс с WebCoin ===
 
 const terminalInput = document.getElementById("terminal-input");
 const terminalLog = document.getElementById("terminal-log");
@@ -11,6 +11,8 @@ const commands = {
            `• ping — проверка связи\n` +
            `• info — информация о системе\n` +
            `• balance — баланс WebCoin\n` +
+           `• add — добавить 10 WKC\n` +
+           `• reset — сбросить баланс\n` +
            `• clear — очистить терминал\n` +
            `• date — текущая дата и время`;
   },
@@ -19,6 +21,18 @@ const commands = {
   balance: () => {
     const coins = localStorage.getItem("webcoin_balance") || "0";
     return `Баланс: ${coins} WKC`;
+  },
+  add: () => {
+    let coins = parseInt(localStorage.getItem("webcoin_balance") || "0");
+    coins += 10;
+    localStorage.setItem("webcoin_balance", coins);
+    updateBalanceUI();
+    return `✅ Добавлено 10 WKC. Новый баланс: ${coins} WKC`;
+  },
+  reset: () => {
+    localStorage.setItem("webcoin_balance", "0");
+    updateBalanceUI();
+    return `🔁 Баланс сброшен до 0 WKC`;
   },
   clear: () => {
     terminalLog.innerHTML = '';
@@ -51,3 +65,15 @@ function handleCommand(event) {
 function printToTerminal(text) {
   terminalLog.innerHTML += `<div>${text}</div>`;
 }
+
+// Обновление UI-баланса в блоке WebCoin
+function updateBalanceUI() {
+  const balanceElement = document.getElementById("wallet-balance");
+  if (balanceElement) {
+    const coins = localStorage.getItem("webcoin_balance") || "0";
+    balanceElement.innerText = `${coins} WKC`;
+  }
+}
+
+// Инициализация (обновим баланс при загрузке)
+updateBalanceUI();
