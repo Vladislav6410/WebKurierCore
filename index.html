@@ -2,27 +2,32 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WebKurierCore</title>
-  <meta name="description" content="WebKurier: терминал, кошелёк, офлайн-доступ">
+  <meta name="description" content="Автономная HTML-система доступа WebKurier: терминал, WebCoin-кошелёк, офлайн-доступ, поддержка Telegram и QR.">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <h1>🌐 WebKurierCore</h1>
-  <p>Добро пожаловать в автономный интерфейс WebKurier.</p>
+  <p>Добро пожаловать в автономную HTML-систему доступа!</p>
 
   <h2>💰 Баланс WebCoin:</h2>
   <p id="balance">0</p>
-  <button onclick="addCoins(1)">+1 WKC</button>
-  <button onclick="resetCoins()">Сбросить</button>
+  <div id="wallet-buttons">
+    <button onclick="addCoins(10)">+10 WebCoin</button>
+    <button onclick="resetCoins()">Сброс</button>
+  </div>
 
-  <h2>💻 Терминал</h2>
-  <div id="terminal" class="terminal-container"></div>
+  <h2>🖥️ Терминал WebKurier</h2>
+  <div id="terminal-container">
+    <pre id="terminal-output">WebKurier Terminal ready.\nType "help" to begin.</pre>
+    <input id="terminal-input" type="text" placeholder="Введите команду..." autofocus />
+  </div>
 
   <h2>🔗 Telegram</h2>
   <a href="https://t.me/WebKurierBot" target="_blank">@WebKurierBot</a>
 
   <script src="wallet.js"></script>
-  <script src="terminal.js"></script> 
+  <script src="terminal.js"></script>
 </body>
 </html>
