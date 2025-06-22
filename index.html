@@ -5,17 +5,158 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>WebKurierCore</title>
   <meta name="description" content="WebKurier: терминал, кошелёк, офлайн-доступ">
-
-  <!-- ✅ Favicon -->
   <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <style>
+    :root {
+      --bg-light: #f4f4f4;
+      --bg-dark: #121212;
+      --text-light: #222;
+      --text-dark: #f4f4f4;
+      --accent-light: #ccc;
+      --accent-dark: #444;
+      --green: #0f0;
+      --red: #f33;
+    }
 
-  <link rel="stylesheet" href="styles.css">
+    body {
+      font-family: monospace;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body.dark-theme {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .toggle-theme {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 8px 12px;
+      background: var(--accent-light);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      border: none;
+      z-index: 10001;
+    }
+
+    body.dark-theme .toggle-theme {
+      background: var(--accent-dark);
+    }
+
+    #preloader {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-light);
+      z-index: 9999;
+      top: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s;
+    }
+
+    body.dark-theme #preloader {
+      background: var(--bg-dark);
+    }
+
+    .loader {
+      width: 40px;
+      height: 40px;
+      border: 5px solid #ccc;
+      border-top-color: #333;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .wallet {
+      margin-top: 30px;
+      padding: 20px;
+      border: 1px solid #aaa;
+      border-radius: 8px;
+      display: inline-block;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .wallet h2 { margin-bottom: 10px; }
+    .wallet .balance {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .wallet button {
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background-color: #06c;
+      color: white;
+      transition: background 0.2s;
+      margin: 4px;
+    }
+
+    .wallet button:hover {
+      background-color: #0057a6;
+    }
+
+    .terminal {
+      margin-top: 30px;
+      padding: 20px;
+      background: #000;
+      color: var(--green);
+      font-family: monospace;
+      border-radius: 8px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
+
+    .terminal input {
+      width: 100%;
+      padding: 6px;
+      margin-top: 8px;
+      background: #111;
+      color: var(--green);
+      border: none;
+      outline: none;
+      font-family: monospace;
+      border-radius: 4px;
+    }
+
+    #terminal-log {
+      margin-top: 12px;
+      min-height: 60px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    #terminal-log div {
+      white-space: pre-wrap;
+    }
+
+    a {
+      color: #06c;
+    }
+  </style>
 </head>
 <body>
-  <!-- Прелоадер -->
   <div id="preloader"><div class="loader"></div></div>
 
-  <!-- Кнопка темы -->
   <button class="toggle-theme" onclick="toggleTheme()">Сменить тему</button>
 
   <h1>🌐 WebKurierCore</h1>
@@ -30,39 +171,92 @@
   </div>
 
   <!-- Терминал -->
-  <div class="terminal" id="terminal-block">
+  <div class="terminal">
     <div>> WebKurier Terminal v1.0</div>
-    <input type="text" id="terminal-input" placeholder="Введи команду..." autocomplete="off" onkeydown="handleCommand(event)">
+    <input type="text" id="terminal-input" placeholder="Введи команду..." onkeydown="handleCommand(event)">
     <div id="terminal-log"></div>
   </div>
 
-  <!-- Telegram-ссылка -->
+  <!-- Telegram -->
   <h2>🔗 Telegram</h2>
-  <a href="https://t.me/WebKurierBot" target="_blank">@WebKurierBot</a>
+  <p><a href="https://t.me/WebKurierBot" target="_blank">@WebKurierBot</a></p>
 
   <!-- Скрипты -->
   <script src="wallet.js"></script>
   <script src="terminal.js"></script>
   <script>
-    // Инициализация темы и баланса
-    window.addEventListener('load', () => {
-      if (localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-theme');
-      }
-      const coins = parseInt(localStorage.getItem('webcoin_balance') || '0');
-      document.getElementById('webcoin-balance').textContent = `Баланс: ${coins} WKC`;
-      document.getElementById('preloader').style.opacity = '0';
-      setTimeout(() => {
-        document.getElementById('preloader').style.display = 'none';
-        document.getElementById('terminal-input').focus();
-      }, 500);
-    });
-
-    // Переключение темы
     function toggleTheme() {
       document.body.classList.toggle('dark-theme');
       localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
     }
+
+    function addCoins(amount) {
+      let current = parseInt(localStorage.getItem('webcoin') || '0');
+      current += amount;
+      localStorage.setItem('webcoin', current);
+      document.getElementById('webcoin-balance').textContent = `Баланс: ${current} WKC`;
+    }
+
+    function resetCoins() {
+      localStorage.setItem('webcoin', '0');
+      document.getElementById('webcoin-balance').textContent = `Баланс: 0 WKC`;
+    }
+
+    function handleCommand(e) {
+      if (e.key === 'Enter') {
+        const input = document.getElementById('terminal-input');
+        const log = document.getElementById('terminal-log');
+        const command = input.value.trim();
+
+        if (command) {
+          log.innerHTML += `<div>&gt; ${command}</div>`;
+          input.value = '';
+        }
+
+        if (command === 'ping') {
+          log.innerHTML += `<div>Pong 🟢</div>`;
+        } else if (command === 'help') {
+          log.innerHTML += `<div>Команды: ping, help, reset, balance, /add [n]</div>`;
+        } else if (command === 'reset') {
+          resetCoins();
+          log.innerHTML += `<div>Баланс сброшен.</div>`;
+        } else if (command === 'balance') {
+          const b = parseInt(localStorage.getItem('webcoin') || '0');
+          log.innerHTML += `<div>Баланс: ${b} WKC</div>`;
+        } else if (command.startsWith('/add')) {
+          const parts = command.split(' ');
+          const num = parseInt(parts[1] || '0');
+          if (isNaN(num) || num <= 0) {
+            log.innerHTML += `<div>Ошибка: укажите число.</div>`;
+          } else {
+            addCoins(num);
+            log.innerHTML += `<div>Добавлено: ${num} WKC</div>`;
+          }
+        } else if (!['ping', 'help', 'reset', 'balance'].includes(command.split(' ')[0])) {
+          log.innerHTML += `<div>Неизвестная команда. Введите help.</div>`;
+        }
+
+        log.scrollTop = log.scrollHeight;
+      }
+    }
+
+    window.addEventListener('load', () => {
+      // Прелоадер
+      document.getElementById('preloader').style.opacity = '0';
+      setTimeout(() => {
+        document.getElementById('preloader').style.display = 'none';
+        document.getElementById('terminal-input').focus();
+      }, 400);
+
+      // Тема
+      if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-theme');
+      }
+
+      // Баланс
+      const coins = parseInt(localStorage.getItem('webcoin') || '0');
+      document.getElementById('webcoin-balance').textContent = `Баланс: ${coins} WKC`;
+    });
   </script>
 </body>
 </html>
