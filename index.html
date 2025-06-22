@@ -44,7 +44,7 @@
     // Прелоадер и инициализация
     window.addEventListener('load', () => {
       if (localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark');
+        document.body.classList.add('dark-theme');
       }
       const coins = parseInt(localStorage.getItem('webcoin') || '0');
       document.getElementById('webcoin-balance').textContent = `Баланс: ${coins} WKC`;
@@ -57,8 +57,8 @@
 
     // Переключение темы
     function toggleTheme() {
-      document.body.classList.toggle('dark');
-      localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+      document.body.classList.toggle('dark-theme');
+      localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
     }
   </script>
 </body>
