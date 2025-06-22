@@ -1,4 +1,4 @@
-// wallet.js
+// wallet.js — полная замена
 
 const WALLET_KEY = "webcoin_balance";
 
@@ -24,7 +24,7 @@ function resetWallet() {
   setBalance(0);
 }
 
-// Обновление UI-элемента баланса (если есть)
+// Обновление UI-баланса
 function updateBalanceUI() {
   const el = document.getElementById("wallet-balance");
   if (el) {
@@ -48,7 +48,7 @@ function handleWalletCommand(command) {
   }
 }
 
-// Кнопки (если подключены через HTML)
+// Автоподключение кнопок
 document.addEventListener("DOMContentLoaded", () => {
   updateBalanceUI();
 
