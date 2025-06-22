@@ -1,135 +1,37 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WebKurierCore</title>
-  <meta name="description" content="Автономная HTML-система доступа WebKurier: поддержка QR, ISO, офлайн-режим.">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <style>
-    :root {
-      --bg-light: #f4f4f4;
-      --bg-dark: #121212;
-      --text-light: #333;
-      --text-dark: #f4f4f4;
-      --link-light: #0066cc;
-      --link-dark: #66ccff;
-    }
-    body {
-      font-family: Arial, sans-serif;
-      background-color: var(--bg-light);
-      color: var(--text-light);
-      text-align: center;
-      padding: 40px;
-      margin: 0;
-      transition: background-color 0.3s, color 0.3s;
-    }
-    .dark {
-      background-color: var(--bg-dark);
-      color: var(--text-dark);
-    }
-    h1 { margin-bottom: 0.5em; }
-    #terminal {
-      margin-top: 2em;
-      padding: 1em;
-      border: 1px solid #999;
-      background: #000;
-      color: #0f0;
-      font-family: monospace;
-      white-space: pre-wrap;
-      min-height: 120px;
-    }
-    input {
-      margin-top: 10px;
-      padding: 6px;
-      width: 80%;
-      max-width: 300px;
-    }
-    .qr {
-      margin: 1em auto;
-    }
-  </style>
-</head>
-<body>
-  <h1>WebKurierCore</h1>
-  <p>Добро пожаловать в автономную HTML-систему доступа!</p>
+# WebKurierCore
 
-  <div class="qr">
-    <img src="https://api.qrserver.com/v1/create-qr-code/?data=https://vladislav6410.github.io/webkuriercore/&size=150x150" alt="QR-код для доступа" />
-  </div>
+🌐 HTML-интерфейс для автономного доступа к WebKurier: терминал, WebCoin-кошелёк, офлайн-доступ и поддержка QR.
 
-  <h3>Терминал WebKurier</h3>
-  <div id="terminal">WebKurier Terminal ready.\nType "help" to begin.</div>
-  <input type="text" id="commandInput" placeholder="Введите команду (ping, info, help)" />
+---
 
-  <h3>WebCoin-кошелёк</h3>
-  <p>Ваш баланс: <span id="balance">0</span> WKC</p>
+## 🚀 О проекте
 
-  <button onclick="addCoins(10)">+10 WKC</button>
-  <button onclick="resetCoins()">Сброс</button>
-  <br><br>
-  <button onclick="toggleTheme()">Переключить тему</button>
+**WebKurierCore** — это автономный HTML-интерфейс, который работает без сервера и подключений, прямо в браузере. Он предназначен для использования как локальный помощник или загрузочная оболочка WebKurier на GitHub Pages, флешке или ISO-диске.
 
-  <script>
-    const terminal = document.getElementById('terminal');
-    const input = document.getElementById('commandInput');
+---
 
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        const cmd = input.value.trim().toLowerCase();
-        handleCommand(cmd);
-        input.value = '';
-      }
-    });
+## 🧩 Возможности
 
-    function handleCommand(cmd) {
-      switch (cmd) {
-        case 'ping':
-          writeTerminal('pong');
-          break;
-        case 'help':
-          writeTerminal('Доступные команды:\n- ping\n- info\n- help');
-          break;
-        case 'info':
-          writeTerminal('WebKurierCore v1.0\nАвтономный доступ и кошелёк');
-          break;
-        default:
-          writeTerminal('Неизвестная команда');
-      }
-    }
+- ✅ **WebCoin-кошелёк** с локальным сохранением
+- ✅ **Интерактивный терминал** с командами (ping, help, info)
+- ✅ **Тёмная/светлая тема** (автоматическое переключение)
+- ✅ **Офлайн-режим** (можно открыть без интернета)
+- ✅ **Поддержка GitHub Pages** (`index.html` в корне)
+- ✅ **QR-код и Telegram-ссылки**
+- ✅ **Минималистичный дизайн, чистый HTML/JS/CSS**
+- ✅ **Совместимость с Telegram-ботами (уровень 8 и выше)**
 
-    function writeTerminal(text) {
-      terminal.textContent += '\n' + text;
-      terminal.scrollTop = terminal.scrollHeight;
-    }
+---
 
-    function toggleTheme() {
-      document.body.classList.toggle('dark');
-    }
+## 📁 Структура проекта
 
-    function getBalance() {
-      return parseInt(localStorage.getItem('wkcbalance') || '0', 10);
-    }
-
-    function updateBalanceDisplay() {
-      document.getElementById('balance').textContent = getBalance();
-    }
-
-    function addCoins(amount) {
-      const current = getBalance();
-      localStorage.setItem('wkcbalance', current + amount);
-      updateBalanceDisplay();
-    }
-
-    function resetCoins() {
-      localStorage.setItem('wkcbalance', 0);
-      updateBalanceDisplay();
-    }
-
-    updateBalanceDisplay();
-  </script>
-</body>
-</html>
+```bash
+WebKurierCore/
+├── index.html         # Главная оболочка
+├── terminal.js        # Терминал с командами
+├── wallet.js          # WebCoin-кошелёк
+├── styles.css         # Стили и темы
+├── README.md          # Этот файл
 
 
 
