@@ -18,7 +18,7 @@
   <h1>🌐 WebKurierCore</h1>
   <p>Добро пожаловать в автономный интерфейс WebKurier: терминал, кошелёк, Telegram-связь.</p>
 
-  <!-- Секция кошелька -->
+  <!-- Кошелёк -->
   <div class="wallet">
     <h2>💰 WebCoin-кошелёк</h2>
     <div class="balance" id="webcoin-balance">Баланс: 0 WKC</div>
@@ -26,7 +26,7 @@
     <button onclick="resetCoins()">Сброс</button>
   </div>
 
-  <!-- Секция терминала -->
+  <!-- Терминал -->
   <div class="terminal" id="terminal-block">
     <div>> WebKurier Terminal v1.0</div>
     <input type="text" id="terminal-input" placeholder="Введи команду..." autocomplete="off" onkeydown="handleCommand(event)">
@@ -41,12 +41,12 @@
   <script src="wallet.js"></script>
   <script src="terminal.js"></script>
   <script>
-    // Прелоадер и инициализация
+    // Инициализация темы и баланса
     window.addEventListener('load', () => {
       if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-theme');
       }
-      const coins = parseInt(localStorage.getItem('webcoin') || '0');
+      const coins = parseInt(localStorage.getItem('webcoin_balance') || '0');
       document.getElementById('webcoin-balance').textContent = `Баланс: ${coins} WKC`;
       document.getElementById('preloader').style.opacity = '0';
       setTimeout(() => {
