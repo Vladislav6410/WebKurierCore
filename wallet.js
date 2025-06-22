@@ -7,7 +7,7 @@ function getBalance() {
   return parseInt(localStorage.getItem(WALLET_KEY) || "0");
 }
 
-// Установить новый баланс
+// Установить баланс и обновить интерфейс
 function setBalance(amount) {
   localStorage.setItem(WALLET_KEY, amount);
   updateBalanceUI();
@@ -24,7 +24,7 @@ function resetCoins() {
   setBalance(0);
 }
 
-// Обновить интерфейс баланса (все ID)
+// Обновить все элементы, отображающие баланс
 function updateBalanceUI() {
   const amount = getBalance();
   const elements = [
@@ -44,5 +44,5 @@ function updateBalanceUI() {
   });
 }
 
-// Автозагрузка при открытии страницы
+// Обновить интерфейс при загрузке страницы
 window.addEventListener("DOMContentLoaded", updateBalanceUI);
