@@ -1,13 +1,13 @@
-// wallet.js — полная замена
+// === wallet.js — WebCoin Кошелёк ===
 
 const WALLET_KEY = "webcoin_balance";
 
-// Получение текущего баланса
+// Получить текущий баланс
 function getBalance() {
   return parseInt(localStorage.getItem(WALLET_KEY) || "0");
 }
 
-// Установка баланса
+// Установить новый баланс
 function setBalance(amount) {
   localStorage.setItem(WALLET_KEY, amount);
   updateBalanceUI();
@@ -19,42 +19,30 @@ function addCoins(amount) {
   setBalance(current + amount);
 }
 
-// Сброс баланса
-function resetWallet() {
+// Сбросить баланс
+function resetCoins() {
   setBalance(0);
 }
 
-// Обновление UI-баланса
+// Обновить интерфейс баланса (все ID)
 function updateBalanceUI() {
-  const el = document.getElementById("wallet-balance");
-  if (el) {
-    el.textContent = getBalance() + " WebCoin";
-  }
+  const amount = getBalance();
+  const elements = [
+    document.getElementById("balance"),
+    document.getElementById("webcoin-balance"),
+    document.getElementById("balance-display")
+  ];
+
+  elements.forEach(el => {
+    if (el) {
+      if (el.id === "balance") {
+        el.textContent = amount;
+      } else {
+        el.textContent = `Баланс: ${amount} WKC`;
+      }
+    }
+  });
 }
 
-// Обработка команд из терминала
-function handleWalletCommand(command) {
-  switch (command.trim()) {
-    case "/add":
-      addCoins(10);
-      return "Добавлено 10 WebCoin.";
-    case "/reset":
-      resetWallet();
-      return "Баланс сброшен.";
-    case "/balance":
-      return "Текущий баланс: " + getBalance() + " WebCoin.";
-    default:
-      return null;
-  }
-}
-
-// Автоподключение кнопок
-document.addEventListener("DOMContentLoaded", () => {
-  updateBalanceUI();
-
-  const addBtn = document.getElementById("add-coins");
-  if (addBtn) addBtn.onclick = () => addCoins(10);
-
-  const resetBtn = document.getElementById("reset-wallet");
-  if (resetBtn) resetBtn.onclick = resetWallet;
-});
+// Автозагрузка при открытии страницы
+window.addEventListener("DOMContentLoaded", updateBalanceUI);
