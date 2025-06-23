@@ -1,4 +1,4 @@
-// engineer.js — ядро цифрового помощника WebKurier
+л// engineer.js — ядро цифрового помощника WebKurier
 
 export const Engineer = {
   language: "ru",
@@ -130,4 +130,23 @@ export const Engineer = {
 </script></body>// Для модульной загрузки JSON (если поддерживается браузером)
 import memory from './memory.json' assert { type: 'json' };
 import config from './config.json' assert { type: 'json' };memory: memory,
-config: config,
+config: config,case "/memory":
+  return JSON.stringify(this.memory, null, 2);
+
+case "/save":
+  return this.saveMemory();
+
+case "/load":
+  return this.loadMemory();
+
+case "/clear":
+  this.memory.logs = [];
+  this.memory.modules = [];
+  this.memory.files = [];
+  this.memory.folders = [];
+  this.memory.users = [];
+  this.memory.tasks = [];
+  return "🧹 Память очищена.";
+
+case "/config":
+  return JSON.stringify(this.config, null, 2);
