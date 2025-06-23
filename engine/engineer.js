@@ -124,4 +124,7 @@ export const Engineer = {
   /ai [режим] — режим ИИ
   /assistant [роль] — создать помощника`;
   }
-};
+}; <body> <script type="module">
+  import { setLanguage } from './lang/language.js';
+  setLanguage("ru"); // здесь можно будет менять на "en"
+</script> </body>
