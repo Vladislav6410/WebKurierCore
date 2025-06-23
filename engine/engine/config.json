@@ -1,0 +1,9 @@
+{
+  "defaultLanguage": "ru",
+  "adminId": 7760997174,
+  "dropboxEnabled": true,
+  "googleEnabled": true,
+  "aiAllowed": true,
+  "saveOnExit": true,
+  "version": "1.0.0"
+}
