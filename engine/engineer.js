@@ -149,4 +149,12 @@ case "/clear":
   return "🧹 Память очищена.";
 
 case "/config":
-  return JSON.stringify(this.config, null, 2);
+  return JSON.stringify(this.config, null, 2);saveMemory() {
+  this.log("Сохранение памяти (в реальной версии — через API)");
+  return "💾 Память сохранена (симуляция)";
+},
+
+loadMemory() {
+  this.log("Загрузка памяти из JSON");
+  return "📂 Память загружена (симуляция)";
+}
