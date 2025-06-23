@@ -129,4 +129,5 @@ export const Engineer = {
   setLanguage("ru"); // здесь можно будет менять на "en"
 </script></body>// Для модульной загрузки JSON (если поддерживается браузером)
 import memory from './memory.json' assert { type: 'json' };
-import config from './config.json' assert { type: 'json' };
+import config from './config.json' assert { type: 'json' };memory: memory,
+config: config,
