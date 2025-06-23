@@ -1,4 +1,6 @@
-// engine/engineer.js — цифровой помощник WebKurierCore
+import config from './config.json' assert { type: 'json' };
+import memory from './memory.json' assert { type: 'json' };
+import { DropboxManager } from './dropbox.js';// engine/engineer.js — цифровой помощник WebKurierCore
 
 export const Engineer = {
   handleCommand(command) {
