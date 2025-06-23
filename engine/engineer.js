@@ -127,4 +127,6 @@ export const Engineer = {
 }; <body><script type="module">
   import { setLanguage } from './lang/language.js';
   setLanguage("ru"); // здесь можно будет менять на "en"
-</script></body>
+</script></body>// Для модульной загрузки JSON (если поддерживается браузером)
+import memory from './memory.json' assert { type: 'json' };
+import config from './config.json' assert { type: 'json' };
