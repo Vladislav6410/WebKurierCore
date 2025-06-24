@@ -257,8 +257,10 @@
       const coins = parseInt(localStorage.getItem('webcoin') || '0');
       document.getElementById('webcoin-balance').textContent = `Баланс: ${coins} WKC`;
     });
-  </script><script src="engine/engineer.js"></script><!-- Dropbox SDK -->
+  <!-- Dropbox SDK -->
 <script src="https://unpkg.com/dropbox/dist/Dropbox-sdk.min.js"></script>
 <script src="engine/dropbox.js"></script>
+<script src="engine/engineer.js"></script>
+<script src="wallet.js"></script> <!-- если используешь wallet.js -->
 </body>
 </html>
