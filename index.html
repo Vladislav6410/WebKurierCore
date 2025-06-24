@@ -266,7 +266,30 @@
 <script src="engine/engineer.js"></script>
 <script src="dream.js"></script> <!-- подключаем DreamMaker -->
 <script src="wallet.js"></script> <!-- если используешь wallet.js -->
+  <script src="engine/engineer.js"></script>
+  <script src="wallet.js"></script>  <!-- ← после этой строки вставляем -->
 
+  <!-- Подключаем DreamMaker -->
+  <script src="engine/dream.js"></script>
+
+  <!-- Интерфейс DreamMaker -->
+  <div id="screen"></div>
+  <div id="preview-area"></div>
+  <div id="chat"></div>
+
+  <div class="chat-toolbar">
+    <button id="btn-photo">📷</button>
+    <button id="btn-video">🎞</button>
+    <button id="btn-audio">🎵</button>
+    <textarea id="chat-input" placeholder="Скажи или напиши…"></textarea>
+    <button id="mic-btn">🎤</button>
+    <button id="send-btn">➤</button>
+  </div>
+
+  <script>
+    // Здесь — логика для загрузки, превью, отправки и работы с dreammaker
+    // ...
+  </script>
 <script>
   window.addEventListener('load', () => {
     // Прелоадер
