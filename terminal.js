@@ -173,8 +173,25 @@ document.addEventListener("DOMContentLoaded", () => {
     commandHistory = commandHistory.slice(0, 10);
     historyIndex = -1;
 
-    const result = await handleWalletCommand(cmd);
-    printToTerminal(result, result.startsWith("⚠️") || result.startsWith("❌"));
+    // 🔽 ВСТАВЛЕННЫЙ DreamMaker блок
+    let response;
+    if (window.lastMedia) {
+      const img = window.lastMedia.image;
+      const vid = window.lastMedia.video;
+      const aud = window.lastMedia.audio;
+
+      if (vid) response = dreammaker.fromVideo(vid);
+      else if (img && aud) response = dreammaker.animate(img, aud);
+      else if (aud && !img) response = 'Укажите фото или видео вместе со звуком.';
+      else response = await handleWalletCommand(cmd);
+
+      window.lastMedia = {};
+    } else {
+      response = await handleWalletCommand(cmd);
+      if (!response && cmd) response = dreammaker.voiceOver(cmd);
+    }
+
+    printToTerminal(response, response.startsWith("⚠️") || response.startsWith("❌"));
     updateBalanceUI();
     input.value = "";
   }
