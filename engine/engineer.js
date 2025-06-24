@@ -1,75 +1,104 @@
-// === WebKurier Engineer v1.0 ===
+// === WebKurier Engineer v2.1 ===
 // Файл: /engine/engineer.js
 
 console.log("🔧 Engineer.js загружен");
 
-// 🔗 Dropbox-ссылка на общую папку (режим dl=1 для прямого доступа)
-const DROPBOX_BASE_URL = "https://www.dropbox.com/scl/fi";
+let memory = {};
+let config = {};
 
-// === Обработка команд ===
+// === Обработка команд терминала ===
 async function handleEngineerCommand(command) {
   const parts = command.trim().split(/\s+/);
   const cmd = parts[0];
-  const arg = parts[1];
+  const arg = parts.slice(1).join(" ");
 
   switch (cmd) {
     case "/help":
-      return "📘 Команды:\n/save, /load, /add [текст], /config, /clear";
+      return `📘 Команды:
+  /save — сохранить память
+  /load — загрузить память
+  /add [текст] — добавить заметку
+  /config — загрузить конфиг
+  /clear — очистить память
+  /help — показать команды`;
 
     case "/save":
-      return saveMemory();
+      return await saveMemory();
 
     case "/load":
-      return loadMemory();
+      return await loadMemory();
 
     case "/add":
       if (!arg) return "❗ Укажи текст для добавления.";
       return addMemoryEntry(arg);
 
     case "/config":
-      return loadConfig();
+      return await loadConfig();
 
     case "/clear":
-      localStorage.clear();
-      return "🧹 Память и конфиг очищены.";
+      memory = {};
+      localStorage.removeItem("memory_data");
+      return "🧹 Память очищена.";
 
     default:
       return "❓ Неизвестная команда. Введи /help";
   }
 }
 
-// === Работа с памятью ===
-function saveMemory() {
+// === Сохранение памяти в Dropbox и локально ===
+async function saveMemory() {
   const data = {
     updated: new Date().toISOString(),
-    notes: localStorage.getItem("engine_notes") || ""
+    notes: memory.notes || ""
   };
-  localStorage.setItem("memory_data", JSON.stringify(data));
-  return "💾 Память сохранена.";
+
+  try {
+    localStorage.setItem("memory_data", JSON.stringify(data));
+    await dropbox.uploadFileToDropbox("/engine/memory.json", data);
+    return "💾 Память сохранена в Dropbox и localStorage.";
+  } catch (e) {
+    return "⚠️ Ошибка при сохранении: " + e.message;
+  }
 }
 
-function loadMemory() {
-  const data = JSON.parse(localStorage.getItem("memory_data") || "{}");
-  return data.notes
-    ? `📂 Память:\n${data.notes}`
+// === Загрузка памяти: сначала Dropbox, потом локально ===
+async function loadMemory() {
+  try {
+    const remote = await dropbox.loadMemoryFromDropbox();
+    if (remote && remote.notes !== undefined) {
+      memory = remote;
+      localStorage.setItem("memory_data", JSON.stringify(remote));
+      return `📂 Память (из Dropbox):\n${remote.notes}`;
+    }
+  } catch (e) {
+    console.warn("Ошибка Dropbox:", e.message);
+  }
+
+  const local = JSON.parse(localStorage.getItem("memory_data") || "{}");
+  memory = local;
+  return local.notes
+    ? `📂 Локальная память:\n${local.notes}`
     : "📂 Память пуста.";
 }
 
+// === Добавление заметки ===
 function addMemoryEntry(note) {
-  const current = localStorage.getItem("engine_notes") || "";
-  const updated = current + "\n" + note;
-  localStorage.setItem("engine_notes", updated);
+  const current = memory.notes || "";
+  memory.notes = (current ? current + "\n" : "") + note;
+  localStorage.setItem("memory_data", JSON.stringify(memory));
   return "✅ Запись добавлена.";
 }
 
-// === Загрузка config.json из Dropbox ===
+// === Загрузка конфигурации из Dropbox ===
 async function loadConfig() {
-  const url = `${DROPBOX_BASE_URL}/r6dgaq7p74m6myuk57n4i/config.json?rlkey=z23boiy3e7qcr5ruahd81kz1j&st=ci8hqv4x&dl=1`;
   try {
-    const res = await fetch(url);
-    const cfg = await res.json();
-    return `⚙️ Config:\n` + JSON.stringify(cfg, null, 2);
+    const remote = await dropbox.loadConfigFromDropbox();
+    if (remote) {
+      config = remote;
+      return "⚙️ Конфиг загружен:\n" + JSON.stringify(config, null, 2);
+    }
   } catch (e) {
-    return "⚠️ Ошибка загрузки config.json";
+    console.warn("Ошибка загрузки config:", e.message);
   }
+  return "⚠️ Ошибка загрузки config.json";
 }
