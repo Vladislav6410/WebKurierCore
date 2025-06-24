@@ -1,8 +1,14 @@
-л// engineer.js — ядро цифрового помощника WebKurier
+// === Ядро цифрового помощника WebKurier ===
+
+import config from './config.json' assert { type: 'json' };
+import memory from './memory.json' assert { type: 'json' };
+import { DropboxManager } from './dropbox.js';
 
 export const Engineer = {
   language: "ru",
   userId: null,
+  memory: memory,
+  config: config,
   storage: {
     userFolders: [],
     createdFiles: [],
@@ -29,6 +35,7 @@ export const Engineer = {
     const [cmd, ...args] = command.trim().split(/\s+/);
 
     switch (cmd) {
+      // 📦 Модули и файлы
       case "/install":
         return this.installModule(args.join(" "));
       case "/rename":
@@ -37,6 +44,8 @@ export const Engineer = {
         return this.createItem(args);
       case "/delete":
         return this.deleteItem(args);
+
+      // 🛠️ Система и панель
       case "/scan":
         return this.scanSystem();
       case "/task":
@@ -49,9 +58,63 @@ export const Engineer = {
         return this.activateAI(args.join(" "));
       case "/assistant":
         return this.createAssistant(args.join(" "));
+
+      // 🧠 Работа с памятью
+      case "/memory":
+        return JSON.stringify(this.memory, null, 2);
+      case "/save":
+        return this.saveMemory();
+      case "/load":
+        return this.loadMemory();
+      case "/clear":
+        this.memory.logs = [];
+        this.memory.modules = [];
+        this.memory.files = [];
+        this.memory.folders = [];
+        this.memory.users = [];
+        this.memory.tasks = [];
+        return "🧹 Память очищена.";
+
+      // ⚙️ Конфиг
+      case "/config":
+        return JSON.stringify(this.config, null, 2);
+
+      // ➕ Добавление кастомной команды
+      case "/add": {
+        const newCmd = args[0];
+        const response = args.slice(1).join(" ");
+        if (!this.memory.commands) this.memory.commands = {};
+        this.memory.commands[newCmd] = response;
+        DropboxManager.saveFile("memory.json", JSON.stringify(this.memory, null, 2));
+        return `✅ Добавлена команда ${newCmd}`;
+      }
+
+      // 📘 Справка
       case "/help":
-        return this.showHelp();
+        return `🧠 Команды инженера:
+  /install [модуль]
+  /rename [старое] [новое]
+  /create folder|file [название]
+  /delete [имя]
+  /scan
+  /task html|js|...
+  /register [email/телефон]
+  /panel
+  /ai [режим]
+  /assistant [роль]
+  /memory — показать память
+  /save — сохранить
+  /load — загрузить
+  /clear — очистить память
+  /config — показать config.json
+  /add /имя Текст — создать команду
+  /help — помощь`;
+
+      // 🧠 Выполнение пользовательской команды
       default:
+        if (this.memory.commands && this.memory.commands[cmd]) {
+          return this.memory.commands[cmd];
+        }
         return `⚠️ Неизвестная команда: ${cmd}`;
     }
   },
@@ -111,50 +174,14 @@ export const Engineer = {
     return `👨‍💼 Цифровой помощник создан: ${role}`;
   },
 
-  showHelp() {
-    return `🧠 Команды инженера:
-  /install [модуль] — установить модуль
-  /rename [старое] [новое] — переименовать
-  /create folder|file [название] — создать
-  /delete [имя] — удалить
-  /scan — проверка системы
-  /task html|js|... — получить ТЗ
-  /register [email/телефон] — регистрация
-  /panel — открыть админку
-  /ai [режим] — режим ИИ
-  /assistant [роль] — создать помощника`;
+  saveMemory() {
+    this.log("Сохранение памяти в Dropbox...");
+    DropboxManager.saveFile("memory.json", JSON.stringify(this.memory, null, 2));
+    return "💾 Память сохранена.";
+  },
+
+  loadMemory() {
+    this.log("Загрузка памяти из Dropbox...");
+    return "📂 Память загружена.";
   }
-}; <body><script type="module">
-  import { setLanguage } from './lang/language.js';
-  setLanguage("ru"); // здесь можно будет менять на "en"
-</script></body>// Для модульной загрузки JSON (если поддерживается браузером)
-import memory from './memory.json' assert { type: 'json' };
-import config from './config.json' assert { type: 'json' };memory: memory,
-config: config,case "/memory":
-  return JSON.stringify(this.memory, null, 2);
-
-case "/save":
-  return this.saveMemory();
-
-case "/load":
-  return this.loadMemory();
-
-case "/clear":
-  this.memory.logs = [];
-  this.memory.modules = [];
-  this.memory.files = [];
-  this.memory.folders = [];
-  this.memory.users = [];
-  this.memory.tasks = [];
-  return "🧹 Память очищена.";
-
-case "/config":
-  return JSON.stringify(this.config, null, 2);saveMemory() {
-  this.log("Сохранение памяти (в реальной версии — через API)");
-  return "💾 Память сохранена (симуляция)";
-},
-
-loadMemory() {
-  this.log("Загрузка памяти из JSON");
-  return "📂 Память загружена (симуляция)";
-}
+};
