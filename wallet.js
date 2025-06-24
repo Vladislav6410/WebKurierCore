@@ -1,4 +1,4 @@
-// === wallet.js — WebCoin Кошелёк Расширенный ===
+// === wallet.js — WebCoin Кошелёк Расширенный + Память Dropbox ===
 
 const WALLET_KEY = "webcoin_balance";
 
@@ -44,7 +44,7 @@ function updateBalanceUI() {
   });
 }
 
-// === Расширенные команды ===
+// === КОМАНДЫ WALLET ===
 const walletCommands = {
   "/add": {
     description: "/add [число] — добавить монеты",
@@ -116,18 +116,54 @@ const walletCommands = {
       input.click();
       return "📂 Выберите файл.";
     }
-  },
+  }
+};
+
+// === КОМАНДЫ ENGINEER (Dropbox + память) ===
+const engineerCommands = {
   "/help": {
-    description: "/help — показать список команд",
+    description: "/help — команды engineer.js",
+    exec: () => handleEngineerCommand("/help")
+  },
+  "/add-note": {
+    description: "/add-note [текст] — добавить заметку",
+    exec: (args) => handleEngineerCommand("/add " + args.join(" "))
+  },
+  "/save": {
+    description: "/save — сохранить память в Dropbox",
+    exec: () => handleEngineerCommand("/save")
+  },
+  "/load": {
+    description: "/load — загрузить память из Dropbox",
+    exec: () => handleEngineerCommand("/load")
+  },
+  "/config": {
+    description: "/config — загрузить конфиг",
+    exec: () => handleEngineerCommand("/config")
+  },
+  "/clear": {
+    description: "/clear — очистить память",
+    exec: () => handleEngineerCommand("/clear")
+  }
+};
+
+// === Объединение всех команд ===
+const allCommands = {
+  ...walletCommands,
+  ...engineerCommands,
+  "/help": {
+    description: "/help — список всех команд",
     exec: () => {
-      return Object.values(walletCommands).map(c => "📌 " + c.description).join("\n");
+      const list = Object.values(allCommands).map(c => "📌 " + c.description);
+      return list.join("\n");
     }
   }
 };
 
+// === Обработчик ===
 async function handleWalletCommand(command) {
   const [cmd, ...args] = command.trim().split(/\s+/);
-  const c = walletCommands[cmd];
+  const c = allCommands[cmd];
   if (!c) return "❌ Неизвестная команда. Используй /help.";
   try {
     const result = await c.exec(args);
@@ -137,6 +173,7 @@ async function handleWalletCommand(command) {
   }
 }
 
+// === Вывод в терминал ===
 function printToTerminal(message, isError = false) {
   const output = document.getElementById("terminal-output");
   if (!output) return;
@@ -147,11 +184,11 @@ function printToTerminal(message, isError = false) {
   output.scrollTop = output.scrollHeight;
 }
 
-// История команд
+// === История команд ===
 let commandHistory = [];
 let historyIndex = -1;
 
-// Терминал — запуск после загрузки
+// === Запуск интерфейса ===
 window.addEventListener("DOMContentLoaded", () => {
   updateBalanceUI();
 
