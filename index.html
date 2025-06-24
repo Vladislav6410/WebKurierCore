@@ -261,6 +261,119 @@
 <script src="https://unpkg.com/dropbox/dist/Dropbox-sdk.min.js"></script>
 <script src="engine/dropbox.js"></script>
 <script src="engine/engineer.js"></script>
+<script src="wallet.js"></script> <!-- если используешь wallet.js --><script src="https://unpkg.com/dropbox/dist/Dropbox-sdk.min.js"></script>
+<script src="engine/dropbox.js"></script>
+<script src="engine/engineer.js"></script>
+<script src="dream.js"></script> <!-- подключаем DreamMaker -->
 <script src="wallet.js"></script> <!-- если используешь wallet.js -->
+
+<script>
+  window.addEventListener('load', () => {
+    // Прелоадер
+    document.getElementById('preloader').style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('preloader').style.display = 'none';
+      document.getElementById('terminal-input').focus();
+    }, 400);
+
+    // Тема
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-theme');
+    }
+
+    // Баланс
+    const coins = parseInt(localStorage.getItem('webcoin') || '0');
+    document.getElementById('webcoin-balance').textContent = `Баланс: ${coins} WKC`;
+  });
+
+  // ===== 🧠 DreamMaker UI Script =====
+  const screen = document.getElementById('screen');
+  const previewArea = document.getElementById('preview-area');
+  const chat = document.getElementById('chat');
+  const input = document.getElementById('chat-input');
+
+  function addMessage(text, who='bot') {
+    const div = document.createElement('div');
+    div.className = 'message';
+    div.textContent = text;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+    return div;
+  }
+
+  function addActions(msg) {
+    ['📋','🔊','👍','👎','📤'].forEach(ic => {
+      const btn = document.createElement('button');
+      btn.textContent = ic;
+      btn.onclick = () => console.log(ic, 'нажат');
+      msg.appendChild(btn);
+    });
+  }
+
+  function handleFile(type) {
+    const inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = type + '/*';
+    inp.onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      let el;
+      if (type === 'image') el = document.createElement('img');
+      if (type === 'video') el = document.createElement('video');
+      if (type === 'audio') el = document.createElement('audio');
+      el.src = url;
+      el.controls = true;
+      previewArea.innerHTML = '';
+      previewArea.appendChild(el);
+      addMessage(`🖼 Загружен ${type}: ${file.name}`);
+      window.lastMedia = window.lastMedia || {};
+      window.lastMedia[type] = file;
+    };
+    inp.click();
+  }
+
+  document.getElementById('btn-photo').onclick = () => handleFile('image');
+  document.getElementById('btn-video').onclick = () => handleFile('video');
+  document.getElementById('btn-audio').onclick = () => handleFile('audio');
+
+  document.getElementById('mic-btn').onclick = () => {
+    if (!('webkitSpeechRecognition' in window)) {
+      return addMessage('⚠️ Браузер не поддерживает голосовой ввод.');
+    }
+    const rec = new webkitSpeechRecognition();
+    rec.lang = 'ru-RU';
+    rec.onresult = e => input.value += e.results[0][0].transcript + ' ';
+    rec.onerror = e => addMessage('Ошибка распознавания: ' + e.error);
+    rec.start();
+  };
+
+  document.getElementById('send-btn').onclick = async () => {
+    const text = input.value.trim();
+    if (!text && !window.lastMedia) return;
+
+    addMessage('> ' + (text || '[медиа]'), 'user');
+    let botMsg = addMessage('🎬 Обрабатываю...');
+
+    if (window.lastMedia) {
+      const img = window.lastMedia.image;
+      const vid = window.lastMedia.video;
+      const aud = window.lastMedia.audio;
+
+      if (vid) botMsg.textContent = dreammaker.fromVideo(vid);
+      else if (img && aud) botMsg.textContent = dreammaker.animate(img, aud);
+      else if (aud && !img) botMsg.textContent = 'Укажите фото или видео вместе со звуком.';
+
+      window.lastMedia = {};
+    } else if (text) {
+      botMsg.textContent = dreammaker.voiceOver(text);
+    }
+
+    addActions(botMsg);
+    input.value = '';
+  };
+</script>
+</body>
+</html>
 </body>
 </html>
