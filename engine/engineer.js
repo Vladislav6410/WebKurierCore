@@ -3,6 +3,10 @@
 
 console.log("🔧 Engineer.js загружен");
 
+// 🔗 Dropbox-ссылка на общую папку (режим dl=1 для прямого доступа)
+const DROPBOX_BASE_URL = "https://www.dropbox.com/scl/fi";
+
+// === Обработка команд ===
 async function handleEngineerCommand(command) {
   const parts = command.trim().split(/\s+/);
   const cmd = parts[0];
@@ -10,7 +14,7 @@ async function handleEngineerCommand(command) {
 
   switch (cmd) {
     case "/help":
-      return "📘 Команды:\n/save, /load, /add [ключ], /config, /clear";
+      return "📘 Команды:\n/save, /load, /add [текст], /config, /clear";
 
     case "/save":
       return saveMemory();
@@ -19,7 +23,7 @@ async function handleEngineerCommand(command) {
       return loadMemory();
 
     case "/add":
-      if (!arg) return "❗ Укажи ключ для добавления.";
+      if (!arg) return "❗ Укажи текст для добавления.";
       return addMemoryEntry(arg);
 
     case "/config":
@@ -35,7 +39,7 @@ async function handleEngineerCommand(command) {
 }
 
 // === Работа с памятью ===
-async function saveMemory() {
+function saveMemory() {
   const data = {
     updated: new Date().toISOString(),
     notes: localStorage.getItem("engine_notes") || ""
@@ -44,10 +48,10 @@ async function saveMemory() {
   return "💾 Память сохранена.";
 }
 
-async function loadMemory() {
+function loadMemory() {
   const data = JSON.parse(localStorage.getItem("memory_data") || "{}");
   return data.notes
-    ? `📂 Память: ${data.notes}`
+    ? `📂 Память:\n${data.notes}`
     : "📂 Память пуста.";
 }
 
@@ -58,10 +62,11 @@ function addMemoryEntry(note) {
   return "✅ Запись добавлена.";
 }
 
-// === Работа с config.json ===
+// === Загрузка config.json из Dropbox ===
 async function loadConfig() {
+  const url = `${DROPBOX_BASE_URL}/r6dgaq7p74m6myuk57n4i/config.json?rlkey=z23boiy3e7qcr5ruahd81kz1j&st=ci8hqv4x&dl=1`;
   try {
-    const res = await fetch("engine/config.json");
+    const res = await fetch(url);
     const cfg = await res.json();
     return `⚙️ Config:\n` + JSON.stringify(cfg, null, 2);
   } catch (e) {
