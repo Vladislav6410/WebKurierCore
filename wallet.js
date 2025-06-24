@@ -1,240 +1,169 @@
-// === wallet.js — WebCoin Кошелёк Расширенный + Память Dropbox ===
+// === wallet.js — WebCoin Кошелёк + Dropbox Memory + DreamMaker ===
 
+// ① WALLET — баланс
 const WALLET_KEY = "webcoin_balance";
+function getBalance() { return parseInt(localStorage.getItem(WALLET_KEY) || "0", 10); }
+function setBalance(amount) { localStorage.setItem(WALLET_KEY, amount); updateBalanceUI(); }
+function addCoins(amount) { setBalance(getBalance() + amount); }
+function resetCoins() { setBalance(0); }
 
-// Получить текущий баланс
-function getBalance() {
-  return parseInt(localStorage.getItem(WALLET_KEY) || "0");
-}
-
-// Установить баланс и обновить интерфейс
-function setBalance(amount) {
-  localStorage.setItem(WALLET_KEY, amount);
-  updateBalanceUI();
-}
-
-// Добавить монеты
-function addCoins(amount) {
-  const current = getBalance();
-  setBalance(current + amount);
-}
-
-// Сбросить баланс
-function resetCoins() {
-  setBalance(0);
-}
-
-// Обновить все элементы, отображающие баланс
 function updateBalanceUI() {
   const amount = getBalance();
-  const elements = [
-    document.getElementById("balance"),
-    document.getElementById("webcoin-balance"),
-    document.getElementById("balance-display")
-  ];
-
-  elements.forEach(el => {
-    if (el) {
-      if (el.id === "balance") {
-        el.textContent = amount;
-      } else {
-        el.textContent = `Баланс: ${amount} WKC`;
-      }
-    }
+  ["balance","webcoin-balance","balance-display"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = id === "balance" ? amount : `Баланс: ${amount} WKC`;
   });
 }
 
-// === КОМАНДЫ WALLET ===
+// ② WALLET-Команды
 const walletCommands = {
-  "/add": {
-    description: "/add [число] — добавить монеты",
-    exec: (args) => {
-      const amount = parseInt(args[0] || "10", 10);
-      if (isNaN(amount) || amount <= 0) throw "Введите положительное число.";
-      addCoins(amount);
-      return `✅ Добавлено ${amount} WKC.`;
-    }
-  },
-  "/reset": {
-    description: "/reset — сбросить баланс",
-    exec: () => {
-      resetCoins();
-      return "🔁 Баланс сброшен.";
-    }
-  },
-  "/balance": {
-    description: "/balance — показать баланс",
-    exec: () => `💰 Баланс: ${getBalance()} WKC.`
-  },
-  "/set": {
-    description: "/set [число] — установить баланс",
-    exec: (args) => {
-      const amount = parseInt(args[0], 10);
-      if (isNaN(amount) || amount < 0) throw "Введите корректное число.";
-      setBalance(amount);
-      return `🔧 Баланс установлен: ${amount} WKC.`;
-    }
-  },
-  "/export": {
-    description: "/export — сохранить баланс в файл",
-    exec: () => {
-      const data = JSON.stringify({ balance: getBalance() });
-      const blob = new Blob([data], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "wallet.json";
-      a.click();
-      return "💾 Баланс сохранён.";
-    }
-  },
-  "/import": {
-    description: "/import — загрузить баланс из файла",
-    exec: () => {
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = ".json";
-      input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          try {
-            const data = JSON.parse(reader.result);
-            if (typeof data.balance === "number") {
-              setBalance(data.balance);
-              printToTerminal(`📥 Баланс загружен: ${data.balance} WKC`);
-            } else {
-              throw "Неверный формат.";
-            }
-          } catch (e) {
-            printToTerminal(`⚠️ Ошибка: ${e}`, true);
-          }
-        };
-        reader.readAsText(file);
-      };
-      input.click();
-      return "📂 Выберите файл.";
-    }
-  }
+  "/add": { description:"/add [число] — добавить монеты", exec: args => {
+    const amount = parseInt(args[0]||"10",10);
+    if (isNaN(amount)||amount<=0) throw "Введите положительное число.";
+    addCoins(amount);
+    return `✅ Добавлено ${amount} WKC.`;
+  }},
+  "/reset": { description:"/reset — сбросить баланс", exec: () => { resetCoins(); return "🔁 Баланс сброшен."; }},
+  "/balance": { description:"/balance — показать баланс", exec: () => `💰 Баланс: ${getBalance()} WKC.` },
+  "/set": { description:"/set [число] — установить баланс", exec: args => {
+    const amount = parseInt(args[0],10);
+    if (isNaN(amount)||amount<0) throw "Введите корректное число.";
+    setBalance(amount);
+    return `🔧 Баланс установлен: ${amount} WKC.`;
+  }},
+  "/export": { description:"/export — сохранить баланс в файл", exec: () => {
+    const data = JSON.stringify({ balance: getBalance() });
+    const blob = new Blob([data],{type:"application/json"});
+    const a = Object.assign(document.createElement("a"),{href:URL.createObjectURL(blob),download:"wallet.json"});
+    a.click();
+    return "💾 Баланс сохранён.";
+  }},
+  "/import": { description:"/import — загрузить баланс из файла", exec: () => {
+    const input = document.createElement("input");
+    input.type = "file"; input.accept = ".json";
+    input.onchange = e => {
+      const file = e.target.files[0]; if (!file) return;
+      new FileReader().addEventListener("load", ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (typeof data.balance === "number") {
+            setBalance(data.balance);
+            printToTerminal(`📥 Баланс загружен: ${data.balance} WKC`);
+          } else throw "Неверный формат.";
+        } catch (e) {
+          printToTerminal(`⚠️ Ошибка: ${e}`, true);
+        }
+      }).readAsText(file);
+    };
+    input.click();
+    return "📂 Выберите файл.";
+  }}
 };
 
-// === КОМАНДЫ ENGINEER (Dropbox + память) ===
+// ③ ENGINEER — Dropbox Memory команды (из engine/engineer.js)
 const engineerCommands = {
-  "/help": {
-    description: "/help — команды engineer.js",
-    exec: () => handleEngineerCommand("/help")
+  "/add-note": { description:"/add-note [текст] — добавить заметку", exec: args => handleEngineerCommand("/add "+args.join(" ")) },
+  "/save":     { description:"/save — сохранить заметки в Dropbox", exec: () => handleEngineerCommand("/save") },
+  "/load":     { description:"/load — загрузить заметки", exec: () => handleEngineerCommand("/load") },
+  "/config":   { description:"/config — загрузить конфиг", exec: () => handleEngineerCommand("/config") },
+  "/clear":    { description:"/clear — очистить память", exec: () => handleEngineerCommand("/clear") },
+};
+
+// ④ DREAMMAKER — генерация медиа
+const dreamCommands = {
+  "/dream-status": { description:"/dream-status — статус DreamMaker", exec: () => window.dreammaker?.status() || "❌ DreamMaker не загружен." },
+  "/dream-video":  { description:"/dream-video [имя_файла] — 3D из видео", exec: ([name]) =>
+    window.dreammaker ? window.dreammaker.fromVideo({name}) : "❌ Нет DreamMaker."
   },
-  "/add-note": {
-    description: "/add-note [текст] — добавить заметку",
-    exec: (args) => handleEngineerCommand("/add " + args.join(" "))
+  "/dream-photo":  { description:"/dream-photo [фото] [аудио] — оживить фото", exec: ([p,a]) =>
+    window.dreammaker ? window.dreammaker.animate({name:p},{name:a}) : "❌ Нет DreamMaker."
   },
-  "/save": {
-    description: "/save — сохранить память в Dropbox",
-    exec: () => handleEngineerCommand("/save")
-  },
-  "/load": {
-    description: "/load — загрузить память из Dropbox",
-    exec: () => handleEngineerCommand("/load")
-  },
-  "/config": {
-    description: "/config — загрузить конфиг",
-    exec: () => handleEngineerCommand("/config")
-  },
-  "/clear": {
-    description: "/clear — очистить память",
-    exec: () => handleEngineerCommand("/clear")
+  "/dream-voice":  { description:"/dream-voice [текст] — озвучить текст", exec: ([...txt]) =>
+    window.dreammaker ? window.dreammaker.voiceOver(txt.join(" ")) : "❌ Нет DreamMaker."
   }
 };
 
-// === Объединение всех команд ===
+// ⑤ ВСЕ КОМАНДЫ вместе
 const allCommands = {
   ...walletCommands,
   ...engineerCommands,
-  "/help": {
-    description: "/help — список всех команд",
-    exec: () => {
-      const list = Object.values(allCommands).map(c => "📌 " + c.description);
-      return list.join("\n");
-    }
+  ...dreamCommands,
+  "/help": { description:"/help — список всех команд", exec: () =>
+    Object.entries(allCommands).map(([c,o])=>`${c}: ${o.description}`).join("\n")
   }
 };
 
-// === Обработчик ===
+// ⑥ ОБРАБОТЧИК команд
 async function handleWalletCommand(command) {
   const [cmd, ...args] = command.trim().split(/\s+/);
-  const c = allCommands[cmd];
-  if (!c) return "❌ Неизвестная команда. Используй /help.";
+  const entry = allCommands[cmd];
+  if (!entry) return "❌ Неизвестная команда. Используй /help.";
   try {
-    const result = await c.exec(args);
-    return result;
+    const res = await entry.exec(args);
+    return res;
   } catch (e) {
     return `⚠️ ${e}`;
   }
 }
 
-// === Вывод в терминал ===
-function printToTerminal(message, isError = false) {
-  const output = document.getElementById("terminal-output");
-  if (!output) return;
+// ⑦ Вывод в терминал
+function printToTerminal(msg, isError=false) {
+  const out = document.getElementById("terminal-output");
+  if (!out) return;
   const line = document.createElement("div");
-  line.textContent = message;
+  line.textContent = msg;
   line.style.color = isError ? "red" : "lime";
-  output.appendChild(line);
-  output.scrollTop = output.scrollHeight;
+  out.appendChild(line);
+  out.scrollTop = out.scrollHeight;
 }
 
-// === История команд ===
-let commandHistory = [];
-let historyIndex = -1;
+// ⑧ История
+let commandHistory = [], historyIndex = -1;
 
-// === Запуск интерфейса ===
+// ⑨ Запуск интерфейса
 window.addEventListener("DOMContentLoaded", () => {
-  // 📥 Автозагрузка памяти и конфигурации из Dropbox
+  // Автозагрузка памяти и конфига
   if (typeof handleEngineerCommand === "function") {
     handleEngineerCommand("/load").then(printToTerminal);
     handleEngineerCommand("/config").then(printToTerminal);
   }
-
   updateBalanceUI();
 
   const input = document.getElementById("terminal-input");
-  const executeBtn = document.getElementById("execute-command");
+  const btn   = document.getElementById("execute-command");
 
-  async function runCommand() {
+  async function run() {
     const cmd = input.value.trim();
     if (!cmd) return;
     printToTerminal("> " + cmd);
     commandHistory.unshift(cmd);
-    commandHistory = commandHistory.slice(0, 10);
+    if (commandHistory.length>50) commandHistory.pop();
     historyIndex = -1;
-    const result = await handleWalletCommand(cmd);
-    printToTerminal(result, result.startsWith("⚠️") || result.startsWith("❌"));
+    const res = await handleWalletCommand(cmd);
+    printToTerminal(res, res.startsWith("⚠️")||res.startsWith("❌"));
     updateBalanceUI();
     input.value = "";
   }
 
-  if (executeBtn) executeBtn.onclick = runCommand;
-
-  if (input) {
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") runCommand();
-      else if (e.key === "ArrowUp") {
-        if (commandHistory.length > 0) {
-          historyIndex = Math.min(historyIndex + 1, commandHistory.length - 1);
-          input.value = commandHistory[historyIndex];
-        }
-        e.preventDefault();
-      } else if (e.key === "ArrowDown") {
-        if (historyIndex > 0) {
-          historyIndex--;
-          input.value = commandHistory[historyIndex];
-        } else {
-          historyIndex = -1;
-          input.value = "";
-        }
-        e.preventDefault();
+  btn?.addEventListener("click", run);
+  input?.addEventListener("keydown", e => {
+    if (e.key === "Enter") run();
+    if (e.key === "ArrowUp") {
+      if (commandHistory.length && historyIndex < commandHistory.length-1) {
+        historyIndex++;
+        input.value = commandHistory[historyIndex];
       }
-    });
-  }
+      e.preventDefault();
+    }
+    if (e.key === "ArrowDown") {
+      if (historyIndex > 0) {
+        historyIndex--;
+        input.value = commandHistory[historyIndex];
+      } else {
+        historyIndex = -1;
+        input.value = "";
+      }
+      e.preventDefault();
+    }
+  });
 });
