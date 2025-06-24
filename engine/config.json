@@ -1,1 +1,12 @@
-#
+{
+  "version": "1.0",
+  "project": "WebKurierCore",
+  "admin_id": "123456789",
+  "language": "ru",
+  "features": {
+    "webcoin": true,
+    "terminal": true,
+    "dropbox": true,
+    "memory": true
+  }
+}
