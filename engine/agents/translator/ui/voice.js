@@ -1,13 +1,21 @@
 // voice.js
 console.log("🎙 Voice module loaded");
 
+// 🎧 Озвучивание перевода
+function speakOutput() {
+  const output = document.getElementById("output").textContent;
+  const utterance = new SpeechSynthesisUtterance(output);
+  utterance.lang = document.getElementById("targetLang").value || "en";
+  speechSynthesis.speak(utterance);
+}
+
+// 🎤 Голосовой ввод (Speech-to-Text)
 const micButton = document.getElementById("mic-button");
-const sourceInput = document.getElementById("source-text");
+const inputField = document.getElementById("inputText");
 
 let recognition;
 let isListening = false;
 
-// Проверка поддержки браузером
 if (!("webkitSpeechRecognition" in window)) {
   micButton.disabled = true;
   micButton.title = "🎤 Браузер не поддерживает голосовой ввод";
@@ -23,7 +31,7 @@ if (!("webkitSpeechRecognition" in window)) {
 
   recognition.onresult = (event) => {
     const transcript = event.results[0][0].transcript;
-    sourceInput.value += (sourceInput.value ? " " : "") + transcript;
+    inputField.value += (inputField.value ? " " : "") + transcript;
     micButton.textContent = "🎤";
     isListening = false;
   };
@@ -35,16 +43,15 @@ if (!("webkitSpeechRecognition" in window)) {
   };
 
   recognition.onend = () => {
-    if (isListening) micButton.textContent = "🎤";
+    micButton.textContent = "🎤";
     isListening = false;
   };
 
-  // Старт/стоп по нажатию
   micButton.addEventListener("click", () => {
     if (isListening) {
       recognition.stop();
     } else {
-      recognition.lang = document.getElementById("language-select").value || "en";
+      recognition.lang = document.getElementById("sourceLang").value || "auto";
       recognition.start();
     }
   });
