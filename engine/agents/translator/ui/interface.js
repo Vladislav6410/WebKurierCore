@@ -135,4 +135,23 @@ function copyOutput() {
 function clearAll() {
   document.getElementById("inputText").value = "";
   document.getElementById("output").textContent = "Здесь будет перевод...";
+}function handleFileUpload() {
+  const fileInput = document.getElementById('fileInput');
+  const file = fileInput.files[0];
+  if (!file) return alert("Файл не выбран.");
+
+  const reader = new FileReader();
+
+  reader.onload = function (e) {
+    const text = e.target.result;
+    document.getElementById('inputText').value = text;
+    translateText(); // Автоматический перевод после загрузки
+  };
+
+  if (file.type.startsWith('image/')) {
+    alert("📷 Распознавание текста из изображений пока не реализовано.");
+    // Будет добавлено позже: OCR-модуль
+  } else {
+    reader.readAsText(file);
+  }
 }
