@@ -1,1 +1,23 @@
-dfj
+{
+  "version": "1.0.0",
+  "name": "WebKurierCore",
+  "engine": "v1.0",
+  "timezone": "Europe/Berlin",
+  "language": "ru",
+  "modules": {
+    "memory": true,
+    "logs": true,
+    "agents": true,
+    "terminal": true,
+    "wallet": true,
+    "dropbox": true,
+    "voice": true
+  },
+  "default_agent": "geodesy-agent",
+  "logging": {
+    "level": "info",
+    "file": "/engine/logs/activity.log"
+  },
+  "autosave_interval": 300,
+  "backup_enabled": true
+}
