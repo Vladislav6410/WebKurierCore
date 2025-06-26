@@ -80,4 +80,59 @@ swapButton.addEventListener("click", () => {
 // Подключение событий
 translateButton.addEventListener("click", translateText);
 languageSelect.addEventListener("change", () => resultOutput.value = "");
-document.addEventListener("DOMContentLoaded", populateLanguages);
+document.addEventListener("DOMContentLoaded", populateLanguages);// 📌 Выполнить перевод
+function performTranslation() {
+  const inputText = document.getElementById("inputText").value.trim();
+  const sourceLang = document.getElementById("sourceLang").value;
+  const targetLang = document.getElementById("targetLang").value;
+  const outputDiv = document.getElementById("output");
+
+  if (!inputText) {
+    outputDiv.textContent = "⚠️ Введите текст для перевода.";
+    return;
+  }
+
+  outputDiv.textContent = "🔄 Перевожу...";
+
+  fetch("https://libretranslate.de/translate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      q: inputText,
+      source: sourceLang,
+      target: targetLang,
+      format: "text"
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      outputDiv.textContent = data.translatedText || "❌ Перевод не выполнен.";
+    })
+    .catch(err => {
+      console.error(err);
+      outputDiv.textContent = "❌ Ошибка при переводе.";
+    });
+}
+
+// 📌 Озвучить результат
+function speakOutput() {
+  const text = document.getElementById("output").textContent;
+  if (!text) return;
+  const utterance = new SpeechSynthesisUtterance(text);
+  speechSynthesis.speak(utterance);
+}
+
+// 📌 Копировать результат
+function copyOutput() {
+  const text = document.getElementById("output").textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    alert("✅ Текст скопирован.");
+  });
+}
+
+// 📌 Очистить всё
+function clearAll() {
+  document.getElementById("inputText").value = "";
+  document.getElementById("output").textContent = "Здесь будет перевод...";
+}
