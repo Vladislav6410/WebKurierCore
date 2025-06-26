@@ -1,1 +1,25 @@
-fgh
+{
+  "admin": {
+    "permissions": [
+      "read",
+      "write",
+      "delete",
+      "manage_users",
+      "access_logs",
+      "configure_system"
+    ]
+  },
+  "client": {
+    "permissions": [
+      "read",
+      "write",
+      "submit_tasks",
+      "view_balance"
+    ]
+  },
+  "guest": {
+    "permissions": [
+      "read"
+    ]
+  }
+}
