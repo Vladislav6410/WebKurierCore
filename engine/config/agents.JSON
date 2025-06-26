@@ -1,1 +1,9 @@
-fgjj
+{
+  "intelligence": "intelligence-agent.js",
+  "drone": "drone-agent.js",
+  "designer": "designer-agent.js",
+  "marketing": "marketing-agent.js",
+  "voice": "voice-agent.js",
+  "techsupport": "techsupport-agent.js",
+  "programmer": "programmer-agent.js"
+}
