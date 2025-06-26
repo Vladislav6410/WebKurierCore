@@ -1,4 +1,3 @@
-// interface.js
 console.log("🌐 Translator Interface loaded");
 
 const sourceInput = document.getElementById("source-text");
@@ -9,7 +8,7 @@ const copyButton = document.getElementById("copy-button");
 const speakerButton = document.getElementById("speaker-button");
 const swapButton = document.getElementById("swap-button");
 
-// Поддерживаемые языки (можно расширить)
+// Поддерживаемые языки
 const languages = {
   "en": "English",
   "ru": "Русский",
@@ -31,7 +30,7 @@ function populateLanguages() {
   }
 }
 
-// Отправка текста на перевод (использует LibreTranslate, можно заменить)
+// Перевод текста
 async function translateText() {
   const text = sourceInput.value.trim();
   const targetLang = languageSelect.value;
@@ -56,31 +55,8 @@ async function translateText() {
   resultOutput.value = data.translatedText || "❌ Ошибка перевода";
 }
 
-// Кнопка "Копировать"
-copyButton.addEventListener("click", () => {
-  navigator.clipboard.writeText(resultOutput.value);
-  copyButton.textContent = "✅ Скопировано!";
-  setTimeout(() => copyButton.textContent = "📋", 1500);
-});
+// Дополнительные функции
 
-// Кнопка "Озвучить"
-speakerButton.addEventListener("click", () => {
-  const utterance = new SpeechSynthesisUtterance(resultOutput.value);
-  utterance.lang = languageSelect.value;
-  speechSynthesis.speak(utterance);
-});
-
-// Кнопка "Сменить текст ↔ перевод"
-swapButton.addEventListener("click", () => {
-  const temp = sourceInput.value;
-  sourceInput.value = resultOutput.value;
-  resultOutput.value = temp;
-});
-
-// Подключение событий
-translateButton.addEventListener("click", translateText);
-languageSelect.addEventListener("change", () => resultOutput.value = "");
-document.addEventListener("DOMContentLoaded", populateLanguages);// 📌 Выполнить перевод
 function performTranslation() {
   const inputText = document.getElementById("inputText").value.trim();
   const sourceLang = document.getElementById("sourceLang").value;
@@ -114,7 +90,6 @@ function performTranslation() {
     });
 }
 
-// 📌 Озвучить результат
 function speakOutput() {
   const text = document.getElementById("output").textContent;
   if (!text) return;
@@ -122,7 +97,6 @@ function speakOutput() {
   speechSynthesis.speak(utterance);
 }
 
-// 📌 Копировать результат
 function copyOutput() {
   const text = document.getElementById("output").textContent;
   if (!text) return;
@@ -131,11 +105,12 @@ function copyOutput() {
   });
 }
 
-// 📌 Очистить всё
 function clearAll() {
   document.getElementById("inputText").value = "";
   document.getElementById("output").textContent = "Здесь будет перевод...";
-}function handleFileUpload() {
+}
+
+function handleFileUpload() {
   const fileInput = document.getElementById('fileInput');
   const file = fileInput.files[0];
   if (!file) return alert("Файл не выбран.");
@@ -145,13 +120,35 @@ function clearAll() {
   reader.onload = function (e) {
     const text = e.target.result;
     document.getElementById('inputText').value = text;
-    translateText(); // Автоматический перевод после загрузки
+    translateText();
   };
 
   if (file.type.startsWith('image/')) {
     alert("📷 Распознавание текста из изображений пока не реализовано.");
-    // Будет добавлено позже: OCR-модуль
   } else {
     reader.readAsText(file);
   }
 }
+
+// Обработчики событий
+copyButton?.addEventListener("click", () => {
+  navigator.clipboard.writeText(resultOutput.value);
+  copyButton.textContent = "✅ Скопировано!";
+  setTimeout(() => copyButton.textContent = "📋", 1500);
+});
+
+speakerButton?.addEventListener("click", () => {
+  const utterance = new SpeechSynthesisUtterance(resultOutput.value);
+  utterance.lang = languageSelect.value;
+  speechSynthesis.speak(utterance);
+});
+
+swapButton?.addEventListener("click", () => {
+  const temp = sourceInput.value;
+  sourceInput.value = resultOutput.value;
+  resultOutput.value = temp;
+});
+
+translateButton?.addEventListener("click", translateText);
+languageSelect?.addEventListener("change", () => resultOutput.value = "");
+document.addEventListener("DOMContentLoaded", populateLanguages);
