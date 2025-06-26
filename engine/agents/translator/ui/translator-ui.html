@@ -24,7 +24,8 @@
     }
     .toolbar {
       display: flex;
-      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
       margin-bottom: 10px;
     }
     .toolbar button, .toolbar select {
@@ -43,7 +44,6 @@
       <option value="ru">Russian</option>
       <option value="de">German</option>
       <option value="pl">Polish</option>
-      <!-- Добавим больше по мере необходимости -->
     </select>
 
     <select id="targetLang">
@@ -57,7 +57,7 @@
   <textarea id="inputText" placeholder="Введите текст или вставьте документ..."></textarea>
 
   <div class="toolbar">
-    <button onclick="translateText()">🔁 Перевести</button>
+    <button onclick="performTranslation()">🔁 Перевести</button>
     <button onclick="speakOutput()">🔊 Озвучить</button>
     <button onclick="copyOutput()">📋 Копировать</button>
     <button onclick="clearAll()">🧹 Очистить</button>
