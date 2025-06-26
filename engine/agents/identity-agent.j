@@ -7,7 +7,6 @@ export const IdentityAgent = {
   version: "1.1.0",
 
   knownIDs: ["KURIER-X", "ALLY-17", "DRONE-42"],
-  telemetryLink: null, // сюда можно подставить связь с drone-agent или GPS
 
   commands: {
     "/scan": () => {
@@ -43,8 +42,10 @@ export const IdentityAgent = {
   },
 
   fetchTelemetryIDs: function () {
-    // Здесь имитация данных. В будущем подключим GPS/сенсоры/дрон
-    return ["ALLY-17", "UNKNOWN-DRONE"];
+    if (typeof TelemetryAgent !== "undefined" && TelemetryAgent.getDetectedIDs) {
+      return TelemetryAgent.getDetectedIDs();
+    }
+    return ["❗ TelemetryAgent недоступен"];
   },
 
   handleCommand: function (cmd) {
