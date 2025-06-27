@@ -1,1 +1,26 @@
-спро
+{
+  "walletName": "WebCoin",
+  "currency": "WKC",
+  "initialBalance": 0,
+  "maxBalance": 100000,
+  "minTransaction": 1,
+  "maxTransaction": 10000,
+  "autoSave": true,
+  "saveLocation": "localStorage",
+  "historyEnabled": true,
+  "historyLimit": 100,
+  "ui": {
+    "showBalance": true,
+    "buttons": ["+10", "Сброс", "Экспорт", "Импорт"],
+    "theme": "auto"
+  },
+  "security": {
+    "requireConfirmation": true,
+    "allowNegativeBalance": false
+  },
+  "backup": {
+    "enabled": true,
+    "format": "json",
+    "fileName": "wallet-backup.json"
+  }
+}
