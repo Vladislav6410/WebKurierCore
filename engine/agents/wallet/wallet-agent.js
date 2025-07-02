@@ -1,4 +1,4 @@
-// === wallet-agent.js — WebCoin Кошелёк (модуль) ===
+import config from "./wallet-config.json" assert { type: "json" };// === wallet-agent.js — WebCoin Кошелёк (модуль) ===
 
 // === ① Баланс ===
 const WALLET_KEY = "webcoin_balance";
