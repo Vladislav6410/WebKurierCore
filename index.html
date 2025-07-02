@@ -2,83 +2,261 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WebKurierCore</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="WebKurier: терминал, кошелёк, офлайн-доступ">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <style>
+    :root {
+      --bg-light: #f4f4f4;
+      --bg-dark: #121212;
+      --text-light: #222;
+      --text-dark: #f4f4f4;
+      --accent-light: #ccc;
+      --accent-dark: #444;
+      --green: #0f0;
+      --red: #f33;
+    }
     body {
       font-family: monospace;
-      background-color: #181818;
-      color: #fff;
-      margin: 0;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      text-align: center;
       padding: 20px;
+      margin: 0;
+      transition: background-color 0.3s, color 0.3s;
     }
-
-    #terminal-output {
-      white-space: pre-line;
-      background: #111;
-      color: #eee;
-      padding: 10px;
-      height: 200px;
-      overflow-y: auto;
-      border: 1px solid #333;
-      border-radius: 5px;
+    body.dark-theme {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
     }
-
-    #terminal-input {
-      flex: 1;
-      padding: 8px;
-      border-radius: 4px;
-      border: 1px solid #444;
-      background: #222;
-      color: #eee;
+    .toggle-theme {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 8px 12px;
+      background: var(--accent-light);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      border: none;
+      z-index: 10001;
     }
-
-    #terminal-section {
+    body.dark-theme .toggle-theme {
+      background: var(--accent-dark);
+    }
+    #preloader {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-light);
+      z-index: 9999;
+      top: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s;
+    }
+    body.dark-theme #preloader {
+      background: var(--bg-dark);
+    }
+    .loader {
+      width: 40px;
+      height: 40px;
+      border: 5px solid #ccc;
+      border-top-color: #333;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .wallet {
       margin-top: 30px;
       padding: 20px;
-      background: #1c1c1c;
-      color: white;
+      border: 1px solid #aaa;
       border-radius: 8px;
+      display: inline-block;
+      background: rgba(255,255,255,0.05);
     }
-
-    #terminal-buttons {
-      margin-top: 10px;
-      display: flex;
-      gap: 10px;
+    .wallet h2 { margin-bottom: 10px; }
+    .wallet .balance {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
     }
-
-    button {
-      padding: 8px 12px;
-      background: #333;
-      color: white;
-      border: 1px solid #555;
-      border-radius: 4px;
+    .wallet button {
+      padding: 8px 16px;
+      font-size: 14px;
       cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background-color: #06c;
+      color: white;
+      transition: background 0.2s;
+      margin: 4px;
     }
-
-    button:hover {
+    .wallet button:hover {
+      background-color: #0057a6;
+    }
+    .terminal {
+      margin-top: 30px;
+      padding: 20px;
+      background: #000;
+      color: var(--green);
+      font-family: monospace;
+      border-radius: 8px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
+    .terminal input {
+      width: 100%;
+      padding: 6px;
+      margin-top: 8px;
+      background: #111;
+      color: var(--green);
+      border: none;
+      outline: none;
+      font-family: monospace;
+      border-radius: 4px;
+    }
+    #terminal-log {
+      margin-top: 12px;
+      min-height: 60px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    #terminal-log div {
+      white-space: pre-wrap;
+    }
+    .terminal-buttons {
+      margin-top: 10px;
+      text-align: center;
+    }
+    .terminal-buttons button {
+      margin: 4px;
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 6px;
+      border: none;
       background: #444;
+      color: white;
+    }
+    body.dark-theme .terminal-buttons button {
+      background: #666;
+    }
+    a {
+      color: #06c;
     }
   </style>
 </head>
 <body>
+  <div id="preloader"><div class="loader"></div></div>
 
-  <h1>WebKurierCore</h1>
-  <p>Добро пожаловать в систему WebKurierCore. Используй терминал ниже для управления агентами и балансом.</p>
+  <button class="toggle-theme" onclick="toggleTheme()">Сменить тему</button>
 
-  <!-- === Терминал WebKurier === -->
-  <div id="terminal-section">
-    <div id="terminal-output"></div>
+  <h1>🌐 WebKurierCore</h1>
+  <p>Добро пожаловать в автономный интерфейс WebKurier: терминал, кошелёк, Telegram-связь.</p>
 
-    <div id="terminal-buttons">
-      <input id="terminal-input" type="text" placeholder="Введи команду..." />
-      <button id="execute-command">▶️</button>
-      <button id="copy-command">📋</button>
-    </div>
+  <!-- Кошелёк -->
+  <div class="wallet">
+    <h2>💰 WebCoin-кошелёк</h2>
+    <div class="balance" id="webcoin-balance">Баланс: 0 WKC</div>
+    <button onclick="addCoins(10)">+10 WKC</button>
+    <button onclick="resetCoins()">Сброс</button>
   </div>
 
-  <!-- === Скрипты === -->
-  <script type="module" src="terminal-v2.js"></script>
+  <!-- Терминал -->
+  <div class="terminal">
+    <div>> WebKurier Terminal v1.0</div>
+    <input type="text" id="terminal-input" placeholder="Введи команду...">
+    <div id="terminal-log"></div>
+  </div>
 
+  <!-- Кнопки терминала -->
+  <div class="terminal-buttons">
+    <button onclick="runTerminalCommand()">⏎ Пуск</button>
+    <button onclick="openFilePicker()">📁 Файлы</button>
+    <button onclick="openTools()">🛠 Инструменты</button>
+    <button onclick="copyTerminalInput()">📋 Копировать</button>
+  </div>
+
+  <!-- Telegram -->
+  <h2>🔗 Telegram</h2>
+  <p><a href="https://t.me/WebKurierBot" target="_blank">@WebKurierBot</a></p>
+
+  <!-- Скрипты -->
+  <script src="wallet.js"></script>
+  <script type="module" src="engine/agents/terminal/terminal-v2.js"></script>
+  <script src="https://unpkg.com/dropbox/dist/Dropbox-sdk.min.js"></script>
+  <script src="engine/dropbox.js"></script>
+  <script src="engine/engineer.js"></script>
+  <script src="engine/dream.js"></script>
+
+  <!-- DreamMaker UI -->
+  <div id="screen"></div>
+  <div id="preview-area"></div>
+  <div id="chat"></div>
+  <div class="chat-toolbar">
+    <button id="btn-photo">📷</button>
+    <button id="btn-video">🎞</button>
+    <button id="btn-audio">🎵</button>
+    <textarea id="chat-input" placeholder="Скажи или напиши…"></textarea>
+    <button id="mic-btn">🎤</button>
+    <button id="send-btn">➤</button>
+  </div>
+
+  <!-- JS для темы, баланса, кнопок -->
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle('dark-theme');
+      localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+    }
+    function addCoins(amount) {
+      let current = parseInt(localStorage.getItem('webcoin') || '0');
+      current += amount;
+      localStorage.setItem('webcoin', current);
+      document.getElementById('webcoin-balance').textContent = `Баланс: ${current} WKC`;
+    }
+    function resetCoins() {
+      localStorage.setItem('webcoin', '0');
+      document.getElementById('webcoin-balance').textContent = `Баланс: 0 WKC`;
+    }
+    function runTerminalCommand() {
+      const e = new KeyboardEvent('keydown', { key: 'Enter' });
+      document.getElementById('terminal-input').dispatchEvent(e);
+    }
+    function openFilePicker() {
+      const inp = document.createElement('input');
+      inp.type = 'file';
+      inp.click();
+    }
+    function openTools() {
+      alert("🛠 Инструменты скоро будут добавлены.");
+    }
+    function copyTerminalInput() {
+      const input = document.getElementById('terminal-input');
+      navigator.clipboard.writeText(input.value);
+    }
+
+    // Прелоадер и тема
+    window.addEventListener('load', () => {
+      document.getElementById('preloader').style.opacity = '0';
+      setTimeout(() => {
+        document.getElementById('preloader').style.display = 'none';
+        document.getElementById('terminal-input').focus();
+      }, 400);
+
+      if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-theme');
+      }
+
+      const coins = parseInt(localStorage.getItem('webcoin') || '0', 10);
+      document.getElementById('webcoin-balance').textContent = `Баланс: ${coins} WKC`;
+    });
+  </script>
 </body>
 </html>
