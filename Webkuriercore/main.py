@@ -2,14 +2,14 @@
 
 import telebot
 from config import BOT_TOKEN
-from handlers import register_handlers
+import handlers
 
 # Инициализация бота
 bot = telebot.TeleBot(BOT_TOKEN)
 
-# Регистрация команд и логики
-register_handlers(bot)
+# Инициализация обработчиков (передаём бота внутрь handlers)
+handlers.init(bot)
 
 # Запуск бота
-print("✅ Бот запущен. Ожидает команды в Telegram...")
+print("✅ WebKurierCoreBot запущен. Ожидает команды в Telegram...")
 bot.polling(none_stop=True)
