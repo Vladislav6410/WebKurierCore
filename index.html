@@ -1,258 +1,192 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="WebKurier: терминал, кошелёк, офлайн-доступ">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <style>
-    :root {
-      --bg-light: #f4f4f4;
-      --bg-dark: #121212;
-      --text-light: #222;
-      --text-dark: #f4f4f4;
-      --accent-light: #ccc;
-      --accent-dark: #444;
-      --green: #0f0;
-      --red: #f33;
-    }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="WebKurier: терминал, кошелёк, офлайн-доступ">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <style>
+    :root {
+      --bg-light: #f4f4f4;
+      --bg-dark: #121212;
+      --text-light: #222;
+      --text-dark: #f4f4f4;
+      --accent-light: #ccc;
+      --accent-dark: #444;
+      --green: #0f0;
+      --red: #f33;
+    }
 
-    body {
-      font-family: monospace;
-      background-color: var(--bg-light);
-      color: var(--text-light);
-      text-align: center;
-      padding: 20px;
-      margin: 0;
-      transition: background-color 0.3s, color 0.3s;
-    }
+    body {
+      font-family: monospace;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+      transition: background-color 0.3s, color 0.3s;
+    }
 
-    body.dark-theme {
-      background-color: var(--bg-dark);
-      color: var(--text-dark);
-    }
+    body.dark-theme {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
 
-    .toggle-theme {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 8px 12px;
-      background: var(--accent-light);
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      border: none;
-      z-index: 10001;
-    }
+    .toggle-theme {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 8px 12px;
+      background: var(--accent-light);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      border: none;
+      z-index: 10001;
+    }
 
-    body.dark-theme .toggle-theme {
-      background: var(--accent-dark);
-    }
+    body.dark-theme .toggle-theme {
+      background: var(--accent-dark);
+    }
 
-    #preloader {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      background: var(--bg-light);
-      z-index: 9999;
-      top: 0;
-      left: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 0.5s;
-    }
+    #preloader {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-light);
+      z-index: 9999;
+      top: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s;
+    }
 
-    body.dark-theme #preloader {
-      background: var(--bg-dark);
-    }
+    body.dark-theme #preloader {
+      background: var(--bg-dark);
+    }
 
-    .loader {
-      width: 40px;
-      height: 40px;
-      border: 5px solid #ccc;
-      border-top-color: #333;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
+    .loader {
+      width: 40px;
+      height: 40px;
+      border: 5px solid #ccc;
+      border-top-color: #333;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
 
-    .wallet {
-      margin-top: 30px;
-      padding: 20px;
-      border: 1px solid #aaa;
-      border-radius: 8px;
-      display: inline-block;
-      background: rgba(255,255,255,0.05);
-    }
+    .wallet {
+      margin-top: 30px;
+      padding: 20px;
+      border: 1px solid #aaa;
+      border-radius: 8px;
+      display: inline-block;
+      background: rgba(255,255,255,0.05);
+    }
 
-    .wallet h2 { margin-bottom: 10px; }
-    .wallet .balance {
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
+    .wallet h2 { margin-bottom: 10px; }
+    .wallet .balance {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
 
-    .wallet button {
-      padding: 8px 16px;
-      font-size: 14px;
-      cursor: pointer;
-      border: none;
-      border-radius: 6px;
-      background-color: #06c;
-      color: white;
-      transition: background 0.2s;
-      margin: 4px;
-    }
+    .wallet button {
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background-color: #06c;
+      color: white;
+      transition: background 0.2s;
+      margin: 4px;
+    }
 
-    .wallet button:hover {
-      background-color: #0057a6;
-    }
+    .wallet button:hover {
+      background-color: #0057a6;
+    }
 
-    .terminal {
-      margin-top: 30px;
-      padding: 20px;
-      background: #000;
-      color: var(--green);
-      font-family: monospace;
-      border-radius: 8px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      text-align: left;
-    }
+    .terminal {
+      margin-top: 30px;
+      padding: 20px;
+      background: #000;
+      color: var(--green);
+      font-family: monospace;
+      border-radius: 8px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
 
-    .terminal input {
-      width: 100%;
-      padding: 6px;
-      margin-top: 8px;
-      background: #111;
-      color: var(--green);
-      border: none;
-      outline: none;
-      font-family: monospace;
-      border-radius: 4px;
-    }
+    .terminal input {
+      width: 100%;
+      padding: 6px;
+      margin-top: 8px;
+      background: #111;
+      color: var(--green);
+      border: none;
+      outline: none;
+      font-family: monospace;
+      border-radius: 4px;
+    }
 
-    #terminal-log {
-      margin-top: 12px;
-      min-height: 60px;
-      max-height: 200px;
-      overflow-y: auto;
-    }
+    #terminal-log {
+      margin-top: 12px;
+      min-height: 60px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
 
-    #terminal-log div {
-      white-space: pre-wrap;
-    }
+    #terminal-log div {
+      white-space: pre-wrap;
+    }
 
-    a {
-      color: #06c;
-    }
-  </style>
+    a {
+      color: #06c;
+    }
+  </style>
 </head>
 <body>
-  <div id="preloader"><div class="loader"></div></div>
+  <div id="preloader"><div class="loader"></div></div>
 
-  <button class="toggle-theme" onclick="toggleTheme()">Сменить тему</button>
+  <button class="toggle-theme" onclick="toggleTheme()">Сменить тему</button>
 
-  <h1>🌐 WebKurierCore</h1>
-  <p>Добро пожаловать в автономный интерфейс WebKurier: терминал, кошелёк, Telegram-связь.</p>
+  <h1>🌐 WebKurierCore</h1>
+  <p>Добро пожаловать в автономный интерфейс WebKurier: терминал, кошелёк, Telegram-связь.</p>
 
-  <!-- Кошелёк -->
-  <div class="wallet">
-    <h2>💰 WebCoin-кошелёк</h2>
-    <div class="balance" id="webcoin-balance">Баланс: 0 WKC</div>
-    <button onclick="addCoins(10)">+10 WKC</button>
-    <button onclick="resetCoins()">Сброс</button>
-  </div>
+  <!-- Кошелёк -->
+  <div class="wallet">
+    <h2>💰 WebCoin-кошелёк</h2>
+    <div class="balance" id="webcoin-balance">Баланс: 0 WKC</div>
+    <!-- UI-кнопки будут сгенерированы здесь -->
+    <div id="wallet-ui"></div>
+  </div>
 
-  <!-- Терминал -->
-  <div class="terminal">
-    <div>> WebKurier Terminal v1.0</div>
-    <input type="text" id="terminal-input" placeholder="Введи команду..." onkeydown="handleCommand(event)">
-    <div id="terminal-log"></div>
-  </div>
+  <!-- Терминал -->
+  <div class="terminal">
+    <div>> WebKurier Terminal v1.0</div>
+    <input type="text" id="terminal-input" placeholder="Введи команду...">
+    <div id="terminal-log"></div>
+  </div>
 
-  <!-- Telegram -->
-  <h2>🔗 Telegram</h2>
-  <p><a href="https://t.me/WebKurierBot" target="_blank">@WebKurierBot</a></p>
+  <!-- Telegram -->
+  <h2>🔗 Telegram</h2>
+  <p><a href="https://t.me/WebKurierBot" target="_blank">@WebKurierBot</a></p>
 
-  <!-- Скрипты -->
-  <script src="wallet.js"></script>
-  <script src="terminal.js"></script>
-  <script>
-    function toggleTheme() {
-      document.body.classList.toggle('dark-theme');
-      localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-    }
-
-    function addCoins(amount) {
-      let current = parseInt(localStorage.getItem('webcoin') || '0');
-      current += amount;
-      localStorage.setItem('webcoin', current);
-      document.getElementById('webcoin-balance').textContent = `Баланс: ${current} WKC`;
-    }
-
-    function resetCoins() {
-      localStorage.setItem('webcoin', '0');
-      document.getElementById('webcoin-balance').textContent = `Баланс: 0 WKC`;
-    }
-
-    function handleCommand(e) {
-      if (e.key === 'Enter') {
-        const input = document.getElementById('terminal-input');
-        const log = document.getElementById('terminal-log');
-        const command = input.value.trim();
-
-        if (command) {
-          log.innerHTML += `<div>&gt; ${command}</div>`;
-          input.value = '';
-        }
-
-        if (command === 'ping') {
-          log.innerHTML += `<div>Pong 🟢</div>`;
-        } else if (command === 'help') {
-          log.innerHTML += `<div>Команды: ping, help, reset, balance, /add [n]</div>`;
-        } else if (command === 'reset') {
-          resetCoins();
-          log.innerHTML += `<div>Баланс сброшен.</div>`;
-        } else if (command === 'balance') {
-          const b = parseInt(localStorage.getItem('webcoin') || '0');
-          log.innerHTML += `<div>Баланс: ${b} WKC</div>`;
-        } else if (command.startsWith('/add')) {
-          const parts = command.split(' ');
-          const num = parseInt(parts[1] || '0');
-          if (isNaN(num) || num <= 0) {
-            log.innerHTML += `<div>Ошибка: укажите число.</div>`;
-          } else {
-            addCoins(num);
-            log.innerHTML += `<div>Добавлено: ${num} WKC</div>`;
-          }
-        } else if (!['ping', 'help', 'reset', 'balance'].includes(command.split(' ')[0])) {
-          log.innerHTML += `<div>Неизвестная команда. Введите help.</div>`;
-        }
-
-        log.scrollTop = log.scrollHeight;
-      }
-    }
-
-    window.addEventListener('load', () => {
-      // Прелоадер
-      document.getElementById('preloader').style.opacity = '0';
-      setTimeout(() => {
-        document.getElementById('preloader').style.display = 'none';
-        document.getElementById('terminal-input').focus();
-      }, 400);
-
-      // Тема
-      if (localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-theme');
-      }                                       
-  <!-- Баланс и загрузка интерфейса -->
+  <!-- Скрипты -->
   <script>
+    function toggleTheme() {
+      document.body.classList.toggle('dark-theme');
+      localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+    }
+
     window.addEventListener('load', () => {
       // Прелоадер
       document.getElementById('preloader').style.opacity = '0';
@@ -265,116 +199,18 @@
       if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-theme');
       }
-
-      // Баланс
-      const coins = parseInt(localStorage.getItem('webcoin') || '0', 10);
-      document.getElementById('webcoin-balance').textContent = `Баланс: ${coins} WKC`;
     });
   </script>
 
-  <!-- Dropbox SDK и расширения -->
+  <!-- Подключение модулей -->
+  <script type="module" src="engine/agents/wallet/wallet-agent.js"></script>
+  <script type="module" src="engine/agents/wallet/wallet-ui.js"></script>
+  <script type="module" src="terminal.js"></script>
+
+  <!-- Дополнительно: Dropbox, DreamMaker, Engineer и др -->
   <script src="https://unpkg.com/dropbox/dist/Dropbox-sdk.min.js"></script>
   <script src="engine/dropbox.js"></script>
   <script src="engine/engineer.js"></script>
-  <script src="wallet.js"></script>
-
-  <!-- DreamMaker — генерация медиа -->
   <script src="engine/dream.js"></script>
-
-  <!-- Интерфейс DreamMaker -->
-  <div id="screen"></div>
-  <div id="preview-area"></div>
-  <div id="chat"></div>
-  <div class="chat-toolbar">
-    <button id="btn-photo">📷</button>
-    <button id="btn-video">🎞</button>
-    <button id="btn-audio">🎵</button>
-    <textarea id="chat-input" placeholder="Скажи или напиши…"></textarea>
-    <button id="mic-btn">🎤</button>
-    <button id="send-btn">➤</button>
-  </div>
-
-  <!-- Логика работы DreamMaker UI -->
-  <script>
-    const screen = document.getElementById('screen');
-    const previewArea = document.getElementById('preview-area');
-    const chat = document.getElementById('chat');
-    const input = document.getElementById('chat-input');
-
-    function addMessage(text, who = 'bot') {
-      const div = document.createElement('div');
-      div.className = 'message ' + who;
-      div.textContent = text;
-      chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
-      return div;
-    }
-
-    function addActions(msg) {
-      ['📋', '🔊', '👍', '👎', '📤'].forEach(ic => {
-        const btn = document.createElement('button');
-        btn.textContent = ic;
-        btn.onclick = () => console.log(ic + ' нажата');
-        msg.appendChild(btn);
-      });
-    }
-
-    function handleFile(type) {
-      const inp = document.createElement('input');
-      inp.type = 'file';
-      inp.accept = type + '/*';
-      inp.onchange = e => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const url = URL.createObjectURL(file);
-        const el = document.createElement(type === 'image' ? 'img' :
-                         type === 'video' ? 'video' : 'audio');
-        el.src = url;
-        el.controls = true;
-        previewArea.innerHTML = '';
-        previewArea.appendChild(el);
-        addMessage(`🖼 Загружен ${type}: ${file.name}`, 'user');
-        window.lastMedia = window.lastMedia || {};
-        window.lastMedia[type] = file;
-      };
-      inp.click();
-    }
-
-    document.getElementById('btn-photo').onclick = () => handleFile('image');
-    document.getElementById('btn-video').onclick = () => handleFile('video');
-    document.getElementById('btn-audio').onclick = () => handleFile('audio');
-
-    document.getElementById('mic-btn').onclick = () => {
-      if (!('webkitSpeechRecognition' in window)) {
-        return addMessage('⚠️ Голосовой ввод не поддерживается.', 'bot');
-      }
-      const rec = new webkitSpeechRecognition();
-      rec.lang = 'ru-RU';
-      rec.onresult = e => input.value += e.results[0][0].transcript + ' ';
-      rec.onerror = e => addMessage('⚠️ Ошибка распознавания: ' + e.error, 'bot');
-      rec.start();
-    };
-
-    document.getElementById('send-btn').onclick = async () => {
-      const text = input.value.trim();
-      if (!text && !window.lastMedia) return;
-
-      addMessage('> ' + (text || '[медиа]'), 'user');
-      const botMsg = addMessage('🎬 Обрабатываю...', 'bot');
-
-      if (window.lastMedia) {
-        const { image: img, video: vid, audio: aud } = window.lastMedia;
-        if (vid) botMsg.textContent = dreammaker.fromVideo(vid);
-        else if (img && aud) botMsg.textContent = dreammaker.animate(img, aud);
-        else if (aud && !img) botMsg.textContent = 'Укажите фото или видео вместе со звуком.';
-        window.lastMedia = {};
-      } else {
-        botMsg.textContent = dreammaker.voiceOver(text);
-      }
-
-      addActions(botMsg);
-      input.value = '';
-    };
-  </script>
 </body>
 </html>
