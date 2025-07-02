@@ -3,37 +3,26 @@ import os
 
 WALLET_FILE = "wallet.json"
 
-# Загрузка базы балансов
+# Загрузка баланса из JSON
 def load_wallet():
     if not os.path.exists(WALLET_FILE):
         return {}
     with open(WALLET_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
 
-# Сохранение базы балансов
-def save_wallet(data):
+# Сохранение баланса в JSON
+def save_wallet(wallet_data):
     with open(WALLET_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+        json.dump(wallet_data, f, ensure_ascii=False, indent=2)
 
-# Получение баланса пользователя
-def get_balance(user_id: str) -> int:
-    db = load_wallet()
-    return db.get(user_id, 0)
+# Получить баланс пользователя
+def get_balance(user_id):
+    wallet = load_wallet()
+    return wallet.get(str(user_id), 0)
 
-# Увеличение баланса
-def add_balance(user_id: str, amount: int) -> int:
-    db = load_wallet()
-    db[user_id] = db.get(user_id, 0) + amount
-    save_wallet(db)
-    return db[user_id]
-
-# Установка точного баланса
-def set_balance(user_id: str, amount: int) -> int:
-    db = load_wallet()
-    db[user_id] = amount
-    save_wallet(db)
-    return amount
-
-# Сброс баланса
-def reset_balance(user_id: str) -> int:
-    return set_balance(user_id, 0)
+# Добавить монеты пользователю
+def add_balance(user_id, amount):
+    wallet = load_wallet()
+    user_id = str(user_id)
+    wallet[user_id] = wallet.get(user_id, 0) + amount
+    save_wallet(wallet)
