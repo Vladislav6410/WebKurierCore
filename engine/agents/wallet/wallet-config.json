@@ -1,26 +1,152 @@
-{
-  "walletName": "WebCoin",
-  "currency": "WKC",
-  "initialBalance": 0,
-  "maxBalance": 100000,
-  "minTransaction": 1,
-  "maxTransaction": 10000,
-  "autoSave": true,
-  "saveLocation": "localStorage",
-  "historyEnabled": true,
-  "historyLimit": 100,
-  "ui": {
-    "showBalance": true,
-    "buttons": ["+10", "Сброс", "Экспорт", "Импорт"],
-    "theme": "auto"
+// === wallet-agent.js — WebCoin Кошелёк с поддержкой config ===
+
+import config from "./wallet-config.json" assert { type: "json" };
+
+const WALLET_KEY = "webcoin_balance";
+const HISTORY_KEY = "webcoin_history";
+
+// === ① Базовые функции ===
+export function getBalance() {
+  return parseInt(localStorage.getItem(WALLET_KEY) || config.initialBalance || 0, 10);
+}
+
+export function setBalance(amount) {
+  const limited = Math.min(
+    Math.max(amount, config.security.allowNegativeBalance ? -Infinity : 0),
+    config.maxBalance || 999999
+  );
+  localStorage.setItem(WALLET_KEY, limited);
+  if (config.historyEnabled) saveHistory(limited);
+  updateBalanceUI();
+  if (config.autoSave) saveBackup();
+}
+
+export function addCoins(amount) {
+  const current = getBalance();
+  const result = Math.min(current + amount, config.maxBalance || 999999);
+  setBalance(result);
+}
+
+export function resetCoins() {
+  setBalance(config.initialBalance || 0);
+}
+
+function saveBackup() {
+  if (!config.backup?.enabled) return;
+  const data = JSON.stringify({ balance: getBalance() });
+  localStorage.setItem(config.backup.fileName || "wallet-backup.json", data);
+}
+
+function saveHistory(value) {
+  if (!config.historyEnabled) return;
+  const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+  history.unshift({ time: new Date().toISOString(), balance: value });
+  const limited = history.slice(0, config.historyLimit || 100);
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(limited));
+}
+
+export function updateBalanceUI() {
+  const balance = getBalance();
+  const currency = config.currency || "WKC";
+  ["balance", "webcoin-balance", "balance-display"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = id === "balance" ? balance : `Баланс: ${balance} ${currency}`;
+  });
+}
+
+// === ② Команды WALLET ===
+const walletCommands = {
+  "/add": {
+    description: "/add [число] — добавить монеты",
+    exec: args => {
+      const step = config.minTransaction || 1;
+      const amount = parseInt(args[0] || step, 10);
+      if (isNaN(amount) || amount < step || amount > config.maxTransaction)
+        throw `❗ Введите число от ${step} до ${config.maxTransaction}`;
+      addCoins(amount);
+      return `✅ Добавлено ${amount} ${config.currency}`;
+    }
   },
-  "security": {
-    "requireConfirmation": true,
-    "allowNegativeBalance": false
+  "/reset": {
+    description: "/reset — сбросить баланс",
+    exec: () => {
+      resetCoins();
+      return "🔁 Баланс сброшен.";
+    }
   },
-  "backup": {
-    "enabled": true,
-    "format": "json",
-    "fileName": "wallet-backup.json"
+  "/balance": {
+    description: "/balance — показать баланс",
+    exec: () => `💰 Баланс: ${getBalance()} ${config.currency}`
+  },
+  "/set": {
+    description: "/set [число] — установить баланс",
+    exec: args => {
+      const amount = parseInt(args[0], 10);
+      if (isNaN(amount) || amount < 0 || amount > config.maxBalance)
+        throw `❗ Введите число от 0 до ${config.maxBalance}`;
+      setBalance(amount);
+      return `🔧 Баланс установлен: ${amount} ${config.currency}`;
+    }
+  },
+  "/export": {
+    description: "/export — сохранить баланс в файл",
+    exec: () => {
+      const data = JSON.stringify({ balance: getBalance() });
+      const blob = new Blob([data], { type: "application/json" });
+      const a = Object.assign(document.createElement("a"), {
+        href: URL.createObjectURL(blob),
+        download: config.backup.fileName || "wallet-backup.json"
+      });
+      a.click();
+      return "💾 Баланс экспортирован.";
+    }
+  },
+  "/import": {
+    description: "/import — загрузить баланс из файла",
+    exec: (args, printToTerminal) => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".json";
+      input.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+          try {
+            const data = JSON.parse(ev.target.result);
+            if (typeof data.balance === "number") {
+              setBalance(data.balance);
+              printToTerminal(`📥 Баланс загружен: ${data.balance} ${config.currency}`);
+            } else throw "Неверный формат файла.";
+          } catch (err) {
+            printToTerminal(`⚠️ Ошибка: ${err}`, true);
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+      return "📂 Выберите файл баланса.";
+    }
+  }
+};
+
+// === ③ Команды HELP ===
+walletCommands["/help"] = {
+  description: "/help — список всех команд",
+  exec: () =>
+    Object.entries(walletCommands)
+      .map(([c, o]) => `${c}: ${o.description}`)
+      .join("\n")
+};
+
+// === ④ Обработчик команд
+export async function handleWalletCommand(command, printToTerminal) {
+  const [cmd, ...args] = command.trim().split(/\s+/);
+  const entry = walletCommands[cmd];
+  if (!entry) return "❌ Неизвестная команда. Используй /help.";
+  try {
+    return await entry.exec(args, printToTerminal);
+  } catch (e) {
+    return `⚠️ ${e}`;
   }
 }
