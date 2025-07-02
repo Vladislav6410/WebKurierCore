@@ -1,53 +1,41 @@
-# handlers.py — обработчики команд бота WebKurierCoreBot
+# handlers.py — обработчики команд WebKurierCoreBot
 
 from telebot import TeleBot
 from telebot.types import Message
-from wallet import get_balance, add_balance
 
-bot: TeleBot = None  # будет установлен из main.py
+wallet_db = {}
 
-def register_handlers(bot_instance: TeleBot):
-    global bot
-    bot = bot_instance
+def register_handlers(bot: TeleBot):
 
-    # Команда /start
-    @bot.message_handler(commands=["start"])
-    def handle_start(message: Message):
-        bot.send_message(message.chat.id,
-                         "👋 Привет! Это WebKurierCoreBot.\n"
-                         "Доступны команды: /help, /wallet, /addcoins, /info")
+    def log_command(command: str, message: Message):
+        print(f"[LOG] {command} от @{message.from_user.username} (ID: {message.from_user.id})")
 
-    # Команда /help
     @bot.message_handler(commands=["help"])
     def handle_help(message: Message):
+        log_command("/help", message)
         bot.send_message(message.chat.id,
-                         "🛠 Справка:\n"
-                         "/start — запуск\n"
-                         "/wallet — показать баланс WebCoin\n"
-                         "/addcoins — +10 монет\n"
-                         "/info — информация о системе")
+            "🛠 Справка:\n"
+            "/start — запуск\n"
+            "/wallet — показать баланс WebCoin\n"
+            "/info — информация о системе")
 
-    # Команда /wallet
     @bot.message_handler(commands=["wallet"])
     def handle_wallet(message: Message):
+        log_command("/wallet", message)
         user_id = str(message.from_user.id)
         coins = get_balance(user_id)
-        bot.send_message(message.chat.id,
-                         f"💰 Ваш баланс: {coins} WebCoin")
+        bot.send_message(message.chat.id, f"💰 Ваш баланс: {coins} WebCoin")
 
-    # Команда /addcoins
-    @bot.message_handler(commands=["addcoins"])
-    def handle_addcoins(message: Message):
-        user_id = str(message.from_user.id)
-        add_balance(user_id, 10)
-        new_balance = get_balance(user_id)
-        bot.send_message(message.chat.id,
-                         f"➕ Добавлено 10 монет!\n💼 Новый баланс: {new_balance} WebCoin")
-
-    # Команда /info
     @bot.message_handler(commands=["info"])
     def handle_info(message: Message):
+        log_command("/info", message)
         bot.send_message(message.chat.id,
-                         "📦 WebKurierCoreBot v1.0\n"
-                         "Интеграция: Терминал + WebCoin + Telegram\n"
-                         "🧩 Используется файл wallet.json")
+            "📦 WebKurierCoreBot v1.0\n"
+            "Терминал, WebCoin и Telegram-интерфейс.")
+
+# Временная память баланса
+def get_balance(user_id):
+    return wallet_db.get(user_id, 0)
+
+def add_balance(user_id, amount):
+    wallet_db[user_id] = wallet_db.get(user_id, 0) + amount
