@@ -1,8 +1,9 @@
+// === terminal.js — Полный объединённый терминал WebKurier ===
 import * as MasterAgent from "./engine/agents/master-agent.js";
 
 const WALLET_KEY = "webcoin_balance";
 
-// Базовые операции
+// --- Базовые функции кошелька ---
 function getBalance() {
   return parseInt(localStorage.getItem(WALLET_KEY) || "0", 10);
 }
@@ -25,16 +26,43 @@ function resetWallet() {
   setBalance(0);
 }
 
-// Интерфейс
 function updateBalanceUI() {
   const el = document.getElementById("wallet-balance");
-  if (el) {
-    el.textContent = "💰 Баланс: " + getBalance() + " WebCoin";
-  }
+  if (el) el.textContent = `💰 Баланс: ${getBalance()} WebCoin`;
 }
 
+// --- Журналирование операций ---
+function logTransaction(type, amount) {
+  const history = JSON.parse(localStorage.getItem("wallet_history") || "[]");
+  history.push({
+    date: new Date().toLocaleString(),
+    type,
+    amount,
+    balance: getBalance()
+  });
+  localStorage.setItem("wallet_history", JSON.stringify(history.slice(-50)));
+}
+
+// --- Модификация функций для журналирования ---
+const originalAddCoins = addCoins;
+addCoins = (amount) => {
+  originalAddCoins(amount);
+  logTransaction("DEPOSIT", amount);
+};
+
+const originalSetBalance = setBalance;
+setBalance = (amount) => {
+  const diff = amount - getBalance();
+  originalSetBalance(amount);
+  if (diff !== 0) {
+    logTransaction(diff > 0 ? "DEPOSIT" : "WITHDRAW", Math.abs(diff));
+  }
+};
+
+// --- Терминальный вывод ---
 function printToTerminal(message, isError = false) {
-  const output = document.getElementById("terminal-output");
+  // Можно использовать "terminal-output" или "terminal-log" в зависимости от твоего HTML
+  const output = document.getElementById("terminal-output") || document.getElementById("terminal-log");
   if (!output) return;
 
   const line = document.createElement("div");
@@ -44,68 +72,56 @@ function printToTerminal(message, isError = false) {
   output.scrollTop = output.scrollHeight;
 }
 
-// Расширенные команды
-const walletCommands = {
+// --- Команды терминала ---
+const commands = {
+  "/help": {
+    description: "📘 Список команд",
+    exec: () =>
+      Object.entries(commands)
+        .map(([cmd, obj]) => `${cmd} — ${obj.description}`)
+        .join("\n")
+  },
   "/add": {
-    description: "/add [число] — добавить монеты",
-    exec: (args) => {
-      const amount = parseInt(args[0] || "10", 10);
-      if (isNaN(amount) || amount <= 0) throw "Введите положительное число.";
-      addCoins(amount);
-      return `✅ Добавлено ${amount} WebCoin.`;
+    description: "Добавить WebCoin: /add [число]",
+    exec: ([amount]) => {
+      const n = parseInt(amount || "10", 10);
+      if (isNaN(n) || n <= 0) throw "Введите положительное число.";
+      addCoins(n);
+      return `✅ Добавлено ${n} WebCoin. Новый баланс: ${getBalance()}`;
+    }
+  },
+  "/set": {
+    description: "Установить баланс: /set [число]",
+    exec: ([amount]) => {
+      const n = parseInt(amount, 10);
+      if (isNaN(n) || n < 0) throw "Введите корректное число.";
+      setBalance(n);
+      return `🔧 Баланс установлен: ${n} WebCoin.`;
     }
   },
   "/reset": {
-    description: "/reset — сбросить баланс",
+    description: "Сбросить баланс",
     exec: () => {
       resetWallet();
       return "🔁 Баланс сброшен.";
     }
   },
   "/balance": {
-    description: "/balance — показать баланс",
-    exec: () => `💰 Баланс: ${getBalance()} WebCoin.`
+    description: "Показать текущий баланс",
+    exec: () => `💰 Баланс: ${getBalance()} WebCoin`
   },
-  "/set": {
-    description: "/set [число] — установить баланс",
-    exec: (args) => {
-      const amount = parseInt(args[0], 10);
-      if (isNaN(amount) || amount < 0) throw "Введите корректное число.";
-      setBalance(amount);
-      return `🔧 Установлен баланс: ${amount} WebCoin.`;
-    }
-  },
-  "/help": {
-    description: "/help — список команд",
-    exec: () => Object.values(walletCommands).map(c => "📌 " + c.description).join("\n")
-  },
-  "/stats": {
-    description: "/stats — статистика кошелька",
+  "/history": {
+    description: "История операций",
     exec: () => {
-      const created = new Date(localStorage.getItem("wallet_created") || Date.now()).toLocaleString();
-      const updated = new Date(localStorage.getItem("wallet_updated") || Date.now()).toLocaleString();
-      return `📊 Статистика:\n🪙 Баланс: ${getBalance()} WebCoin\n📅 Создан: ${created}\n🕓 Обновлён: ${updated}`;
-    }
-  },
-  "/export": {
-    description: "/export — сохранить баланс в файл",
-    exec: () => {
-      const data = JSON.stringify({ 
-        balance: getBalance(),
-        created: localStorage.getItem("wallet_created"),
-        updated: localStorage.getItem("wallet_updated")
-      });
-      const blob = new Blob([data], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "webcoin_wallet.json";
-      a.click();
-      return "💾 Баланс сохранён в файл.";
+      const history = JSON.parse(localStorage.getItem("wallet_history") || "[]");
+      if (history.length === 0) return "📜 История операций пуста";
+      return history.map((entry, i) =>
+        `${i + 1}. ${entry.date}: ${entry.type} ${entry.amount} WC → ${entry.balance} WC`
+      ).join("\n");
     }
   },
   "/import": {
-    description: "/import — загрузить файл кошелька",
+    description: "Импортировать кошелёк из файла",
     exec: () => {
       const input = document.createElement("input");
       input.type = "file";
@@ -113,7 +129,6 @@ const walletCommands = {
       input.onchange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
         const reader = new FileReader();
         reader.onload = () => {
           try {
@@ -136,40 +151,39 @@ const walletCommands = {
       return "📂 Выберите файл кошелька.";
     }
   },
-  "/tip": {
-    description: "/tip [агент] [сумма] — отправить агенту WebCoin",
-    exec: async ([agent, amount]) => {
-      const value = parseInt(amount, 10);
-      if (!agent || isNaN(value) || value <= 0) throw "Укажи агента и сумму.";
-      if (getBalance() < value) throw "Недостаточно средств.";
-      
-      // Интеграция с MasterAgent
-      const result = await MasterAgent.sendCoins(agent, value);
-      if (!result.success) throw `Ошибка отправки: ${result.error || "неизвестная ошибка"}`;
-      
-      setBalance(getBalance() - value);
-      return `📤 ${value} WebCoin отправлено агенту ${agent}`;
+  "/export": {
+    description: "Сохранить кошелёк в файл",
+    exec: () => {
+      const data = JSON.stringify({
+        balance: getBalance(),
+        created: localStorage.getItem("wallet_created"),
+        updated: localStorage.getItem("wallet_updated")
+      });
+      const blob = new Blob([data], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "webcoin_wallet.json";
+      a.click();
+      return "💾 Баланс сохранён.";
     }
   },
-  "/history": {
-    description: "/history — история операций",
+  "/stats": {
+    description: "Статистика кошелька",
     exec: () => {
-      const history = JSON.parse(localStorage.getItem("wallet_history") || "[]");
-      if (history.length === 0) return "📜 История операций пуста";
-      
-      return history.map((entry, i) => 
-        `${i+1}. ${entry.date}: ${entry.type} ${entry.amount} WC → ${entry.balance} WC`
-      ).join("\n");
+      const created = new Date(localStorage.getItem("wallet_created") || Date.now()).toLocaleString();
+      const updated = new Date(localStorage.getItem("wallet_updated") || Date.now()).toLocaleString();
+      return `📊 Статистика:\n🪙 Баланс: ${getBalance()} WebCoin\n📅 Создан: ${created}\n🕓 Обновлён: ${updated}`;
     }
   },
   "/sync": {
-    description: "/sync — синхронизировать с сервером",
+    description: "Синхронизировать баланс с сервером",
     exec: async () => {
       try {
         const res = await fetch("/api/sync-balance", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             balance: getBalance(),
             created: localStorage.getItem("wallet_created"),
             updated: localStorage.getItem("wallet_updated")
@@ -182,8 +196,20 @@ const walletCommands = {
       }
     }
   },
+  "/tip": {
+    description: "Отправить агенту WebCoin: /tip [агент] [сумма]",
+    exec: async ([agent, amount]) => {
+      const value = parseInt(amount, 10);
+      if (!agent || isNaN(value) || value <= 0) throw "Укажи агента и сумму.";
+      if (getBalance() < value) throw "Недостаточно средств.";
+      const result = await MasterAgent.sendCoins(agent, value);
+      if (!result.success) throw `Ошибка отправки: ${result.error || "неизвестная ошибка"}`;
+      setBalance(getBalance() - value);
+      return `📤 ${value} WebCoin отправлено агенту ${agent}`;
+    }
+  },
   "/agents": {
-    description: "/agents — список активных агентов",
+    description: "Список активных агентов",
     exec: async () => {
       try {
         const agents = await MasterAgent.listActiveAgents();
@@ -194,7 +220,7 @@ const walletCommands = {
     }
   },
   "/market": {
-    description: "/market — показать рыночные курсы",
+    description: "Показать рыночные курсы WebCoin",
     exec: async () => {
       try {
         const rates = await MasterAgent.getExchangeRates();
@@ -205,125 +231,104 @@ const walletCommands = {
         return "⚠️ Ошибка получения курсов: " + e;
       }
     }
+  },
+  "/status": {
+    description: "Статус агента: /status [имя]",
+    exec: ([agentName]) => {
+      if (!agentName) throw "Укажите имя агента.";
+      const status = MasterAgent.status && MasterAgent.status[agentName] || '❓ неизвестен';
+      return `📍 Агент "${agentName}": ${status}`;
+    }
+  },
+  "/reload": {
+    description: "Перезагрузить агента: /reload [имя]",
+    exec: ([agentName]) => {
+      if (!agentName) throw "Укажите имя агента.";
+      if (MasterAgent.agents && agentName in MasterAgent.agents) {
+        MasterAgent.reload(agentName);
+        return `🔁 Перезагрузка агента "${agentName}"...`;
+      } else {
+        throw `Агент "${agentName}" не найден.`;
+      }
+    }
+  },
+  "/clear": {
+    description: "Очистить экран",
+    exec: () => {
+      const output = document.getElementById("terminal-output") || document.getElementById("terminal-log");
+      if (output) output.innerHTML = "";
+      return "";
+    }
+  },
+  "/ping": {
+    description: "Проверить соединение",
+    exec: () => "🏓 Pong!"
   }
 };
 
-// Журналирование операций
-function logTransaction(type, amount) {
-  const history = JSON.parse(localStorage.getItem("wallet_history") || "[]");
-  history.push({
-    date: new Date().toLocaleString(),
-    type,
-    amount,
-    balance: getBalance()
-  });
-  localStorage.setItem("wallet_history", JSON.stringify(history.slice(-50)));
-}
-
-// Модифицируем функции для журналирования
-const originalAddCoins = addCoins;
-addCoins = (amount) => {
-  originalAddCoins(amount);
-  logTransaction("DEPOSIT", amount);
-};
-
-const originalSetBalance = setBalance;
-setBalance = (amount) => {
-  const diff = amount - getBalance();
-  originalSetBalance(amount);
-  if (diff !== 0) {
-    logTransaction(diff > 0 ? "DEPOSIT" : "WITHDRAW", Math.abs(diff));
-  }
-};
-
-// Обработка команды
-async function handleWalletCommand(command) {
-  const [cmd, ...args] = command.trim().split(/\s+/);
-  const commandEntry = walletCommands[cmd];
-  if (!commandEntry) return "❌ Неизвестная команда. Введите /help.";
-  try {
-    return await commandEntry.exec(args);
-  } catch (err) {
-    return `⚠️ ${err}`;
-  }
-}
-
-// История команд
+// --- История команд ---
 let commandHistory = [];
 let historyIndex = -1;
 
-// Инициализация
+// --- Обработка команд ---
+async function handleCommand(event) {
+  if (event.key === "Enter" || event.type === "run") {
+    const input = document.getElementById("terminal-input");
+    const cmd = input.value.trim();
+    input.value = "";
+    if (!cmd) return;
+
+    printToTerminal("> " + cmd);
+    commandHistory.unshift(cmd);
+    commandHistory = commandHistory.slice(0, 50);
+    historyIndex = -1;
+
+    const [command, ...args] = cmd.split(" ");
+    const action = commands[command];
+
+    if (!action) {
+      printToTerminal("❌ Неизвестная команда. Введите /help", true);
+      return;
+    }
+
+    try {
+      const result = await action.exec(args);
+      if (result) printToTerminal(result);
+    } catch (err) {
+      printToTerminal("⚠️ " + err, true);
+    }
+
+    updateBalanceUI();
+  }
+}
+
+// --- Кнопки и инициализация ---
 document.addEventListener("DOMContentLoaded", () => {
   // Создаем историю при первом запуске
   if (!localStorage.getItem("wallet_created")) {
     localStorage.setItem("wallet_created", new Date().toISOString());
   }
-  
   updateBalanceUI();
 
+  const input = document.getElementById("terminal-input");
+  const enterBtn = document.getElementById("btn-enter");
+  const copyBtn = document.getElementById("btn-copy");
   const addBtn = document.getElementById("add-coins");
   const resetBtn = document.getElementById("reset-wallet");
-  const executeBtn = document.getElementById("execute-command");
-  const input = document.getElementById("terminal-input");
-  const output = document.getElementById("terminal-output");
-
-  async function runCommand() {
-    const cmd = input.value.trim();
-    if (!cmd) return;
-
-    printToTerminal("> " + cmd);
-    commandHistory.unshift(cmd);
-    commandHistory = commandHistory.slice(0, 10);
-    historyIndex = -1;
-
-    // Интеграция с DreamMaker
-    let response;
-    if (window.lastMedia) {
-      const img = window.lastMedia.image;
-      const vid = window.lastMedia.video;
-      const aud = window.lastMedia.audio;
-
-      if (vid) response = dreammaker.fromVideo(vid);
-      else if (img && aud) response = dreammaker.animate(img, aud);
-      else if (aud && !img) response = 'Укажите фото или видео вместе со звуком.';
-      else response = await handleWalletCommand(cmd);
-
-      window.lastMedia = {};
-    } else {
-      response = await handleWalletCommand(cmd);
-      if (!response && cmd) response = dreammaker.voiceOver(cmd);
-    }
-
-    printToTerminal(response, response.startsWith("⚠️") || response.startsWith("❌"));
-    updateBalanceUI();
-    input.value = "";
-  }
-
-  if (addBtn) addBtn.onclick = () => {
-    addCoins(10);
-    updateBalanceUI();
-  };
-
-  if (resetBtn) resetBtn.onclick = () => {
-    resetWallet();
-    updateBalanceUI();
-  };
-
-  if (executeBtn) executeBtn.onclick = runCommand;
 
   if (input) {
+    input.addEventListener("keydown", handleCommand);
     input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") runCommand();
-      else if (e.key === "ArrowUp") {
+      if (e.key === "ArrowUp") {
         if (commandHistory.length > 0) {
           historyIndex = Math.min(historyIndex + 1, commandHistory.length - 1);
-          input.value = commandHistory[historyIndex];
+          input.value = commandHistory[historyIndex] || "";
         }
         e.preventDefault();
       } else if (e.key === "ArrowDown") {
         if (historyIndex > 0) {
           historyIndex--;
-          input.value = commandHistory[historyIndex];
+          input.value = commandHistory[historyIndex] || "";
         } else {
           historyIndex = -1;
           input.value = "";
@@ -332,4 +337,21 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  if (enterBtn) enterBtn.addEventListener("click", () => handleCommand({ key: "Enter" }));
+  if (copyBtn) copyBtn.addEventListener("click", () => {
+    if (input) {
+      navigator.clipboard.writeText(input.value || "").then(() => {
+        printToTerminal("📋 Команда скопирована.");
+      });
+    }
+  });
+  if (addBtn) addBtn.addEventListener("click", () => {
+    addCoins(10);
+    updateBalanceUI();
+  });
+  if (resetBtn) resetBtn.addEventListener("click", () => {
+    resetWallet();
+    updateBalanceUI();
+  });
 });
