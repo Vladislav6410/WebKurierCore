@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Кнопка действия",
+    "description": "Простая кнопка с надписью",
+    "preview": "button.png",
+    "html": "<button>Нажми меня</button>"
+  },
+  {
+    "title": "Заголовок",
+    "description": "Большой заголовок страницы",
+    "preview": "heading.png",
+    "html": "<h1>Добро пожаловать!</h1>"
+  },
+  {
+    "title": "Двухколоночный блок",
+    "description": "Разметка с двумя колонками",
+    "preview": "columns.png",
+    "html": "<div style='display:flex; gap:20px;'><div style='flex:1;'>Левая колонка</div><div style='flex:1;'>Правая колонка</div></div>"
+  },
+  {
+    "title": "Список",
+    "description": "Маркированный список",
+    "preview": "list.png",
+    "html": "<ul><li>Пункт 1</li><li>Пункт 2</li><li>Пункт 3</li></ul>"
+  },
+  {
+    "title": "Форма входа",
+    "description": "Поле логина и пароля",
+    "preview": "login.png",
+    "html": "<form><input type='text' placeholder='Логин'><br><input type='password' placeholder='Пароль'><br><button>Войти</button></form>"
+  }
+]
