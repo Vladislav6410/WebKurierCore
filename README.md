@@ -27,15 +27,41 @@
 
 ---
 
-## 📁 Структура проекта
-
-```bash
-WebKurierCore/
-├── index.html         # Главная оболочка
-├── terminal.js        # Терминал с командами
-├── wallet.js          # WebCoin-кошелёк
-├── styles.css         # Стили и темы
-├── README.md          # Этот файл
+## 📁 Структура проекта WebKurierCore
+•	🧾 index.html — 🌐 Главная страница
+	•	💻 terminal.js — Интерфейс терминала
+	•	💰 wallet.js — Кошелёк WebCoin
+	•	🎨 styles.css — Стили сайта
+	•	📘 README.md — Инструкция проекта
+	•	📁 i18n/
+  ↳ 🌍 i18n.js — Логика мультиязычия
+	•	📁 lang-select/
+  ↳ 🚩 flags.html — Выбор языка (22 флага)
+	•	📁 translations/
+  ↳ 🇷🇺 ru.json
+  ↳ 🇬🇧 en.json
+  ↳ 🇩🇪 de.json
+  ↳ 🇫🇷 fr.json
+  ↳ 🇵🇱 pl.json
+  ↳ 🇨🇿 cs.json
+  ↳ 🇷🇴 ro.json
+  ↳ 🇧🇬 bg.json
+  ↳ 🇱🇹 lt.json
+  ↳ 🇭🇷 hr.json
+  ↳ 🇭🇺 hu.json
+  ↳ 🇩🇰 da.json
+  ↳ 🇪🇸 es.json
+  ↳ 🇮🇹 it.json
+  ↳ 🇺🇦 uk.json
+  ↳ 🇳🇴 no.json
+  ↳ 🇵🇹 pt.json
+  ↳ 🇹🇷 tr.json
+  ↳ 🇸🇮 sl.json
+  ↳ 🇬🇷 el.json
+  ↳ 🇷🇸 sr.json
+  ↳ 🇱🇻 lv.json
+  ↳ 🇪🇪 et.json
+  ↳ 🇳🇱 nl.json
 
 
 
