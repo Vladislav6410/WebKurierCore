@@ -1,0 +1,23 @@
+[
+  {
+    "id": "hero",
+    "title": "Hero Блок",
+    "description": "Крупный заголовок + текст + кнопка",
+    "preview": "preview-hero.jpg",
+    "html": "<section class='hero'><h1>Добро пожаловать!</h1><p>Описание блока</p><button>Начать</button></section>"
+  },
+  {
+    "id": "footer",
+    "title": "Футер",
+    "description": "Низ сайта с авторскими правами",
+    "preview": "preview-footer.jpg",
+    "html": "<footer><p>© 2025 WebKurier</p></footer>"
+  },
+  {
+    "id": "gallery",
+    "title": "Галерея",
+    "description": "Изображения в строку",
+    "preview": "preview-gallery.jpg",
+    "html": "<div class='gallery'><img src='img1.jpg'><img src='img2.jpg'></div>"
+  }
+]
