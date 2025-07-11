@@ -7,7 +7,6 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <style>
     /* ...весь ваш CSS без изменений... */
-    /* Панель инструментов */
     #tools-panel {
       display: none;
       position: fixed;
@@ -171,14 +170,14 @@
     </div>
   </div>
 
-  <!-- Скрипты -->
+  <!-- Скрипты: внешние и модули -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="wallet.js"></script>
-  <script type="module" src="engine/agents/terminal/terminal-v2.js"></script>
   <script src="https://unpkg.com/dropbox/dist/Dropbox-sdk.min.js"></script>
   <script src="engine/dropbox.js"></script>
   <script src="engine/engineer.js"></script>
   <script src="engine/dream.js"></script>
-
+  <script type="module" src="engine/agents/terminal/terminal-v2.js"></script>
   <!-- Подключение панели инструментов и агентов -->
   <script type="module">
     import * as toolsAgent from './engine/agents/tools-agent.js';
@@ -189,15 +188,17 @@
       toolsAgent.showToolsPanel();
     });
   </script>
-
   <!-- JS для панели инструментов и новых функций -->
   <script>
+    // --- Тема ---
     function toggleTheme() {
       document.body.classList.toggle('dark-theme');
       localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
     }
+
+    // --- Кошелёк ---
     function addCoins(amount) {
-      let current = parseInt(localStorage.getItem('webcoin') || '0');
+      let current = parseInt(localStorage.getItem('webcoin') || '0', 10);
       current += amount;
       localStorage.setItem('webcoin', current);
       document.getElementById('webcoin-balance').textContent = `Баланс: ${current} WKC`;
@@ -206,6 +207,8 @@
       localStorage.setItem('webcoin', '0');
       document.getElementById('webcoin-balance').textContent = `Баланс: 0 WKC`;
     }
+
+    // --- Терминал ---
     function runTerminalCommand() {
       const e = new KeyboardEvent('keydown', { key: 'Enter' });
       document.getElementById('terminal-input').dispatchEvent(e);
@@ -220,7 +223,7 @@
       navigator.clipboard.writeText(input.value);
     }
 
-    // Панель инструментов
+    // --- Панель инструментов ---
     function openToolsPanel() {
       document.getElementById('tools-panel').style.display = 'block';
     }
@@ -228,9 +231,12 @@
       document.getElementById('tools-panel').style.display = 'none';
       document.getElementById('htmlFile').value = '';
     }
-    document.getElementById('toolsButton').onclick = openToolsPanel;
+    // Для совместимости с модулями
+    if (document.getElementById('toolsButton')) {
+      document.getElementById('toolsButton').onclick = openToolsPanel;
+    }
 
-    // Загрузка .html файла
+    // --- Загрузка .html файла ---
     document.getElementById('htmlFile').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -241,7 +247,7 @@
       reader.readAsText(file, 'UTF-8');
     });
 
-    // Сохранение .html файла
+    // --- Сохранение .html файла ---
     function saveHtmlFile() {
       const content = document.getElementById('htmlEditor').value;
       const blob = new Blob([content], {type: 'text/html'});
@@ -257,7 +263,7 @@
       }, 0);
     }
 
-    // Вставка шаблона блока
+    // --- Вставка шаблона блока ---
     function insertBlockTemplate() {
       const select = document.getElementById('blockTemplates');
       const value = select.value;
@@ -267,7 +273,7 @@
       }
     }
 
-    // Генерация HTML по описанию (простая реализация)
+    // --- Генерация HTML по описанию ---
     function generateHtmlFromDesc() {
       const desc = document.getElementById('htmlDescInput').value.trim().toLowerCase();
       let html = '';
@@ -284,10 +290,9 @@
       document.getElementById('htmlEditor').value += '\n' + html;
     }
 
-    // Экспорт ZIP (минималистичная реализация)
+    // --- Экспорт ZIP ---
     function exportZip() {
       const html = document.getElementById('htmlEditor').value;
-      // Используем JSZip через CDN (если нужно расширить)
       if (!window.JSZip) {
         const script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
@@ -310,7 +315,7 @@
       });
     }
 
-    // Прелоадер и тема
+    // --- Прелоадер и тема при запуске ---
     window.addEventListener('load', () => {
       document.getElementById('preloader').style.opacity = '0';
       setTimeout(() => {
@@ -321,7 +326,6 @@
       if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-theme');
       }
-
       const coins = parseInt(localStorage.getItem('webcoin') || '0', 10);
       document.getElementById('webcoin-balance').textContent = `Баланс: ${coins} WKC`;
     });
