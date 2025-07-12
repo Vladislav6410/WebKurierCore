@@ -1,0 +1,18 @@
+from PIL import Image, ImageDraw, ImageFont
+
+# Создание изображения 200x100 белого цвета
+img = Image.new('RGB', (200, 100), color='white')
+draw = ImageDraw.Draw(img)
+
+# Текст на кнопке
+text = "Button"
+font = ImageFont.load_default()
+text_width, text_height = draw.textsize(text, font)
+x = (img.width - text_width) // 2
+y = (img.height - text_height) // 2
+
+draw.text((x, y), text, fill='black', font=font)
+
+# Сохранение как button.png
+img.save('button.png')
+print("✅ button.png создан.")
