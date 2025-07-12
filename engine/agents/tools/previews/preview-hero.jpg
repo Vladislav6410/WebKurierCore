@@ -1,0 +1,34 @@
+from PIL import Image, ImageDraw, ImageFont
+
+# Размер изображения
+width, height = 600, 200
+img = Image.new("RGB", (width, height), color="white")
+draw = ImageDraw.Draw(img)
+
+# Загрузка стандартного шрифта
+font = ImageFont.load_default()
+
+# Заголовок Hero-секции
+title = "🏁 Добро пожаловать в WebKurier"
+subtitle = "Автоматизация. Интеллект. Будущее."
+button_text = "[ Начать ]"
+
+# Отрисовка текста
+draw.text((20, 30), title, fill="black", font=font)
+draw.text((20, 60), subtitle, fill="gray", font=font)
+
+# Кнопка
+button_x, button_y = 20, 100
+button_w, button_h = 160, 40
+draw.rectangle([button_x, button_y, button_x + button_w, button_y + button_h], fill="#007BFF", outline="black")
+text_w, text_h = draw.textsize(button_text, font=font)
+draw.text(
+    (button_x + (button_w - text_w) // 2, button_y + (button_h - text_h) // 2),
+    button_text,
+    fill="white",
+    font=font
+)
+
+# Сохраняем
+img.save("preview-hero.jpg", "JPEG")
+print("✅ Файл preview-hero.jpg успешно создан.")
