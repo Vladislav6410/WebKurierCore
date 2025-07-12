@@ -1,7 +1,6 @@
 // === terminal.js — Полный объединённый терминал WebKurier ===// === terminal.js — Полный объединённый терминал WebKurier ===
 import CONFIG from "./engine/config.js"; // 📦 Конфигурация
 import * as MasterAgent from "./engine/agents/master-agent.js";
-import * as MasterAgent from "./engine/agents/master-agent.js";
 
 const WALLET_KEY = "webcoin_balance";
 
