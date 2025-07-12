@@ -28,5 +28,23 @@
     "description": "Поле логина и пароля",
     "preview": "login.png",
     "html": "<form><input type='text' placeholder='Логин'><br><input type='password' placeholder='Пароль'><br><button>Войти</button></form>"
+  },
+  {
+    "title": "Галерея",
+    "description": "Сетка изображений в блоке",
+    "preview": "preview-gallery.jpg",
+    "html": "<div style='display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;'>\n  <img src='img1.jpg' style='width:100%'>\n  <img src='img2.jpg' style='width:100%'>\n  <img src='img3.jpg' style='width:100%'>\n</div>"
+  },
+  {
+    "title": "Подвал сайта",
+    "description": "Блок с контактами и копирайтом",
+    "preview": "preview-footer.jpg",
+    "html": "<footer style='padding:20px; background:#333; color:#fff;'>\n  <p>Контакты: info@example.com</p>\n  <p>© 2025 WebKurier</p>\n</footer>"
+  },
+  {
+    "title": "Обложка (Hero)",
+    "description": "Шапка сайта с фоном и заголовком",
+    "preview": "preview-hero.jpg",
+    "html": "<section style='background:#467; color:#fff; padding:60px; text-align:center;'>\n  <h1>🚀 WebKurierCore</h1>\n  <p>Твоя стартовая платформа</p>\n</section>"
   }
 ]
