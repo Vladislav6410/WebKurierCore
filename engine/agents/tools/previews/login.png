@@ -1,0 +1,27 @@
+from PIL import Image, ImageDraw, ImageFont
+
+# Создаём изображение 300x150 белого цвета
+img = Image.new('RGB', (300, 150), color='white')
+draw = ImageDraw.Draw(img)
+
+# Заголовок "Login Form"
+font = ImageFont.load_default()
+title = "Login Form"
+title_width, _ = draw.textsize(title, font)
+draw.text(((300 - title_width) // 2, 10), title, fill="black", font=font)
+
+# Поле ввода логина
+draw.rectangle([50, 40, 250, 60], outline="black")
+draw.text((55, 44), "Логин", fill="gray", font=font)
+
+# Поле ввода пароля
+draw.rectangle([50, 70, 250, 90], outline="black")
+draw.text((55, 74), "Пароль", fill="gray", font=font)
+
+# Кнопка "Войти"
+draw.rectangle([100, 110, 200, 130], fill="#ccc", outline="black")
+draw.text((125, 114), "Войти", fill="black", font=font)
+
+# Сохраняем
+img.save("login.png")
+print("✅ login.png создан.")
