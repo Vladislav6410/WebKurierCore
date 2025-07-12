@@ -8,6 +8,15 @@ export function showToolsPanel() {
   }
 }
 
+// 📘 Показ инструкции
+export function showManual() {
+  const block = document.getElementById("manual-block");
+  if (block) {
+    block.style.display = "block";
+    block.scrollIntoView({ behavior: "smooth" });
+  }
+}
+
 // 📤 Загрузка HTML
 export function loadHTMLFile(event) {
   const file = event.target.files[0];
