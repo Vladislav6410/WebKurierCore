@@ -1,0 +1,27 @@
+from PIL import Image, ImageDraw, ImageFont
+
+# Создаём изображение 400x100 с белым фоном
+img = Image.new("RGB", (400, 100), "white")
+draw = ImageDraw.Draw(img)
+
+# Заголовок
+font = ImageFont.load_default()
+title = "Футер сайта"
+title_w, _ = draw.textsize(title, font)
+draw.text(((400 - title_w) // 2, 10), title, fill="black", font=font)
+
+# Рисуем блоки футера
+block_y = 40
+block_height = 40
+block_width = 100
+gap = 20
+start_x = 30
+
+for i in range(3):
+    x0 = start_x + i * (block_width + gap)
+    draw.rectangle([x0, block_y, x0 + block_width, block_y + block_height], outline="black", fill="#f0f0f0")
+    draw.text((x0 + 10, block_y + 12), f"Блок {i+1}", fill="black", font=font)
+
+# Сохраняем как JPG
+img.save("preview-footer.jpg", "JPEG")
+print("✅ preview-footer.jpg создан.")
