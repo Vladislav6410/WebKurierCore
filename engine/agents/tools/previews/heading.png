@@ -1,0 +1,20 @@
+from PIL import Image, ImageDraw, ImageFont
+
+# Создаём белое изображение размером 300x100
+img = Image.new('RGB', (300, 100), color='white')
+draw = ImageDraw.Draw(img)
+
+# Заголовок сверху
+text = "Heading"
+font = ImageFont.load_default()
+text_width, text_height = draw.textsize(text, font)
+x = (img.width - text_width) // 2
+y = 10
+draw.text((x, y), text, fill='black', font=font)
+
+# Линия, имитирующая заголовок (как будто это <h1>)
+draw.rectangle([30, 50, 270, 70], fill='#ccc', outline='black')
+
+# Сохранение
+img.save("heading.png")
+print("✅ heading.png создан.")
