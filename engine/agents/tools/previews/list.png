@@ -1,0 +1,24 @@
+from PIL import Image, ImageDraw, ImageFont
+
+# Создаём белое изображение размером 300x120
+img = Image.new('RGB', (300, 120), color='white')
+draw = ImageDraw.Draw(img)
+
+# Шрифт
+font = ImageFont.load_default()
+
+# Заголовок "List"
+title = "List"
+title_width, _ = draw.textsize(title, font)
+draw.text(((300 - title_width) // 2, 10), title, fill="black", font=font)
+
+# Рисуем маркированный список
+items = ["• Пункт 1", "• Пункт 2", "• Пункт 3"]
+y = 40
+for item in items:
+    draw.text((30, y), item, fill="black", font=font)
+    y += 20
+
+# Сохраняем
+img.save("list.png")
+print("✅ list.png создан.")
