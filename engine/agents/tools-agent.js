@@ -1,6 +1,7 @@
 // === tools-agent.js ===
-// Агент для панели инструментов
+// Агент для панели инструментов WebKurierCore
 
+// 🧱 Показ / скрытие панели инструментов
 export function showToolsPanel() {
   const panel = document.getElementById("tools-panel");
   if (panel) {
@@ -8,16 +9,18 @@ export function showToolsPanel() {
   }
 }
 
-// 📘 Показ инструкции
+// 📘 Показ блока инструкции
 export function showManual() {
   const block = document.getElementById("manual-block");
   if (block) {
     block.style.display = "block";
     block.scrollIntoView({ behavior: "smooth" });
+  } else {
+    alert("📘 Инструкция не найдена на странице.");
   }
 }
 
-// 📤 Загрузка HTML
+// 📤 Загрузка HTML-файла
 export function loadHTMLFile(event) {
   const file = event.target.files[0];
   if (file && file.type === "text/html") {
@@ -29,7 +32,7 @@ export function loadHTMLFile(event) {
   }
 }
 
-// 💾 Сохранение HTML
+// 💾 Сохранение HTML как .html
 export function saveHTMLContent() {
   const content = document.getElementById("html-preview").value;
   const blob = new Blob([content], { type: "text/html" });
@@ -39,7 +42,7 @@ export function saveHTMLContent() {
   a.click();
 }
 
-// 🧠 Генерация HTML по описанию
+// 🧠 Генерация HTML по описанию (AI-подсказка)
 export function generateFromDescription() {
   const desc = document.getElementById("gen-description").value.trim().toLowerCase();
   let html = '';
@@ -51,6 +54,8 @@ export function generateFromDescription() {
     html = `<h1>Заголовок</h1>`;
   } else if (desc.includes("список")) {
     html = `<ul><li>Пункт 1</li><li>Пункт 2</li></ul>`;
+  } else if (desc.includes("форма")) {
+    html = `<form><input type='text' placeholder='Имя'><input type='password' placeholder='Пароль'><button>Войти</button></form>`;
   } else {
     html = "<!-- Не удалось распознать описание -->";
   }
