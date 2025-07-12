@@ -1,0 +1,30 @@
+from PIL import Image, ImageDraw, ImageFont
+
+# Создаём холст
+width, height = 400, 120
+img = Image.new("RGB", (width, height), color="white")
+draw = ImageDraw.Draw(img)
+
+# Шрифт
+font = ImageFont.load_default()
+
+# Заголовок
+title = "Галерея изображений"
+tw, _ = draw.textsize(title, font)
+draw.text(((width - tw) // 2, 10), title, fill="black", font=font)
+
+# Рисуем превьюшки (мини-изображения)
+thumb_w, thumb_h = 80, 60
+gap = 20
+start_x = 20
+start_y = 40
+
+for i in range(4):
+    x = start_x + i * (thumb_w + gap)
+    y = start_y
+    draw.rectangle([x, y, x + thumb_w, y + thumb_h], outline="gray", fill="#e0e0e0")
+    draw.text((x + 15, y + 20), f"{i+1}", fill="black", font=font)
+
+# Сохраняем
+img.save("preview-gallery.jpg", "JPEG")
+print("✅ Файл preview-gallery.jpg создан.")
