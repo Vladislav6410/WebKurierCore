@@ -138,7 +138,43 @@
     <button id="mic-btn">🎤</button>
     <button id="send-btn">➤</button>
   </div>
+<section class="tools-structure">
+  <h2>🧰 Модуль инструментов WebKurierCore</h2>
+  <p>Папка <code>engine/agents/tools/</code> содержит UI-панель, шаблоны, превью и обработчики для работы с HTML-контентом.</p>
 
+  <details open>
+    <summary>📁 engine/agents/tools/</summary>
+    <ul>
+      <li>📄 <strong>tools-agent.js</strong> — логика панели: загрузка, генерация, экспорт, вставка шаблонов</li>
+      <li>📄 <strong>tools-ui.js</strong> — отрисовка панели инструментов, галерея</li>
+      <li>📄 <strong>templates.json</strong> — список HTML-шаблонов с описанием и путём к превью</li>
+      <details>
+        <summary>📁 previews/ — изображения для шаблонов</summary>
+        <ul>
+          <li>🖼️ <strong>button.png</strong> — превью кнопки</li>
+          <li>🖼️ <strong>heading.png</strong> — превью заголовка</li>
+          <li>🖼️ <strong>columns.png</strong> — превью двух колонок</li>
+          <li>🖼️ <strong>list.png</strong> — превью списка</li>
+          <li>🖼️ <strong>login.png</strong> — превью формы входа</li>
+          <li>🖼️ <strong>preview-footer.jpg</strong> — шаблон футера</li>
+          <li>🖼️ <strong>preview-gallery.jpg</strong> — шаблон галереи изображений</li>
+          <li>🖼️ <strong>preview-hero.jpg</strong> — превью hero-блока (приветственный экран)</li>
+        </ul>
+      </details>
+    </ul>
+  </details>
+
+  <h3>📦 Функции панели инструментов</h3>
+  <ul>
+    <li>🧱 <strong>AI-генерация HTML</strong> — на основе текстового описания</li>
+    <li>🧩 <strong>Шаблоны</strong> — из галереи блоков с превью</li>
+    <li>🎯 <strong>Поиск</strong> — фильтрация по названию и описанию</li>
+    <li>🗜️ <strong>HTML-просмотр</strong> — результат прямо в окне</li>
+    <li>📤 <strong>Загрузка</strong> — вставка своего HTML</li>
+    <li>💾 <strong>Сохранение</strong> — экспорт в .html</li>
+    <li>📦 <strong>Экспорт ZIP</strong> — генерация проекта в ZIP</li>
+  </ul>
+</section>
   <!-- Панель инструментов -->
   <div id="tools-panel">
     <button class="close-btn" onclick="closeToolsPanel()">×</button>
