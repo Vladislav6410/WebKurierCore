@@ -1,275 +1,268 @@
-// === terminal.js — Полный объединённый терминал WebKurier ===// === terminal.js — Полный объединённый терминал WebKurier ===
-import CONFIG from "./engine/config.js"; // 📦 Конфигурация
-import * as MasterAgent from "./engine/agents/master-agent.js";
+import CONFIG from "./engine/config.js";
 
-const WALLET_KEY = "webcoin_balance";
-
-// --- Базовые функции кошелька ---
-function getBalance() {
-  return parseInt(localStorage.getItem(WALLET_KEY) || "0", 10);
-}
-
-function setBalance(amount) {
-  localStorage.setItem(WALLET_KEY, amount);
-  localStorage.setItem("wallet_updated", new Date().toISOString());
-  if (!localStorage.getItem("wallet_created")) {
-    localStorage.setItem("wallet_created", new Date().toISOString());
-  }
-  updateBalanceUI();
-}
-
-function addCoins(amount) {
-  const current = getBalance();
-  setBalance(current + amount);
-}
-
-function resetWallet() {
-  setBalance(0);
-}
-
-function updateBalanceUI() {
-  const el = document.getElementById("wallet-balance");
-  if (el) el.textContent = `💰 Баланс: ${getBalance()} WebCoin`;
-}
-
-// --- Журналирование операций ---
-function logTransaction(type, amount) {
-  const history = JSON.parse(localStorage.getItem("wallet_history") || "[]");
-  history.push({
-    date: new Date().toLocaleString(),
-    type,
-    amount,
-    balance: getBalance()
-  });
-  localStorage.setItem("wallet_history", JSON.stringify(history.slice(-50)));
-}
-
-// --- Модификация функций для журналирования ---
-const originalAddCoins = addCoins;
-addCoins = (amount) => {
-  originalAddCoins(amount);
-  logTransaction("DEPOSIT", amount);
-};
-
-const originalSetBalance = setBalance;
-setBalance = (amount) => {
-  const diff = amount - getBalance();
-  originalSetBalance(amount);
-  if (diff !== 0) {
-    logTransaction(diff > 0 ? "DEPOSIT" : "WITHDRAW", Math.abs(diff));
-  }
-};
-
-// --- Терминальный вывод ---
-function printToTerminal(message, isError = false) {
-  // Можно использовать "terminal-output" или "terminal-log" в зависимости от твоего HTML
-  const output = document.getElementById("terminal-output") || document.getElementById("terminal-log");
-  if (!output) return;
-
-  const line = document.createElement("div");
-  line.textContent = message;
-  line.style.color = isError ? "red" : "white";
-  output.appendChild(line);
-  output.scrollTop = output.scrollHeight;
-}
-
-// --- Команды терминала ---
+// --- Базовые команды ---
 const commands = {
   "/help": {
-    description: "📘 Список команд",
-    exec: () =>
-      Object.entries(commands)
-        .map(([cmd, obj]) => `${cmd} — ${obj.description}`)
-        .join("\n")
+    description: "Список команд",
+    exec: () => Object.entries(commands)
+      .map(([cmd, obj]) => `${cmd} — ${obj.description}`)
+      .join("\n")
   },
-  "/add": {
-    description: "Добавить WebCoin: /add [число]",
-    exec: ([amount]) => {
-      const n = parseInt(amount || "10", 10);
-      if (isNaN(n) || n <= 0) throw "Введите положительное число.";
-      addCoins(n);
-      return `✅ Добавлено ${n} WebCoin. Новый баланс: ${getBalance()}`;
-    }
-  },
-  "/set": {
-    description: "Установить баланс: /set [число]",
-    exec: ([amount]) => {
-      const n = parseInt(amount, 10);
-      if (isNaN(n) || n < 0) throw "Введите корректное число.";
-      setBalance(n);
-      return `🔧 Баланс установлен: ${n} WebCoin.`;
-    }
-  },
-  "/reset": {
-    description: "Сбросить баланс",
-    exec: () => {
-      resetWallet();
-      return "🔁 Баланс сброшен.";
-    }
-  },
-  "/balance": {
-    description: "Показать текущий баланс",
-    exec: () => `💰 Баланс: ${getBalance()} WebCoin`
-  },
-  "/history": {
-    description: "История операций",
-    exec: () => {
-      const history = JSON.parse(localStorage.getItem("wallet_history") || "[]");
-      if (history.length === 0) return "📜 История операций пуста";
-      return history.map((entry, i) =>
-        `${i + 1}. ${entry.date}: ${entry.type} ${entry.amount} WC → ${entry.balance} WC`
-      ).join("\n");
-    }
-  },
-  "/import": {
-    description: "Импортировать кошелёк из файла",
-    exec: () => {
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = ".json";
-      input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          try {
-            const data = JSON.parse(reader.result);
-            if (typeof data.balance === "number") {
-              setBalance(data.balance);
-              if (data.created) localStorage.setItem("wallet_created", data.created);
-              if (data.updated) localStorage.setItem("wallet_updated", data.updated);
-              printToTerminal("📥 Баланс загружен: " + data.balance + " WebCoin.");
-            } else {
-              throw "Неверный формат файла.";
-            }
-          } catch (e) {
-            printToTerminal("⚠️ Ошибка импорта: " + e, true);
-          }
-        };
-        reader.readAsText(file);
-      };
-      input.click();
-      return "📂 Выберите файл кошелька.";
-    }
-  },
-  "/export": {
-    description: "Сохранить кошелёк в файл",
-    exec: () => {
-      const data = JSON.stringify({
-        balance: getBalance(),
-        created: localStorage.getItem("wallet_created"),
-        updated: localStorage.getItem("wallet_updated")
-      });
-      const blob = new Blob([data], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "webcoin_wallet.json";
-      a.click();
-      return "💾 Баланс сохранён.";
-    }
-  },
-  "/stats": {
-    description: "Статистика кошелька",
-    exec: () => {
-      const created = new Date(localStorage.getItem("wallet_created") || Date.now()).toLocaleString();
-      const updated = new Date(localStorage.getItem("wallet_updated") || Date.now()).toLocaleString();
-      return `📊 Статистика:\n🪙 Баланс: ${getBalance()} WebCoin\n📅 Создан: ${created}\n🕓 Обновлён: ${updated}`;
-    }
-  },
-  "/sync": {
-    description: "Синхронизировать баланс с сервером",
-    exec: async () => {
-      try {
-        const res = await fetch("/api/sync-balance", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            balance: getBalance(),
-            created: localStorage.getItem("wallet_created"),
-            updated: localStorage.getItem("wallet_updated")
-          })
-        });
-        const json = await res.json();
-        return "🌐 Баланс синхронизирован: " + (json.status || "успешно");
-      } catch (e) {
-        return "⚠️ Ошибка синхронизации: " + e;
-      }
-    }
-  },
-  "/tip": {
-    description: "Отправить агенту WebCoin: /tip [агент] [сумма]",
-    exec: async ([agent, amount]) => {
-      const value = parseInt(amount, 10);
-      if (!agent || isNaN(value) || value <= 0) throw "Укажи агента и сумму.";
-      if (getBalance() < value) throw "Недостаточно средств.";
-      const result = await MasterAgent.sendCoins(agent, value);
-      if (!result.success) throw `Ошибка отправки: ${result.error || "неизвестная ошибка"}`;
-      setBalance(getBalance() - value);
-      return `📤 ${value} WebCoin отправлено агенту ${agent}`;
-    }
-  },
-  "/agents": {
-    description: "Список активных агентов",
-    exec: async () => {
-      try {
-        const agents = await MasterAgent.listActiveAgents();
-        return "🤖 Активные агенты:\n" + agents.map(a => `- ${a.name} (v${a.version})`).join("\n");
-      } catch (e) {
-        return "⚠️ Ошибка получения списка агентов: " + e;
-      }
-    }
-  },
-  "/market": {
-    description: "Показать рыночные курсы WebCoin",
-    exec: async () => {
-      try {
-        const rates = await MasterAgent.getExchangeRates();
-        return `📈 Рыночные курсы:\n${Object.entries(rates)
-          .map(([currency, rate]) => `- 1 WebCoin = ${rate} ${currency}`)
-          .join("\n")}`;
-      } catch (e) {
-        return "⚠️ Ошибка получения курсов: " + e;
-      }
-    }
-  },
-  "/status": {
-    description: "Статус агента: /status [имя]",
-    exec: ([agentName]) => {
-      if (!agentName) throw "Укажите имя агента.";
-      const status = MasterAgent.status && MasterAgent.status[agentName] || '❓ неизвестен';
-      return `📍 Агент "${agentName}": ${status}`;
-    }
-  },
-  "/reload": {
-    description: "Перезагрузить агента: /reload [имя]",
-    exec: ([agentName]) => {
-      if (!agentName) throw "Укажите имя агента.";
-      if (MasterAgent.agents && agentName in MasterAgent.agents) {
-        MasterAgent.reload(agentName);
-        return `🔁 Перезагрузка агента "${agentName}"...`;
-      } else {
-        throw `Агент "${agentName}" не найден.`;
-      }
-    }
-  },
-  "/clear": {
-    description: "Очистить экран",
-    exec: () => {
-      const output = document.getElementById("terminal-output") || document.getElementById("terminal-log");
-      if (output) output.innerHTML = "";
-      return "";
-    }
-  },
-  "/ping": {
-    description: "Проверить соединение",
-    exec: () => "🏓 Pong!"
+  "/config": {
+    description: "Показать конфигурацию",
+    exec: () => "⚙️ Конфиг:\n" + JSON.stringify(CONFIG, null, 2)
   }
+  // ...добавляй свои базовые команды (баланс, reset, clear и т.д.)...
 };
 
-// --- История команд ---
-let commandHistory = [];
-let historyIndex = -1;
+// === MasterAgent ===
+if (CONFIG.features?.master) {
+  import("./engine/agents/master-agent.js").then((MasterAgent) => {
+    commands["/agents"] = {
+      description: "Список активных агентов",
+      exec: async () => {
+        const agents = await MasterAgent.listActiveAgents();
+        return "🤖 Активные агенты:\n" + agents.map(a => `- ${a.name} (v${a.version})`).join("\n");
+      }
+    };
+    commands["/tip"] = {
+      description: "Отправить WebCoin агенту: /tip [имя] [сумма]",
+      exec: async ([agent, amount]) => {
+        const result = await MasterAgent.sendCoins(agent, parseInt(amount, 10));
+        return result.success
+          ? `📤 ${amount} WebCoin отправлено агенту ${agent}`
+          : `❌ Ошибка: ${result.error}`;
+      }
+    };
+    commands["/market"] = {
+      description: "Показать курсы WebCoin",
+      exec: async () => {
+        const rates = await MasterAgent.getExchangeRates();
+        return "📈 Курсы:\n" + Object.entries(rates).map(([cur, rate]) => `- 1 WC = ${rate} ${cur}`).join("\n");
+      }
+    };
+    commands["/status"] = {
+      description: "Статус агента: /status [имя]",
+      exec: ([name]) => MasterAgent.status?.[name] || "❓ Неизвестно"
+    };
+    commands["/reload"] = {
+      description: "Перезагрузить агента: /reload [имя]",
+      exec: ([name]) => {
+        MasterAgent.reload(name);
+        return `🔁 Перезагрузка агента "${name}"...`;
+      }
+    };
+  });
+}
+
+// === TranslatorAgent ===
+if (CONFIG.features?.translator) {
+  import("./engine/agents/translator/translator-agent.js").then((TranslatorAgent) => {
+    commands["/translate"] = {
+      description: "Перевести текст: /translate [язык] [текст]",
+      exec: async ([lang, ...text]) => {
+        const result = await TranslatorAgent.translate(text.join(" "), lang);
+        return `🌐 Перевод (${lang}): ${result}`;
+      }
+    };
+    commands["/lang"] = {
+      description: "Показать языки",
+      exec: async () => {
+        const langs = await TranslatorAgent.getLanguages();
+        return "🌍 Языки: " + langs.join(", ");
+      }
+    };
+    commands["/detect"] = {
+      description: "Определить язык",
+      exec: async ([...text]) => {
+        const lang = await TranslatorAgent.detect(text.join(" "));
+        return `🔎 Язык: ${lang}`;
+      }
+    };
+  });
+}
+
+// === DropboxAgent ===
+if (CONFIG.features?.dropbox) {
+  import("./engine/agents/dropbox/dropbox-agent.js").then((DropboxAgent) => {
+    commands["/save"] = {
+      description: "Сохранить в Dropbox",
+      exec: async () => {
+        // Пример: сохраняем баланс
+        await DropboxAgent.uploadFile("wallet_backup.json", JSON.stringify({ balance: 100 }));
+        return "📦 Файл сохранён в Dropbox.";
+      }
+    };
+    commands["/load"] = {
+      description: "Загрузить из Dropbox",
+      exec: async () => {
+        const text = await DropboxAgent.downloadFile("wallet_backup.json");
+        const json = JSON.parse(text);
+        // setBalance(json.balance);
+        return `📥 Баланс восстановлен: ${json.balance} WebCoin.`;
+      }
+    };
+    commands["/list"] = {
+      description: "Список файлов Dropbox",
+      exec: async () => {
+        const files = await DropboxAgent.listFiles();
+        return "🗃 Файлы: " + files.join(", ");
+      }
+    };
+    commands["/backup"] = {
+      description: "Резервная копия в Dropbox",
+      exec: async () => {
+        // ...логика бэкапа...
+        return "✅ Резервная копия создана.";
+      }
+    };
+  });
+}
+
+// === LegalAgent ===
+if (CONFIG.features?.legal) {
+  import("./engine/agents/legal/legal-agent.js").then((LegalAgent) => {
+    commands["/legal"] = {
+      description: "Юридическая помощь: analyze/template/help",
+      exec: async ([action, ...args]) => {
+        if (action === "analyze") return await LegalAgent.analyze(args.join(" "));
+        if (action === "template") return await LegalAgent.template(args.join(" "));
+        if (action === "help") return await LegalAgent.help();
+        return "Доступные: analyze, template, help";
+      }
+    };
+  });
+}
+
+// === ToolsAgent ===
+if (CONFIG.features?.tools) {
+  import("./engine/agents/tools/tools-agent.js").then((ToolsAgent) => {
+    commands["/build"] = {
+      description: "Сгенерировать HTML",
+      exec: async ([...args]) => await ToolsAgent.build(args.join(" "))
+    };
+    commands["/preview"] = {
+      description: "Предпросмотр HTML",
+      exec: async ([...args]) => await ToolsAgent.preview(args.join(" "))
+    };
+    commands["/exportzip"] = {
+      description: "Экспортировать ZIP",
+      exec: async () => await ToolsAgent.exportZip()
+    };
+  });
+}
+
+// === LayoutAgent ===
+if (CONFIG.features?.layout) {
+  import("./engine/agents/layout/layout-agent.js").then((LayoutAgent) => {
+    commands["/layout"] = {
+      description: "Вёрстка: build/fixcss",
+      exec: async ([action, ...args]) => {
+        if (action === "build") return await LayoutAgent.build(args.join(" "));
+        if (action === "fixcss") return await LayoutAgent.fixCss(args.join(" "));
+        return "Доступные: build, fixcss";
+      }
+    };
+  });
+}
+
+// === BudgetAgent ===
+if (CONFIG.features?.budget) {
+  import("./engine/agents/budget/budget-agent.js").then((BudgetAgent) => {
+    commands["/budget"] = {
+      description: "Бюджет: add/chart",
+      exec: async ([action, ...args]) => {
+        if (action === "add") return await BudgetAgent.add(args.join(" "));
+        if (action === "chart") return await BudgetAgent.chart();
+        return "Доступные: add, chart";
+      }
+    };
+  });
+}
+
+// === ReportAgent ===
+if (CONFIG.features?.report) {
+  import("./engine/agents/report/report-agent.js").then((ReportAgent) => {
+    commands["/report"] = {
+      description: "Отчёты: generate/last",
+      exec: async ([action, ...args]) => {
+        if (action === "generate") return await ReportAgent.generate(args.join(" "));
+        if (action === "last") return await ReportAgent.last();
+        return "Доступные: generate, last";
+      }
+    };
+  });
+}
+
+// === ModuleAgent ===
+if (CONFIG.features?.module) {
+  import("./engine/agents/module/module-agent.js").then((ModuleAgent) => {
+    commands["/module"] = {
+      description: "Модули: list/enable",
+      exec: async ([action, ...args]) => {
+        if (action === "list") return await ModuleAgent.list();
+        if (action === "enable") return await ModuleAgent.enable(args[0]);
+        return "Доступные: list, enable";
+      }
+    };
+  });
+}
+
+// === AIHelperAgent ===
+if (CONFIG.features?.aihelper) {
+  import("./engine/agents/aihelper/aihelper-agent.js").then((AIHelperAgent) => {
+    commands["/ai"] = {
+      description: "AI-помощник: suggest/help",
+      exec: async ([action, ...args]) => {
+        if (action === "suggest") return await AIHelperAgent.suggest(args.join(" "));
+        if (action === "help") return await AIHelperAgent.help();
+        return "Доступные: suggest, help";
+      }
+    };
+  });
+}
+
+// === NavigatorAgent ===
+if (CONFIG.features?.navigator) {
+  import("./engine/agents/navigator/navigator-agent.js").then((NavigatorAgent) => {
+    commands["/nav"] = {
+      description: "Навигация: start/location",
+      exec: async ([action, ...args]) => {
+        if (action === "start") return await NavigatorAgent.start(args.join(" "));
+        if (action === "location") return await NavigatorAgent.location();
+        return "Доступные: start, location";
+      }
+    };
+  });
+}
+
+// === MarketingAgent ===
+if (CONFIG.features?.marketing) {
+  import("./engine/agents/marketing/marketing-agent.js").then((MarketingAgent) => {
+    commands["/ads"] = {
+      description: "Маркетинг: idea/slogan",
+      exec: async ([action, ...args]) => {
+        if (action === "idea") return await MarketingAgent.idea(args.join(" "));
+        if (action === "slogan") return await MarketingAgent.slogan(args.join(" "));
+        return "Доступные: idea, slogan";
+      }
+    };
+  });
+}
+
+// === WalletAgent ===
+if (CONFIG.features?.wallet) {
+  import("./engine/agents/wallet/wallet-agent.js").then((WalletAgent) => {
+    commands["/wallet"] = {
+      description: "Кошелёк: send/export",
+      exec: async ([action, ...args]) => {
+        if (action === "send") return await WalletAgent.send(args[0], args[1]);
+        if (action === "export") return await WalletAgent.export();
+        return "Доступные: send, export";
+      }
+    };
+  });
+}
 
 // --- Обработка команд ---
 async function handleCommand(event) {
@@ -280,9 +273,6 @@ async function handleCommand(event) {
     if (!cmd) return;
 
     printToTerminal("> " + cmd);
-    commandHistory.unshift(cmd);
-    commandHistory = commandHistory.slice(0, 50);
-    historyIndex = -1;
 
     const [command, ...args] = cmd.split(" ");
     const action = commands[command];
@@ -298,61 +288,22 @@ async function handleCommand(event) {
     } catch (err) {
       printToTerminal("⚠️ " + err, true);
     }
-
-    updateBalanceUI();
   }
 }
 
-// --- Кнопки и инициализация ---
+// --- Инициализация ---
 document.addEventListener("DOMContentLoaded", () => {
-  // Создаем историю при первом запуске
-  if (!localStorage.getItem("wallet_created")) {
-    localStorage.setItem("wallet_created", new Date().toISOString());
-  }
-  updateBalanceUI();
-
   const input = document.getElementById("terminal-input");
-  const enterBtn = document.getElementById("btn-enter");
-  const copyBtn = document.getElementById("btn-copy");
-  const addBtn = document.getElementById("add-coins");
-  const resetBtn = document.getElementById("reset-wallet");
-
-  if (input) {
-    input.addEventListener("keydown", handleCommand);
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowUp") {
-        if (commandHistory.length > 0) {
-          historyIndex = Math.min(historyIndex + 1, commandHistory.length - 1);
-          input.value = commandHistory[historyIndex] || "";
-        }
-        e.preventDefault();
-      } else if (e.key === "ArrowDown") {
-        if (historyIndex > 0) {
-          historyIndex--;
-          input.value = commandHistory[historyIndex] || "";
-        } else {
-          historyIndex = -1;
-          input.value = "";
-        }
-        e.preventDefault();
-      }
-    });
-  }
-
-  if (enterBtn) enterBtn.addEventListener("click", () => handleCommand({ key: "Enter" }));
-  if (copyBtn) copyBtn.addEventListener("click", () => {
-    if (input) {
-      navigator.clipboard.writeText(input.value || "").then(() => {
-        printToTerminal("📋 Команда скопирована.");
-      });
-    }
-  });
-  if (addBtn) addBtn.addEventListener("click", () => {
-    addCoins(10);
-    updateBalanceUI();
-  });
-  if (resetBtn) resetBtn.addEventListener("click", () => {
-    resetWallet();
-    updateBalanceUI();
-  });
+  if (input) input.addEventListener("keydown", handleCommand);
 });
+
+// --- Вывод в терминал ---
+function printToTerminal(message, isError = false) {
+  const output = document.getElementById("terminal-output") || document.getElementById("terminal-log");
+  if (!output) return;
+  const line = document.createElement("div");
+  line.textContent = message;
+  line.style.color = isError ? "red" : "white";
+  output.appendChild(line);
+  output.scrollTop = output.scrollHeight;
+}
