@@ -1,0 +1,21 @@
+from PIL import Image, ImageDraw, ImageFont
+
+# Создание изображения 300x150 белого цвета
+img = Image.new('RGB', (300, 150), color='white')
+draw = ImageDraw.Draw(img)
+
+# Рисуем две колонки
+draw.rectangle([20, 30, 130, 120], outline='black', width=2)
+draw.rectangle([170, 30, 280, 120], outline='black', width=2)
+
+# Подпись
+text = "2 Columns"
+font = ImageFont.load_default()
+text_width, text_height = draw.textsize(text, font)
+x = (img.width - text_width) // 2
+y = 10
+draw.text((x, y), text, fill='black', font=font)
+
+# Сохранение
+img.save("columns.png")
+print("✅ columns.png создан.")
