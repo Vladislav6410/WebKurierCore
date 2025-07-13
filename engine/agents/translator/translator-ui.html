@@ -2,18 +2,46 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>🌍 Мультиязычный Переводчик</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f0f0f0;
+      padding: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-bottom: 10px;
+    }
+    button {
+      margin: 5px;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+    #translatedResult {
+      margin-top: 20px;
+      background: white;
+      padding: 10px;
+      border-radius: 5px;
+    }
+  </style>
   <script type="module" src="translator-agent.js"></script>
   <script type="module" src="voice.js"></script>
   <script type="module" src="interface.js"></script>
 </head>
 <body>
   <h1>🌐 Агент-переводчик</h1>
-  <div>
-    <textarea id="sourceText" placeholder="Введите текст для перевода..."></textarea><br>
-    <button onclick="TranslatorUI.translate()">📤 Перевести</button>
-  </div>
+
+  <textarea id="sourceText" placeholder="Введите текст..."></textarea><br>
+
+  <button onclick="TranslatorUI.translate()">📤 Перевести</button>
+  <button onclick="TranslatorUI.playVoice()">🔊 Озвучить</button>
+  <button onclick="TranslatorUI.clear()">🧹 Очистить</button>
+  <button onclick="TranslatorUI.showOriginal()">📄 Оригинал</button>
+  <button onclick="TranslatorUI.uploadFile()">📁 Загрузить файл</button>
+
   <div id="translatedResult"></div>
 </body>
 </html>
