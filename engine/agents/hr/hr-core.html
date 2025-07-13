@@ -1,0 +1,37 @@
+<!-- hr-core.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>🧑‍💼 Агент: Найм на работу</title>
+  <script type="module" src="hr-agent.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    button {
+      margin: 5px;
+      padding: 8px 12px;
+    }
+    #output {
+      margin-top: 20px;
+      background: white;
+      padding: 12px;
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧑‍💼 Агент найма на работу (HR)</h1>
+
+  <button onclick="HRAgent.analyzeResume()">📄 Анализ резюме</button>
+  <button onclick="HRAgent.generateVacancy()">📌 Генерировать вакансию</button>
+  <button onclick="HRAgent.rateCandidate()">🧪 Оценить кандидата</button>
+
+  <div id="output"></div>
+</body>
+</html>
