@@ -1,0 +1,39 @@
+<!-- pilot-core.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>🚁 Агент: Пилот дрона</title>
+  <script type="module" src="pilot-agent.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f0f0f0;
+      padding: 20px;
+    }
+    button {
+      margin: 5px;
+      padding: 8px 14px;
+      font-size: 14px;
+    }
+    #output {
+      margin-top: 20px;
+      background: #fff;
+      padding: 12px;
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>🚁 Агент ручного пилота</h1>
+
+  <button onclick="PilotAgent.takeoff()">🛫 Взлёт</button>
+  <button onclick="PilotAgent.land()">🛬 Посадка</button>
+  <button onclick="PilotAgent.holdPosition()">⏸ Удержание позиции</button>
+  <button onclick="PilotAgent.followPath()">📍 Следовать по маршруту</button>
+
+  <div id="output"></div>
+</body>
+</html>
