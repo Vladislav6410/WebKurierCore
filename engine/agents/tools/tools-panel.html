@@ -1,0 +1,17 @@
+<!-- tools-panel.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>🛠 Инструменты генерации</title>
+  <script type="module" src="tools-agent.js"></script>
+  <script type="module" src="tools-ui.js"></script>
+</head>
+<body>
+  <h1>🛠 Панель инструментов WebKurier</h1>
+  <button onclick="ToolsUI.showTemplates()">📂 Показать шаблоны</button>
+  <button onclick="ToolsUI.generateByDescription()">🧠 Сгенерировать по описанию</button>
+  <button onclick="ToolsUI.exportZip()">💾 Экспорт в ZIP</button>
+  <div id="tools-output"></div>
+</body>
+</html>
