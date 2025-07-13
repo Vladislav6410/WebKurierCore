@@ -1,0 +1,40 @@
+<!-- wallet-core.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>💼 WebCoin Кошелёк</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f9f9f9;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    #wallet-ui {
+      margin-top: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    button {
+      margin: 5px;
+      padding: 8px 12px;
+    }
+  </style>
+  <script type="module" src="wallet-agent.js"></script>
+  <script type="module" src="wallet-ui.js"></script>
+</head>
+<body>
+  <h1>💼 WebCoin Wallet</h1>
+  <div id="wallet-ui">
+    <p>💰 Баланс: <span id="wallet-balance">0</span> WebCoin</p>
+    <button onclick="WalletUI.add(10)">➕ Добавить 10</button>
+    <button onclick="WalletUI.reset()">♻️ Сбросить</button>
+    <button onclick="WalletUI.showHistory()">📜 История</button>
+  </div>
+</body>
+</html>
