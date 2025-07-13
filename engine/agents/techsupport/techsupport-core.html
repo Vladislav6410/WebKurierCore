@@ -1,0 +1,41 @@
+<!-- techsupport-core.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>🛟 Агент: Техническая поддержка</title>
+  <script type="module" src="techsupport-agent.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    button {
+      margin: 5px;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+    #output {
+      margin-top: 20px;
+      padding: 10px;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 0 4px rgba(0,0,0,0.1);
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛟 Агент технической поддержки</h1>
+
+  <button onclick="TechSupportAgent.checkStatus()">📋 Проверка системы</button>
+  <button onclick="TechSupportAgent.clearCache()">🧹 Очистить кэш</button>
+  <button onclick="TechSupportAgent.help()">❓ Помощь</button>
+
+  <div id="output"></div>
+</body>
+</html>
