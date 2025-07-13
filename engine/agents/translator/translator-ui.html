@@ -1,0 +1,19 @@
+<!-- translator-ui.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>🌍 Мультиязычный Переводчик</title>
+  <script type="module" src="translator-agent.js"></script>
+  <script type="module" src="voice.js"></script>
+  <script type="module" src="interface.js"></script>
+</head>
+<body>
+  <h1>🌐 Агент-переводчик</h1>
+  <div>
+    <textarea id="sourceText" placeholder="Введите текст для перевода..."></textarea><br>
+    <button onclick="TranslatorUI.translate()">📤 Перевести</button>
+  </div>
+  <div id="translatedResult"></div>
+</body>
+</html>
