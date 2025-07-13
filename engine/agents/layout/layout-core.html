@@ -1,0 +1,17 @@
+<!-- layout-core.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>🎨 Верстальщик</title>
+  <script type="module" src="layout-agent.js"></script>
+  <script type="module" src="layout-ui.js"></script>
+</head>
+<body>
+  <h1>🎨 Агент-верстальщик</h1>
+  <button onclick="LayoutUI.analyze()">🧪 Анализ</button>
+  <button onclick="LayoutUI.preview()">👁 Предпросмотр</button>
+  <button onclick="LayoutUI.save()">💾 Сохранить HTML</button>
+  <div id="layout-preview"></div>
+</body>
+</html>
