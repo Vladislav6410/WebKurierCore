@@ -8,51 +8,157 @@
     body {
       font-family: Arial, sans-serif;
       background: #f8f8f8;
-      padding: 30px;
+      padding: 20px;
       margin: 0;
     }
+
     h1 {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 10px;
     }
-    ul {
-      list-style: none;
-      padding: 0;
-      max-width: 600px;
-      margin: auto;
-    }
-    li {
-      margin: 10px 0;
+
+    .lang-select {
       text-align: center;
+      margin-bottom: 20px;
     }
-    a {
-      display: inline-block;
+
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .agent {
+      width: 150px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+
+    .agent:hover {
+      transform: scale(1.03);
+    }
+
+    .agent img {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+
+    .agent a {
+      display: block;
+      padding: 10px;
+      font-size: 16px;
       text-decoration: none;
-      font-size: 18px;
       color: #333;
-      background: #e0e0e0;
-      padding: 10px 20px;
-      border-radius: 8px;
-      transition: background 0.3s ease;
     }
-    a:hover {
-      background: #c0c0c0;
+
+    .back-button {
+      display: block;
+      text-align: center;
+      margin: 30px auto 10px;
+      font-size: 16px;
+      text-decoration: none;
+      color: #444;
+      background: #ddd;
+      padding: 8px 20px;
+      border-radius: 8px;
+      width: max-content;
     }
   </style>
 </head>
 <body>
-  <h1>💼 Ядро агентов WebKurier</h1>
-  <ul>
-    <li><a href="autopilot/autopilot-core.html">🤖 Автопилот</a></li>
-    <li><a href="hr/hr-core.html">🧑‍💼 Отдел кадров (HR)</a></li>
-    <li><a href="layout/layout-core.html">💻 Верстальщик</a></li>
-    <li><a href="pilot/pilot-core.html">🎮 Пилот дрона</a></li>
-    <li><a href="programmer/programmer-core.html">👨‍💻 Программист</a></li>
-    <li><a href="techsupport/techsupport-core.html">🛠 Техподдержка</a></li>
-    <li><a href="telemetry/telemetry-core.html">📡 Телеметрия</a></li>
-    <li><a href="tools/tools-core.html">🧰 Инструменты</a></li>
-    <li><a href="translator/translator-ui.html">🌐 Переводчик</a></li>
-    <li><a href="voice/voice-core.html">🎤 Голосовой</a></li>
-  </ul>
+
+  <h1>💼 Агенты WebKurier</h1>
+
+  <div class="lang-select">
+    🌐 Язык:
+    <select onchange="changeLang(this.value)">
+      <option value="ru">Русский</option>
+      <option value="en">English</option>
+      <option value="de">Deutsch</option>
+      <option value="pl">Polski</option>
+    </select>
+  </div>
+
+  <div class="grid">
+    <div class="agent">
+      <a href="autopilot/autopilot-core.html">
+        <img src="autopilot/preview.jpg" alt="Autopilot">
+        🤖 Автопилот
+      </a>
+    </div>
+    <div class="agent">
+      <a href="hr/hr-core.html">
+        <img src="hr/preview.jpg" alt="HR">
+        🧑‍💼 Отдел кадров
+      </a>
+    </div>
+    <div class="agent">
+      <a href="layout/layout-core.html">
+        <img src="layout/preview.jpg" alt="Layout">
+        💻 Верстальщик
+      </a>
+    </div>
+    <div class="agent">
+      <a href="pilot/pilot-core.html">
+        <img src="pilot/preview.jpg" alt="Pilot">
+        🎮 Пилот
+      </a>
+    </div>
+    <div class="agent">
+      <a href="programmer/programmer-core.html">
+        <img src="programmer/preview.jpg" alt="Programmer">
+        👨‍💻 Программист
+      </a>
+    </div>
+    <div class="agent">
+      <a href="techsupport/techsupport-core.html">
+        <img src="techsupport/preview.jpg" alt="TechSupport">
+        🛠 Поддержка
+      </a>
+    </div>
+    <div class="agent">
+      <a href="telemetry/telemetry-core.html">
+        <img src="telemetry/preview.jpg" alt="Telemetry">
+        📡 Телеметрия
+      </a>
+    </div>
+    <div class="agent">
+      <a href="tools/tools-core.html">
+        <img src="tools/preview.jpg" alt="Tools">
+        🧰 Инструменты
+      </a>
+    </div>
+    <div class="agent">
+      <a href="translator/translator-ui.html">
+        <img src="translator/preview.jpg" alt="Translator">
+        🌐 Переводчик
+      </a>
+    </div>
+    <div class="agent">
+      <a href="voice/voice-core.html">
+        <img src="voice/preview.jpg" alt="Voice">
+        🎤 Голос
+      </a>
+    </div>
+  </div>
+
+  <a href="../index.html" class="back-button">← Назад</a>
+
+  <script>
+    function changeLang(lang) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("lang", lang);
+      window.location.href = url.toString();
+    }
+  </script>
+
 </body>
 </html>
