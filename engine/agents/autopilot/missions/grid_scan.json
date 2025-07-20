@@ -1,0 +1,14 @@
+{
+  "mission_name": "Grid Scan",
+  "description": "Сканирование территории по сетке (картостроение)",
+  "area": {
+    "start": { "lat": 51.723000, "lon": 8.126000 },
+    "end": { "lat": 51.725000, "lon": 8.124000 }
+  },
+  "parameters": {
+    "altitude": 40,
+    "grid_spacing": 20,
+    "orientation": "horizontal",
+    "camera_trigger": true
+  }
+}
