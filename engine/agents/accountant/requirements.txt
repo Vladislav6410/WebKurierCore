@@ -1,1 +1,4 @@
 fpdf
+openpyxl
+dropbox
+pytesseract
