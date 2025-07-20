@@ -1,0 +1,12 @@
+{
+  "full_name": "Max Mustermann",
+  "steuer_id": "12345678901",
+  "employer": "Knauf Spedition GmbH",
+  "brutto_income": 32000,
+  "tax_paid": 5100,
+  "health_insurance": 2600,
+  "retirement_insurance": 1800,
+  "unemployment_insurance": 600,
+  "year": 2023,
+  "source_file": "Lohnsteuerbescheinigung_2023.pdf"
+}
