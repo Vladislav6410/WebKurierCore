@@ -1,0 +1,15 @@
+{
+  "mission_name": "Tree Line Follow",
+  "description": "Облет деревьев вдоль лесополосы",
+  "waypoints": [
+    { "lat": 51.723400, "lon": 8.126700, "alt": 20 },
+    { "lat": 51.723800, "lon": 8.126300, "alt": 20 },
+    { "lat": 51.724200, "lon": 8.125900, "alt": 20 },
+    { "lat": 51.724600, "lon": 8.125500, "alt": 20 }
+  ],
+  "parameters": {
+    "speed": 3,
+    "follow_mode": "line",
+    "avoid_obstacles": true
+  }
+}
