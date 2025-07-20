@@ -1,0 +1,16 @@
+{
+  "user": "{{user_id}}",
+  "year": "{{year}}",
+  "full_name": "{{full_name}}",
+  "steuer_id": "{{steuer_id}}",
+  "brutto_income": "{{brutto}}",
+  "tax_paid": "{{tax_paid}}",
+  "health_insurance": "{{insurance}}",
+  "estimated_refund": "{{estimated_refund}}",
+  "created_at": "{{timestamp}}",
+  "attachments": [
+    "Lohnsteuerbescheinigung.pdf",
+    "contract.pdf",
+    "expenses.xlsx"
+  ]
+}
