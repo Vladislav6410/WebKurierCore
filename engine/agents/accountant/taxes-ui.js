@@ -7,7 +7,7 @@ async function submitTaxReturn() {
   const resultBox = document.getElementById("result");
 
   if (!lohnFile) {
-    alert("❗ Пожалуйста, выберите Lohnsteuerbescheinigung файл.");
+    alert("❗ " + (window.i18nText?.uploadLohn || "Bitte wählen Sie eine Datei aus."));
     return;
   }
 
@@ -18,7 +18,11 @@ async function submitTaxReturn() {
     formData.append("expenses", expensesFile);
   }
 
-  resultBox.innerHTML = "⏳ Отправка данных на сервер...";
+  resultBox.innerHTML = `
+    ${window.i18nText.success(year)}<br>
+    📎 Dateien: ${lohnFile.name}${expensesFile ? " + " + expensesFile.name : ""}<br>
+    ${window.i18nText.waiting}
+  `;
   resultBox.style.display = "block";
 
   try {
@@ -27,15 +31,15 @@ async function submitTaxReturn() {
       body: formData
     });
 
-    if (!response.ok) throw new Error("Ошибка при отправке");
+    if (!response.ok) throw new Error("Fehler beim Senden.");
 
     const result = await response.json();
     resultBox.innerHTML = `
-      ✅ Декларация за <b>${year}</b> сформирована!<br>
-      💶 Возврат: <b>${result.estimated_refund} €</b><br>
-      📁 Сохранено: ${result.output_path}
+      ✅ ${window.i18nText.success(year)}<br>
+      💶 ${window.i18nText.estimatedRefund || "Erstattungsbetrag"}: <b>${result.estimated_refund} €</b><br>
+      📁 ${window.i18nText.savedAs || "Gespeichert unter"}: ${result.output_path}
     `;
   } catch (error) {
-    resultBox.innerHTML = `❌ Ошибка: ${error.message}`;
+    resultBox.innerHTML = `❌ Fehler: ${error.message}`;
   }
 }
