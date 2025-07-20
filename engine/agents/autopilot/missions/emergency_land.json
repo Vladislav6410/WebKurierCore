@@ -1,0 +1,17 @@
+{
+  "mission_name": "Emergency Land",
+  "description": "Немедленная посадка на текущем месте",
+  "waypoints": [
+    {
+      "lat": "CURRENT",
+      "lon": "CURRENT",
+      "alt": 0,
+      "action": "land"
+    }
+  ],
+  "parameters": {
+    "priority": "critical",
+    "min_battery": 5,
+    "notify": true
+  }
+}
