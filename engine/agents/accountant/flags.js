@@ -1,4 +1,11 @@
-// 📁 engine/agents/accountant/flags.js
+function getLangFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const lang = params.get("lang");
+  if (["de", "ru", "en", "pl"].includes(lang)) {
+    return lang;
+  }
+  return null;
+}
 
 function renderLanguageFlags(containerId = "lang-flags") {
   const flags = {
@@ -33,16 +40,12 @@ function detectBrowserLanguage() {
 
 function setLanguage(lang) {
   i18nInit(lang);
-  document.documentElement.lang = lang; // 👈 обновляем <html lang="...">
+  document.documentElement.lang = lang;
   localStorage.setItem("lang", lang);
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  let lang = localStorage.getItem("lang");
-  if (!lang) {
-    lang = detectBrowserLanguage();
-    localStorage.setItem("lang", lang);
-  }
+  let lang = getLangFromURL() || localStorage.getItem("lang") || detectBrowserLanguage();
   setLanguage(lang);
   renderLanguageFlags();
 });
