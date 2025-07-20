@@ -8,7 +8,9 @@ const translations = {
     uploadExpenses: "Zusätzliche Ausgaben:",
     generate: "📤 Erklärung erstellen",
     success: (year) => `✅ Steuererklärung für <b>${year}</b> vorbereitet.`,
-    waiting: "⏳ Bitte warten Sie auf die Analyse..."
+    waiting: "⏳ Bitte warten Sie auf die Analyse...",
+    estimatedRefund: "Erstattungsbetrag",
+    savedAs: "Gespeichert unter"
   },
   ru: {
     title: "💶 Налоговый помощник",
@@ -17,7 +19,9 @@ const translations = {
     uploadExpenses: "Дополнительные расходы:",
     generate: "📤 Сформировать декларацию",
     success: (year) => `✅ Декларация за <b>${year}</b> подготовлена.`,
-    waiting: "⏳ Пожалуйста, подождите..."
+    waiting: "⏳ Пожалуйста, подождите...",
+    estimatedRefund: "Сумма возврата",
+    savedAs: "Сохранено как"
   },
   en: {
     title: "💶 Tax Assistant",
@@ -26,7 +30,9 @@ const translations = {
     uploadExpenses: "Additional expenses:",
     generate: "📤 Generate Declaration",
     success: (year) => `✅ Tax declaration for <b>${year}</b> is ready.`,
-    waiting: "⏳ Please wait for analysis..."
+    waiting: "⏳ Please wait for analysis...",
+    estimatedRefund: "Estimated refund",
+    savedAs: "Saved as"
   },
   pl: {
     title: "💶 Asystent podatkowy",
@@ -35,7 +41,9 @@ const translations = {
     uploadExpenses: "Dodatkowe wydatki:",
     generate: "📤 Utwórz deklarację",
     success: (year) => `✅ Deklaracja podatkowa za <b>${year}</b> gotowa.`,
-    waiting: "⏳ Proszę czekać na analizę..."
+    waiting: "⏳ Proszę czekać na analizę...",
+    estimatedRefund: "Zwrot podatku",
+    savedAs: "Zapisano jako"
   }
 };
 
