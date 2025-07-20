@@ -1,0 +1,35 @@
+{
+  "mission_name": "Inspection Loop",
+  "description": "Облёт объекта по кругу с остановками и съёмкой",
+  "waypoints": [
+    {
+      "lat": 51.723450,
+      "lon": 8.126400,
+      "alt": 20,
+      "action": "photo"
+    },
+    {
+      "lat": 51.723470,
+      "lon": 8.126550,
+      "alt": 20,
+      "action": "photo"
+    },
+    {
+      "lat": 51.723440,
+      "lon": 8.126700,
+      "alt": 20,
+      "action": "photo"
+    },
+    {
+      "lat": 51.723410,
+      "lon": 8.126550,
+      "alt": 20,
+      "action": "photo"
+    }
+  ],
+  "parameters": {
+    "hover_time_sec": 3,
+    "photo_mode": true,
+    "loop": true
+  }
+}
