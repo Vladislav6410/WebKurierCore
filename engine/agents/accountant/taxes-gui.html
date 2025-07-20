@@ -1,0 +1,62 @@
+<!-- 📁 engine/agents/accountant/taxes-gui.html -->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Steuererklärung Assistent</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: sans-serif; background: #f4f4f4; padding: 2em; }
+    .container { background: white; padding: 2em; border-radius: 8px; max-width: 600px; margin: auto; }
+    h1 { font-size: 24px; margin-bottom: 0.5em; }
+    label { display: block; margin-top: 1em; }
+    input, select { width: 100%; padding: 8px; margin-top: 0.3em; }
+    button { margin-top: 1.5em; padding: 10px 20px; font-weight: bold; }
+    .result { margin-top: 2em; padding: 1em; background: #e1f5e1; border: 1px solid #9ccf9c; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>💶 Steuer-Assistent</h1>
+    
+    <label for="year">Jahr wählen:</label>
+    <select id="year">
+      <option>2022</option>
+      <option selected>2023</option>
+      <option>2024</option>
+    </select>
+
+    <label for="lohnFile">Lohnsteuerbescheinigung:</label>
+    <input type="file" id="lohnFile" accept=".pdf,.json">
+
+    <label for="expensesFile">Zusätzliche Ausgaben:</label>
+    <input type="file" id="expensesFile" accept=".pdf,.json,.xlsx">
+
+    <button onclick="submitTaxReturn()">📤 Erklärung erstellen</button>
+
+    <div id="result" class="result" style="display:none;"></div>
+  </div>
+
+  <script>
+    function submitTaxReturn() {
+      const year = document.getElementById('year').value;
+      const lohnFile = document.getElementById('lohnFile').files[0];
+      const expensesFile = document.getElementById('expensesFile').files[0];
+
+      if (!lohnFile) {
+        alert("Bitte wählen Sie die Lohnsteuerbescheinigung aus.");
+        return;
+      }
+
+      // 🧠 В будущем: отправка файлов в Python-агент через API
+      const resultBox = document.getElementById("result");
+      resultBox.innerHTML = `
+        ✅ Steuererklärung für <b>${year}</b> vorbereitet.<br>
+        📎 Dateien: ${lohnFile.name}${expensesFile ? " + " + expensesFile.name : ""}<br>
+        ⏳ Bitte warten Sie auf die Analyse...
+      `;
+      resultBox.style.display = "block";
+    }
+  </script>
+</body>
+</html>
