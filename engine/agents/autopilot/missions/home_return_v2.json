@@ -1,0 +1,29 @@
+{
+  "mission_name": "Safe Return Home",
+  "description": "Возврат на точку старта с промежуточной высотой",
+  "waypoints": [
+    {
+      "lat": 51.723410,
+      "lon": 8.126510,
+      "alt": 40,
+      "action": "climb"
+    },
+    {
+      "lat": 51.723390,
+      "lon": 8.126600,
+      "alt": 50,
+      "action": "hover"
+    },
+    {
+      "lat": 51.723200,
+      "lon": 8.126800,
+      "alt": 20,
+      "action": "land"
+    }
+  ],
+  "parameters": {
+    "return_speed_mps": 4,
+    "hover_time_sec": 5,
+    "safety_altitude_m": 35
+  }
+}
