@@ -24,8 +24,20 @@ function renderLanguageFlags(containerId = "lang-flags") {
   });
 }
 
+function detectBrowserLanguage() {
+  const lang = navigator.language || navigator.userLanguage || "de";
+  if (lang.startsWith("ru")) return "ru";
+  if (lang.startsWith("pl")) return "pl";
+  if (lang.startsWith("en")) return "en";
+  return "de";
+}
+
 window.addEventListener("DOMContentLoaded", () => {
-  const lang = localStorage.getItem("lang") || "de";
+  let lang = localStorage.getItem("lang");
+  if (!lang) {
+    lang = detectBrowserLanguage();
+    localStorage.setItem("lang", lang);
+  }
   i18nInit(lang);
   renderLanguageFlags();
 });
