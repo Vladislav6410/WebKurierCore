@@ -1,0 +1,41 @@
+{
+  "mission_name": "Emergency Return",
+  "description": "Аварийное возвращение дрона на домашнюю точку",
+  "waypoints": [
+    {
+      "lat": 51.723450,
+      "lon": 8.126400,
+      "alt": 10,
+      "action": "ascend"
+    },
+    {
+      "lat": 51.723500,
+      "lon": 8.126200,
+      "alt": 30,
+      "action": "fly"
+    },
+    {
+      "lat": 51.723550,
+      "lon": 8.126000,
+      "alt": 30,
+      "action": "fly"
+    },
+    {
+      "lat": 51.723600,
+      "lon": 8.125800,
+      "alt": 15,
+      "action": "descend"
+    },
+    {
+      "lat": 51.723600,
+      "lon": 8.125800,
+      "alt": 0,
+      "action": "land"
+    }
+  ],
+  "parameters": {
+    "priority": "high",
+    "avoid_obstacles": true,
+    "min_battery": 15
+  }
+}
