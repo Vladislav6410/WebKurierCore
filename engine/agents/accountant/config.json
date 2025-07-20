@@ -1,0 +1,16 @@
+{
+  "dropbox_enabled": true,
+  "dropbox_path": "/Taxes/",
+  "user_id": "VH59269",
+  "default_language": "de",
+  "years": ["2022", "2023", "2024"],
+  "profile": {
+    "full_name": "Vladislav H.",
+    "steuer_id": "12345678901",
+    "location": "Neubeckum, 59269",
+    "employer": "Knauf Spedition GmbH",
+    "country": "Germany"
+  },
+  "output_path": "engine/agents/accountant/output/",
+  "template_path": "engine/agents/accountant/templates/tax_declaration_template.json"
+}
