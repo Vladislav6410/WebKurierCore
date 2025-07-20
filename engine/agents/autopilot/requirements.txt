@@ -1,0 +1,3 @@
+dronekit
+pymavlink
+opencv-python  # только если нужны CV / sensor fusion
