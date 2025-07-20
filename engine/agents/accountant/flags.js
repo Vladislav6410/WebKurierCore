@@ -17,8 +17,7 @@ function renderLanguageFlags(containerId = "lang-flags") {
     btn.style.fontSize = "24px";
     btn.style.margin = "5px";
     btn.onclick = () => {
-      i18nInit(code);
-      localStorage.setItem("lang", code);
+      setLanguage(code);
     };
     container.appendChild(btn);
   });
@@ -32,12 +31,18 @@ function detectBrowserLanguage() {
   return "de";
 }
 
+function setLanguage(lang) {
+  i18nInit(lang);
+  document.documentElement.lang = lang; // 👈 обновляем <html lang="...">
+  localStorage.setItem("lang", lang);
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   let lang = localStorage.getItem("lang");
   if (!lang) {
     lang = detectBrowserLanguage();
     localStorage.setItem("lang", lang);
   }
-  i18nInit(lang);
+  setLanguage(lang);
   renderLanguageFlags();
 });
