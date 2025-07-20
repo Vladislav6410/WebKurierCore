@@ -37,26 +37,7 @@
     <div id="result" class="result" style="display:none;"></div>
   </div>
 
-  <script>
-    function submitTaxReturn() {
-      const year = document.getElementById('year').value;
-      const lohnFile = document.getElementById('lohnFile').files[0];
-      const expensesFile = document.getElementById('expensesFile').files[0];
-
-      if (!lohnFile) {
-        alert("Bitte wählen Sie die Lohnsteuerbescheinigung aus.");
-        return;
-      }
-
-      // 🧠 В будущем: отправка файлов в Python-агент через API
-      const resultBox = document.getElementById("result");
-      resultBox.innerHTML = `
-        ✅ Steuererklärung für <b>${year}</b> vorbereitet.<br>
-        📎 Dateien: ${lohnFile.name}${expensesFile ? " + " + expensesFile.name : ""}<br>
-        ⏳ Bitte warten Sie auf die Analyse...
-      `;
-      resultBox.style.display = "block";
-    }
-  </script>
+  <!-- Подключение внешнего скрипта -->
+  <script src="taxes-ui.js"></script>
 </body>
 </html>
