@@ -1,0 +1,15 @@
+{
+  "mission_name": "Building Roof Inspection",
+  "description": "Облет крыши здания для проверки состояния",
+  "waypoints": [
+    { "lat": 51.723800, "lon": 8.125800, "alt": 25 },
+    { "lat": 51.723850, "lon": 8.125900, "alt": 25 },
+    { "lat": 51.723900, "lon": 8.125800, "alt": 25 },
+    { "lat": 51.723850, "lon": 8.125700, "alt": 25 }
+  ],
+  "parameters": {
+    "hover_time": 3,
+    "camera_angle": 90,
+    "circle_mode": false
+  }
+}
