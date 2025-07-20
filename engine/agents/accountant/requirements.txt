@@ -2,3 +2,5 @@ fpdf
 openpyxl
 dropbox
 pytesseract
+requests
+Pillow
