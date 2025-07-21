@@ -1,0 +1,30 @@
+{
+  "language": "de",
+  "currency": "EUR",
+  "country": "Germany",
+  "user_profile": {
+    "name": "Max Mustermann",
+    "tax_id": "12345678901",
+    "city": "Neubeckum",
+    "zip": "59269"
+  },
+  "dropbox": {
+    "enabled": true,
+    "access_token": "PASTE_YOUR_TOKEN_HERE",
+    "input_folder": "/WebKurier/Agents/Accountant/data/",
+    "output_folder": "/WebKurier/Agents/Accountant/output/"
+  },
+  "elster": {
+    "enabled": true,
+    "export_path": "output/declaration.xml"
+  },
+  "paths": {
+    "data": "data/",
+    "templates": "templates/",
+    "output": "output/"
+  },
+  "logging": {
+    "enabled": true,
+    "log_file": "logs/accountant.log"
+  }
+}
