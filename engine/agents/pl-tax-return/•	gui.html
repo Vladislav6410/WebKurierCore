@@ -1,0 +1,52 @@
+// engine/agents/accountant/ui.js
+
+let data = {
+  lohn: null,
+  expenses: null,
+  contracts: null,
+};
+
+document.getElementById("scanInput").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  data.lohn = await file.text();
+});
+
+document.getElementById("expensesInput").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  const text = await file.text();
+  try {
+    data.expenses = JSON.parse(text);
+  } catch {
+    alert("Ошибка: требуется JSON-формат расходов.");
+  }
+});
+
+document.getElementById("contractsInput").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  const text = await file.text();
+  try {
+    data.contracts = JSON.parse(text);
+  } catch {
+    alert("Ошибка: требуется JSON-формат контрактов.");
+  }
+});
+
+function generateDeclaration() {
+  const result = {
+    date: new Date().toISOString(),
+    lohn_raw: data.lohn || "не загружен",
+    expenses: data.expenses || [],
+    contracts: data.contracts || [],
+  };
+  document.getElementById("output").innerText = JSON.stringify(result, null, 2);
+}
+
+function saveLocally() {
+  const content = document.getElementById("output").innerText;
+  const blob = new Blob([content], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "declaration.json";
+  a.click();
+}
