@@ -1,526 +1,195 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="WebKurier: терминал, кошелёк, офлайн-доступ">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <style>
-    /* ...весь ваш CSS без изменений... */
-    #tools-panel {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%,-50%);
-      background: #fff;
-      color: #222;
-      border-radius: 12px;
-      box-shadow: 0 6px 32px rgba(0,0,0,0.25);
-      z-index: 10010;
-      padding: 32px 24px 24px 24px;
-      min-width: 340px;
-      max-width: 90vw;
-      min-height: 320px;
-      max-height: 90vh;
-      overflow: auto;
-    }
-    body.dark-theme #tools-panel {
-      background: #222;
-      color: #f4f4f4;
-    }
-    #tools-panel textarea, #tools-panel select, #tools-panel input[type="text"] {
-      width: 100%;
-      min-height: 40px;
-      font-family: monospace;
-      font-size: 15px;
-      margin: 12px 0;
-      border-radius: 8px;
-      border: 1px solid #aaa;
-      padding: 8px;
-      background: #fafafa;
-      color: #222;
-      resize: vertical;
-    }
-    body.dark-theme #tools-panel textarea,
-    body.dark-theme #tools-panel select,
-    body.dark-theme #tools-panel input[type="text"] {
-      background: #181818;
-      color: #f4f4f4;
-      border: 1px solid #555;
-    }
-    #tools-panel .panel-buttons {
-      text-align: right;
-      margin-top: 10px;
-    }
-    #tools-panel .panel-buttons button {
-      margin-left: 8px;
-      padding: 7px 16px;
-      border-radius: 6px;
-      border: none;
-      background: #06c;
-      color: white;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    #tools-panel .panel-buttons button:hover {
-      background: #0057a6;
-    }
-    #tools-panel input[type="file"] {
-      display: none;
-    }
-    #tools-panel label {
-      display: inline-block;
-      margin-bottom: 8px;
-      cursor: pointer;
-      color: #06c;
-      text-decoration: underline;
-    }
-    #tools-panel .close-btn {
-      position: absolute;
-      top: 8px;
-      right: 12px;
-      background: transparent;
-      border: none;
-      font-size: 22px;
-      color: #888;
-      cursor: pointer;
-    }
-    #tools-panel .close-btn:hover {
-      color: #c00;
-    }
-  </style>
+  <!-- ...остальная часть head... -->
 </head>
 <body>
-  <div id="preloader"><div class="loader"></div></div>
+  <!-- ...существующий контент... -->
 
-  <button class="toggle-theme" onclick="toggleTheme()">Сменить тему</button>
+  <!-- 📊 Таблица прайсов на аэрофотосъёмку -->
+  <section id="drone-prices">
+    <h2>📊 Прайс на аэрофотосъёмку (1 км²)</h2>
+    <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: sans-serif;">
+      <thead style="background: #f0f0f0;">
+        <tr>
+          <th>№</th>
+          <th>Пакет</th>
+          <th>Описание</th>
+          <th>Цена</th>
+          <th>Срок</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td><b>Base Map</b></td>
+          <td>Ортофото (GeoTIFF, JPG), PDF-карта, выравнивание, базовая обработка</td>
+          <td><b>390 €</b></td>
+          <td>1–2 дня</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td><b>3D Terrain</b></td>
+          <td>DSM/DTM, 3D-модель (.OBJ, .PLY, .LAS), облако точек, точная геопривязка</td>
+          <td><b>790 €</b></td>
+          <td>2–3 дня</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td><b>GeoAnalysis</b></td>
+          <td>NDVI/NDRE, растровый анализ, отчёт в PDF, контуры объектов, классификация</td>
+          <td><b>1290 €</b></td>
+          <td>3–5 дней</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
-  <h1>🌐 WebKurierCore</h1>
-  <p>Добро пожаловать в автономный интерфейс WebKurier: терминал, кошелёк, Telegram-связь.</p>
+  <!-- 🐍 Код Python для генерации геоотчётов -->
+  <section id="python-code" style="margin-top: 40px; background: #f8f8f8; padding: 20px; border-radius: 10px;">
+    <h2>📁 Код генератора геоотчёта (Python)</h2>
+    <pre style="background: #2d2d2d; color: #f8f8f2; padding: 20px; border-radius: 8px; overflow-x: auto; font-family: 'Courier New', monospace;">
+import os
+import json
+from fpdf import FPDF
+from datetime import datetime
 
-  <!-- Кошелёк -->
-  <div class="wallet">
-    <h2>💰 WebCoin-кошелёк</h2>
-    <div class="balance" id="webcoin-balance">Баланс: 0 WKC</div>
-    <button onclick="addCoins(10)">+10 WKC</button>
-    <button onclick="resetCoins()">Сброс</button>
-  </div>
+# 📌 Путь к сохранённым данным съёмки и анализов
+DATA_DIR = "./engine/logs/reports/"
+OUTPUT_DIR = "./engine/logs/generated/"
 
-  <!-- Терминал -->
-  <div class="terminal">
-    <div>> WebKurier Terminal v1.0</div>
-    <input type="text" id="terminal-input" placeholder="Введи команду...">
-    <div id="terminal-log"></div>
-  </div>
+class GeoReport:
+    def __init__(self, mission_name):
+        self.mission_name = mission_name
+        self.report_data = {}
+        self.date = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-  <!-- Кнопки терминала -->
-  <div class="terminal-buttons">
-    <button onclick="runTerminalCommand()">⏎ Пуск</button>
-    <button onclick="openFilePicker()">📁 Файлы</button>
-    <button id="toolsButton">🛠 Инструменты</button>
-    <button onclick="copyTerminalInput()">📋 Копировать</button>
-  </div>
+    def load_data(self):
+        file_path = os.path.join(DATA_DIR, f"{self.mission_name}.json")
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"Нет данных для отчёта: {file_path}")
+        with open(file_path, 'r', encoding='utf-8') as f:
+            self.report_data = json.load(f)
 
-  <!-- Telegram -->
-  <h2>🔗 Telegram</h2>
-  <p><a href="https://t.me/WebKurierBot" target="_blank">@WebKurierBot</a></p>
+    def generate_pdf(self):
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", "B", 14)
 
-  <!-- DreamMaker UI (оставлено как есть) -->
-  <div id="screen"></div>
-  <div id="preview-area"></div>
-  <div id="chat"></div>
-  <div class="chat-toolbar">
-    <button id="btn-photo">📷</button>
-    <button id="btn-video">🎞</button>
-    <button id="btn-audio">🎵</button>
-    <textarea id="chat-input" placeholder="Скажи или напиши…"></textarea>
-    <button id="mic-btn">🎤</button>
-    <button id="send-btn">➤</button>
-  </div>
-<section class="tools-structure">
-  <h2>🧰 Модуль инструментов WebKurierCore</h2>
-  <p>Папка <code>engine/agents/tools/</code> содержит UI-панель, шаблоны, превью и обработчики для работы с HTML-контентом.</p>
+        # Заголовок
+        pdf.cell(0, 10, f"📍 Геоотчёт: {self.mission_name}", ln=True)
+        pdf.set_font("Arial", "", 12)
+        pdf.cell(0, 10, f"Дата генерации: {self.date}", ln=True)
 
-  <details open>
-    <summary>📁 engine/agents/tools/</summary>
-    <ul>
-      <li>📄 <strong>tools-agent.js</strong> — логика панели: загрузка, генерация, экспорт, вставка шаблонов</li>
-      <li>📄 <strong>tools-ui.js</strong> — отрисовка панели инструментов, галерея</li>
-      <li>📄 <strong>templates.json</strong> — список HTML-шаблонов с описанием и путём к превью</li>
-      <details>
-        <summary>📁 previews/ — изображения для шаблонов</summary>
-        <ul>
-          <li>🖼️ <strong>button.png</strong> — превью кнопки</li>
-          <li>🖼️ <strong>heading.png</strong> — превью заголовка</li>
-          <li>🖼️ <strong>columns.png</strong> — превью двух колонок</li>
-          <li>🖼️ <strong>list.png</strong> — превью списка</li>
-          <li>🖼️ <strong>login.png</strong> — превью формы входа</li>
-          <li>🖼️ <strong>preview-footer.jpg</strong> — шаблон футера</li>
-          <li>🖼️ <strong>preview-gallery.jpg</strong> — шаблон галереи изображений</li>
-          <li>🖼️ <strong>preview-hero.jpg</strong> — превью hero-блока (приветственный экран)</li>
-        </ul>
-      </details>
-    </ul>
-  </details>
+        # 📊 Основные параметры
+        pdf.ln(10)
+        for key, value in self.report_data.items():
+            if isinstance(value, dict):
+                pdf.set_font("Arial", "B", 12)
+                pdf.cell(0, 10, f"🔹 {key}", ln=True)
+                pdf.set_font("Arial", "", 12)
+                for subkey, subvalue in value.items():
+                    pdf.cell(0, 10, f"  • {subkey}: {subvalue}", ln=True)
+            else:
+                pdf.cell(0, 10, f"{key}: {value}", ln=True)
 
-  <h3>📦 Функции панели инструментов</h3>
-  <ul>
-    <li>🧱 <strong>AI-генерация HTML</strong> — на основе текстового описания</li>
-    <li>🧩 <strong>Шаблоны</strong> — из галереи блоков с превью</li>
-    <li>🎯 <strong>Поиск</strong> — фильтрация по названию и описанию</li>
-    <li>🗜️ <strong>HTML-просмотр</strong> — результат прямо в окне</li>
-    <li>📤 <strong>Загрузка</strong> — вставка своего HTML</li>
-    <li>💾 <strong>Сохранение</strong> — экспорт в .html</li>
-    <li>📦 <strong>Экспорт ZIP</strong> — генерация проекта в ZIP</li>
-  </ul>
-</section>
-  <!-- Панель инструментов -->
-  <div id="tools-panel">
-    <button class="close-btn" onclick="closeToolsPanel()">×</button>
-    <h2>🛠 Инструменты</h2>
-    <div>
-      <label for="htmlFile">📤 Загрузить .html файл</label>
-      <input type="file" id="htmlFile" accept=".html,.htm">
-    </div>
-    <textarea id="htmlEditor" placeholder="Здесь появится содержимое файла или можно написать своё..."></textarea>
-    <div>
-      <label for="blockTemplates">📦 Шаблоны блоков</label>
-      <select id="blockTemplates">
-        <option value="">Выбери шаблон...</option>
-        <option value="<header><h1>Заголовок</h1></header>">Шапка</option>
-        <option value="<footer><p>Футер</p></footer>">Футер</option>
-        <option value="<section><h2>Блок</h2><p>Текст блока...</p></section>">Секция</option>
-      </select>
-      <button onclick="insertBlockTemplate()">Вставить</button>
-    </div>
-    <div>
-      <label for="htmlDescInput">🧠 Генерация HTML по описанию</label>
-      <input type="text" id="htmlDescInput" placeholder="Например: 'Кнопка с надписью Отправить'">
-      <button onclick="generateHtmlFromDesc()">Сгенерировать</button>
-    </div>
-    <div class="panel-buttons">
-      <button onclick="saveHtmlFile()">💾 Сохранить</button>
-      <button onclick="exportZip()">📦 Экспорт ZIP</button>
-      <button onclick="closeToolsPanel()">Закрыть</button>
-    </div>
-  </div>
+        # Сохранение
+        os.makedirs(OUTPUT_DIR, exist_ok=True)
+        output_path = os.path.join(OUTPUT_DIR, f"{self.mission_name}_report.pdf")
+        pdf.output(output_path)
+        return output_path
 
-  <!-- Скрипты: внешние и модули -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="wallet.js"></script>
-  <script src="https://unpkg.com/dropbox/dist/Dropbox-sdk.min.js"></script>
-  <script src="engine/dropbox.js"></script>
-  <script src="engine/engineer.js"></script>
-  <script src="engine/dream.js"></script>
-  <script type="module" src="engine/agents/terminal/terminal-v2.js"></script>
-  <!-- Подключение панели инструментов и агентов -->
-  <script type="module">
-    import * as toolsAgent from './engine/agents/tools-agent.js';
-    import { renderToolsPanel } from './engine/agents/tools-ui.js';
-    window.toolsAgent = toolsAgent;
-    renderToolsPanel();
-    document.getElementById("toolsButton").addEventListener("click", () => {
-      toolsAgent.showToolsPanel();
-    });
-  </script>
-  <!-- JS для панели инструментов и новых функций -->
-  <script>
-    // --- Тема ---
-    function toggleTheme() {
-      document.body.classList.toggle('dark-theme');
-      localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-    }
 
-    // --- Кошелёк ---
-    function addCoins(amount) {
-      let current = parseInt(localStorage.getItem('webcoin') || '0', 10);
-      current += amount;
-      localStorage.setItem('webcoin', current);
-      document.getElementById('webcoin-balance').textContent = `Баланс: ${current} WKC`;
-    }
-    function resetCoins() {
-      localStorage.setItem('webcoin', '0');
-      document.getElementById('webcoin-balance').textContent = `Баланс: 0 WKC`;
-    }
-
-    // --- Терминал ---
-    function runTerminalCommand() {
-      const e = new KeyboardEvent('keydown', { key: 'Enter' });
-      document.getElementById('terminal-input').dispatchEvent(e);
-    }
-    function openFilePicker() {
-      const inp = document.createElement('input');
-      inp.type = 'file';
-      inp.click();
-    }
-    function copyTerminalInput() {
-      const input = document.getElementById('terminal-input');
-      navigator.clipboard.writeText(input.value);
-    }
-
-    // --- Панель инструментов ---
-    function openToolsPanel() {
-      document.getElementById('tools-panel').style.display = 'block';
-    }
-    function closeToolsPanel() {
-      document.getElementById('tools-panel').style.display = 'none';
-      document.getElementById('htmlFile').value = '';
-    }
-    // Для совместимости с модулями
-    if (document.getElementById('toolsButton')) {
-      document.getElementById('toolsButton').onclick = openToolsPanel;
-    }
-
-    // --- Загрузка .html файла ---
-    document.getElementById('htmlFile').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(ev) {
-        document.getElementById('htmlEditor').value = ev.target.result;
-      };
-      reader.readAsText(file, 'UTF-8');
-    });
-
-    // --- Сохранение .html файла ---
-    function saveHtmlFile() {
-      const content = document.getElementById('htmlEditor').value;
-      const blob = new Blob([content], {type: 'text/html'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'result.html';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }, 0);
-    }
-
-    // --- Вставка шаблона блока ---
-    function insertBlockTemplate() {
-      const select = document.getElementById('blockTemplates');
-      const value = select.value;
-      if (value) {
-        const editor = document.getElementById('htmlEditor');
-        editor.value += '\n' + value;
-      }
-    }
-
-    // --- Генерация HTML по описанию ---
-    function generateHtmlFromDesc() {
-      const desc = document.getElementById('htmlDescInput').value.trim().toLowerCase();
-      let html = '';
-      if (desc.includes('кнопка')) {
-        const match = desc.match(/кнопка с надписью (.+)/);
-        html = `<button>${match ? match[1] : 'Кнопка'}</button>`;
-      } else if (desc.includes('заголовок')) {
-        html = `<h1>Заголовок</h1>`;
-      } else if (desc.includes('список')) {
-        html = `<ul><li>Пункт 1</li><li>Пункт 2</li></ul>`;
-      } else {
-        html = '<!-- Не удалось распознать описание -->';
-      }
-      document.getElementById('htmlEditor').value += '\n' + html;
-    }
-
-    // --- Экспорт ZIP ---
-    function exportZip() {
-      const html = document.getElementById('htmlEditor').value;
-      if (!window.JSZip) {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
-        script.onload = exportZip;
-        document.body.appendChild(script);
-        return;
-      }
-      const zip = new JSZip();
-      zip.file("index.html", html);
-      zip.generateAsync({type:"blob"}).then(function(content) {
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(content);
-        a.download = "project.zip";
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-          document.body.removeChild(a);
-          URL.revokeObjectURL(a.href);
-        }, 0);
-      });
-    }
-
-    // --- Прелоадер и тема при запуске ---
-    window.addEventListener('load', () => {
-      document.getElementById('preloader').style.opacity = '0';
-      setTimeout(() => {
-        document.getElementById('preloader').style.display = 'none';
-        document.getElementById('terminal-input').focus();
-      }, 400);
-
-      if (localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-theme');
-      }
-      const coins = parseInt(localStorage.getItem('webcoin') || '0', 10);
-      document.getElementById('webcoin-balance').textContent = `Баланс: ${coins} WKC`;
-    });
-  </script><!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="WebKurier: терминал, кошелёк, офлайн-доступ">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <title data-i18n="title">WebKurierCore</title>
-  <script src="i18n/i18n.js" type="module"></script>
-</head>
-<body>
-  <button class="toggle-theme" onclick="toggleTheme()" data-i18n="toggle_theme">Сменить тему</button>
-
-  <h1 data-i18n="welcome_title">🌐 WebKurierCore</h1>
-  <p data-i18n="welcome_desc">Добро пожаловать в автономный интерфейс WebKurier: терминал, кошелёк, Telegram-связь.</p>
-
-  <div class="wallet">
-    <h2 data-i18n="wallet_title">💰 WebCoin-кошелёк</h2>
-    <div class="balance" id="webcoin-balance" data-i18n="wallet_balance">Баланс: 0 WKC</div>
-    <button onclick="addCoins(10)" data-i18n="wallet_add">+10 WKC</button>
-    <button onclick="resetCoins()" data-i18n="wallet_reset">Сброс</button>
-  </div>
-
-  <div class="terminal">
-    <div data-i18n="terminal_title">&gt; WebKurier Terminal v1.0</div>
-    <input type="text" id="terminal-input" placeholder="Введи команду..." data-i18n-placeholder="terminal_placeholder">
-    <div id="terminal-log"></div>
-  </div>
-
-  <div class="terminal-buttons">
-    <button onclick="runTerminalCommand()" data-i18n="run">⏎ Пуск</button>
-    <button onclick="openFilePicker()" data-i18n="files">📁 Файлы</button>
-    <button id="toolsButton" data-i18n="tools">🛠 Инструменты</button>
-    <button onclick="copyTerminalInput()" data-i18n="copy">📋 Копировать</button>
-  </div>
-
-  <h2 data-i18n="telegram_title">🔗 Telegram</h2>
-  <p><a href="https://t.me/WebKurierBot" target="_blank">@WebKurierBot</a></p>
-<section>
-  <h2>📁 Структура проекта <strong>WebKurierCore</strong></h2>
-  <details open>
-    <summary>📂 WebKurierCore</summary>
-    <ul>
-      <li>🧾 <code>index.html</code> — 🌐 Главная страница</li>
-      <li>💻 <code>terminal.js</code> — Терминал</li>
-      <li>💰 <code>wallet.js</code> — Кошелёк WebCoin</li>
-      <li>🎨 <code>styles.css</code> — Стили</li>
-      <li>📘 <code>README.md</code> — Документация</li>
-      <details>
-        <summary>📁 i18n/</summary>
-        <li>🌍 <a href="https://vladislav6410.github.io/i18n/i18n.js" target="_blank"><code>i18n.js</code></a> — Интернационализация</li>
-      </details>
-      <details>
-        <summary>📁 lang-select/</summary>
-        <li>🚩 <a href="https://vladislav6410.github.io/lang-select/flags.html" target="_blank"><code>flags.html</code></a> — Страница выбора языка</li>
-      </details>
-      <details>
-        <summary>📁 translations/</summary>
-        <li>🇷🇺 <a href="https://t.me/WebKurierBot?start=edit_ru">ru.json</a></li>
-        <li>🇬🇧 <a href="https://t.me/WebKurierBot?start=edit_en">en.json</a></li>
-        <li>🇩🇪 <a href="https://t.me/WebKurierBot?start=edit_de">de.json</a></li>
-        <li>🇫🇷 <a href="https://t.me/WebKurierBot?start=edit_fr">fr.json</a></li>
-        <li>🇵🇱 <a href="https://t.me/WebKurierBot?start=edit_pl">pl.json</a></li>
-        <li>🇨🇿 <a href="https://t.me/WebKurierBot?start=edit_cs">cs.json</a></li>
-        <li>🇷🇴 <a href="https://t.me/WebKurierBot?start=edit_ro">ro.json</a></li>
-        <li>🇧🇬 <a href="https://t.me/WebKurierBot?start=edit_bg">bg.json</a></li>
-        <li>🇱🇹 <a href="https://t.me/WebKurierBot?start=edit_lt">lt.json</a></li>
-        <li>🇭🇷 <a href="https://t.me/WebKurierBot?start=edit_hr">hr.json</a></li>
-        <li>🇭🇺 <a href="https://t.me/WebKurierBot?start=edit_hu">hu.json</a></li>
-        <li>🇩🇰 <a href="https://t.me/WebKurierBot?start=edit_da">da.json</a></li>
-        <li>🇪🇸 <a href="https://t.me/WebKurierBot?start=edit_es">es.json</a></li>
-        <li>🇮🇹 <a href="https://t.me/WebKurierBot?start=edit_it">it.json</a></li>
-        <li>🇺🇦 <a href="https://t.me/WebKurierBot?start=edit_uk">uk.json</a></li>
-        <li>🇳🇴 <a href="https://t.me/WebKurierBot?start=edit_no">no.json</a></li>
-        <li>🇵🇹 <a href="https://t.me/WebKurierBot?start=edit_pt">pt.json</a></li>
-        <li>🇹🇷 <a href="https://t.me/WebKurierBot?start=edit_tr">tr.json</a></li>
-        <li>🇸🇮 <a href="https://t.me/WebKurierBot?start=edit_sl">sl.json</a></li>
-        <li>🇬🇷 <a href="https://t.me/WebKurierBot?start=edit_el">el.json</a></li>
-        <li>🇷🇸 <a href="https://t.me/WebKurierBot?start=edit_sr">sr.json</a></li>
-        <li>🇱🇻 <a href="https://t.me/WebKurierBot?start=edit_lv">lv.json</a></li>
-        <li>🇪🇪 <a href="https://t.me/WebKurierBot?start=edit_et">et.json</a></li>
-        <li>🇳🇱 <a href="https://t.me/WebKurierBot?start=edit_nl">nl.json</a></li>
-      </details>
-    </ul>
-  </details>
-</section>
-  <!-- Подключение Telegram WebApp SDK -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script>
-    const tg = window.Telegram.WebApp;
-    if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-      const tgLang = tg.initDataUnsafe.user.language_code;
-      if (!localStorage.getItem('lang')) {
-        localStorage.setItem('lang', tgLang);
-        window.location.href = window.location.pathname + '?lang=' + tgLang;
-      }
-    }
-  </script><!-- Кнопка перехода к структуре проекта -->
-<p><a href="#structure" style="font-size:16px; text-decoration:none;">📂 Открыть структуру проекта</a></p>
-
-<!-- Панель JSON-редактора -->
-<div id="json-editor-panel" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%);
-     background:#fff; border:2px solid #ccc; border-radius:10px; padding:20px; max-width:90vw; max-height:80vh;
-     overflow:auto; z-index:9999; box-shadow:0 0 20px rgba(0,0,0,0.2); font-family:monospace;">
-  <button onclick="document.getElementById('json-editor-panel').style.display='none'"
-          style="position:absolute; top:8px; right:12px; font-size:18px;">×</button>
-  <h3>📝 Редактор JSON</h3>
-  <textarea id="json-editor" style="width:100%; height:300px; font-family:monospace; font-size:14px;"></textarea>
-  <br><br>
-  <button onclick="saveJsonFile()">💾 Сохранить</button>
-</div>
-
-<script>
-  // Открытие JSON-редактора
-  document.querySelectorAll('a[href$=".json"]').forEach(el => {
-    el.addEventListener('click', function(event) {
-      event.preventDefault();
-      const url = this.href;
-      fetch(url)
-        .then(res => res.text())
-        .then(data => {
-          document.getElementById('json-editor').value = data;
-          document.getElementById('json-editor-panel').style.display = 'block';
-        })
-        .catch(err => {
-          document.getElementById('json-editor').value = 'Ошибка загрузки файла: ' + err;
-          document.getElementById('json-editor-panel').style.display = 'block';
-        });
-    });
-  });
-
-  // Сохранение JSON
-  function saveJsonFile() {
-    const data = document.getElementById('json-editor').value;
-    const blob = new Blob([data], {type: "application/json"});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = "translation.json";
-    a.click();
-    URL.revokeObjectURL(a.href);
+# 🧪 Пример использования:
+if __name__ == "__main__":
+    report = GeoReport("test_mission_01")
+    report.load_data()
+    path = report.generate_pdf()
+    print(f"✅ Отчёт сохранён: {path}")</pre>
+    
+    <div style="margin-top: 20px; background: #e6f7ff; padding: 15px; border-radius: 8px; border-left: 4px solid #1890ff;">
+      <h3>🔧 Где размещать:</h3>
+      <ul>
+        <li><code>report_generator.py</code> → в папку Webkuriercore/ рядом с main.py</li>
+        <li>Данные в формате JSON → <code>engine/logs/reports/</code></li>
+        <li>PDF-файлы отчётов → <code>engine/logs/generated/</code></li>
+      </ul>
+      
+      <h3>📂 Пример входного файла:</h3>
+      <pre style="background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
+{
+  "Участок": "Полевой массив 3A",
+  "GSD": "3.5 см/пиксель",
+  "Высота полета": "120 м",
+  "Камера": "Sony RX1RM2",
+  "Количество снимков": 198,
+  "Размер области": "12.5 га",
+  "Перекрытие": {
+    "Продольное": "80%",
+    "Поперечное": "70%"
+  },
+  "Результаты": {
+    "Ортофотоплан": "Сформирован",
+    "ЦМР": "Готова",
+    "3D-сцена": "Экспортирована в OBJ"
   }
-</script><!-- 🔰 Инструкция пользователя -->
-<div id="manual-block" style="display: none; padding: 20px; background: #f8f8f8; border-top: 1px solid #ccc;">
-  <h2 data-i18n="instruction.title">📘 Инструкция по WebKurierCore</h2>
-  <p data-i18n="instruction.desc">
-    WebKurierCore — это автономная оболочка для терминала, WebCoin-кошелька, панели инструментов и AI-модулей.<br>
-    Включает поддержку офлайн-доступа, переключения языка, генерации кода и редактирования.
-  </p>
+}</pre>
+    </div>
+  </section>
 
-  <ul>
-    <li data-i18n="instruction.point1">🌐 Интерфейс запускается без сервера — прямо в браузере.</li>
-    <li data-i18n="instruction.point2">💰 Кошелёк хранится локально и не требует авторизации.</li>
-    <li data-i18n="instruction.point3">🛠 Панель инструментов позволяет вставлять HTML, генерировать и экспортировать.</li>
-    <li data-i18n="instruction.point4">🧠 Интеграция с AI-агентами: верстальщик, переводчик, дрон-инженер и др.</li>
-    <li data-i18n="instruction.point5">🌍 Мультиязычность поддерживается через `i18n.js` + JSON-файлы.</li>
-  </ul>
-</div>
+  <!-- 📂 Структура папок проекта -->
+  <section id="folder-structure" style="margin-top: 40px;">
+    <h2>📂 Структура папок проекта</h2>
+    <div style="background: #f0f8ff; padding: 20px; border-radius: 10px; font-family: 'Courier New', monospace; line-height: 1.6;">
+      engine/<br>
+      ├── agents/<br>
+      │   ├── geodesist/<br>
+      │   │   ├── report/                  &larr; Генерация PDF, GeoTIFF, NDVI<br>
+      │   │   ├── ui/                      &larr; Интерфейс кнопок /отчёт, /цены<br>
+      │   │   └── templates/               &larr; HTML, PDF шаблоны отчётов<br>
+      │   ├── autopilot/                   &larr; Агент автопилота дрона<br>
+      │   ├── pilot/                       &larr; Агент ручного управления<br>
+      │   ├── telemetry/                   &larr; Сбор телеметрии<br>
+      │   ├── translator/                  &larr; Переводчик и локализация<br>
+      │   ├── accountant/                  &larr; Финансовые отчёты и налоги<br>
+      │   ├── security/                    &larr; Агент безопасности (антивирус, токены)<br>
+      │   └── master/                      &larr; Главный управляющий<br>
+      │<br>
+      ├── config/<br>
+      │   ├── settings.json                &larr; Глобальная конфигурация<br>
+      │   ├── missions.json                &larr; Настройки полётов<br>
+      │   └── report_config.json           &larr; Настройки отчётов<br>
+      │<br>
+      ├── logs/<br>
+      │   ├── reports/                     &larr; Сырые JSON-данные полей<br>
+      │   ├── generated/                   &larr; PDF, GeoTIFF, модели<br>
+      │   └── telemetry/                   &larr; Данные полёта, датчики<br>
+      │<br>
+      ├── memory/<br>
+      │   └── assistant_memory.json        &larr; Виртуальная память помощника<br>
+      │<br>
+      ├── prompts/<br>
+      │   ├── geodesy.prompt.json          &larr; Шаблоны задач по геодезии<br>
+      │   ├── report.prompt.json           &larr; Формулировки отчётов<br>
+      │   └── ui.prompt.json               &larr; Тексты кнопок и интерфейса<br>
+      │<br>
+      ├── ui/<br>
+      │   ├── index.html                   &larr; Интерфейс WebApp<br>
+      │   ├── report-ui.html               &larr; Отдельная страница отчёта<br>
+      │   ├── styles.css                   &larr; Стили<br>
+      │   └── scripts/<br>
+      │       ├── report.js                &larr; Кнопка /отчёт<br>
+      │       ├── prices.js                &larr; Кнопка /цены<br>
+      │       └── utils.js                 &larr; Общие функции<br>
+      │<br>
+      └── data/<br>
+          ├── cameras.json                 &larr; Список камер и GSD<br>
+          ├── price_list.csv               &larr; Прайс на 1 км²<br>
+          └── missions/<br>
+              └── mission1.json            &larr; Настройки миссий<br>
+    </div>
+  </section>
+
+  <!-- ...остальные скрипты и закрывающие теги... -->
 </body>
 </html>
