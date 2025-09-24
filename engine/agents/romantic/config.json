@@ -1,0 +1,18 @@
+{
+  "enabled": true,
+  "default_mode": "chat",
+  "dropbox_memory": false,
+  "dropbox_path": "/Romantic/Memory/",
+  "tts_enabled": false,
+  "asr_enabled": false,
+  "model": "gpt-5-thinking",
+  "limits": {
+    "max_daily_msgs": 200,
+    "max_reply_chars": 1200
+  },
+  "safety": {
+    "nsfw": "block",
+    "age_filter": "18+ confirmation",
+    "therapy_disclaimer": true
+  }
+}
