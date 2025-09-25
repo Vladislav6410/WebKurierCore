@@ -1,0 +1,30 @@
+{
+  "user_id": "u123",
+  "lang": "en",
+  "tone": "gentle",
+  "likes": ["poetry", "night_stories"],
+  "dislikes": ["long_texts"],
+  "favorite_phrases": ["sweet dreams", "good night"],
+  "flags": {
+    "safe_mode": true,
+    "allow_personalization": true
+  },
+  "history": [
+    {
+      "ts": "2025-01-01T21:00:00Z",
+      "role": "user",
+      "text": "Hello"
+    },
+    {
+      "ts": "2025-01-01T21:00:01Z",
+      "role": "agent",
+      "text": "I'm happy to hear from you."
+    }
+  ],
+  "counters": {
+    "likes": 0,
+    "stories_used": 0,
+    "compliments_used": 0
+  },
+  "last_updated": "2025-01-01T21:00:01Z"
+}
