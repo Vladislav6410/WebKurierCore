@@ -13,11 +13,13 @@
     "engine/agents/identity-agent.js",
     "engine/agents/autopilot-agent.js",
     "engine/agents/navigator-agent.js",
-    "engine/agents/geodesy-agent.js"
+    "engine/agents/geodesy-agent.js",
+    "engine/agents/romantic/romantic-agent.js"   // 👈 добавили Romantic Agent
   ],
   "memory": {
     "active": true,
     "autoSave": true,
+    "path": "engine/agents/romantic/memory/",    // 👈 новый путь к памяти
     "lastCommands": [],
     "notes": []
   },
