@@ -1,14 +1,31 @@
 {
-  "version": "1.0",
-  "project": "WebKurierCore",
-  "admin_id": "7145533143",
-  "language": "ru",
-  "bot_token": "7145533143:AAEirzSuGNSLwNi4UOILOt7-8EGZ6Z295PM",
-  "bot_username": "WKCoreBot",
-  "features": {
-    "webcoin": true,
-    "terminal": true,
-    "dropbox": true,
-    "memory": true
+  "version": "1.0.0",
+  "updated": "2025-06-26T17:38:00+02:00",
+  "agents": [
+    "engine/agents/accountant-agent.js",
+    "engine/agents/designer-agent.js",
+    "engine/agents/drone-agent.js",
+    "engine/agents/marketing-agent.js",
+    "engine/agents/voice-agent.js",
+    "engine/agents/techsupport-agent.js",
+    "engine/agents/programmer-agent.js",
+    "engine/agents/intelligence-agent.js",
+    "engine/agents/identity-agent.js",
+    "engine/agents/autopilot-agent.js",
+    "engine/agents/navigator-agent.js",
+    "engine/agents/geodesy-agent.js",
+    "engine/agents/romantic/romantic-agent.js"
+  ],
+  "memory": {
+    "active": true,
+    "autoSave": true,
+    "path": "engine/agents/romantic/memory/",
+    "lastCommands": [],
+    "notes": []
+  },
+  "config": {
+    "theme": "dark",
+    "language": "ru",
+    "backupEnabled": true
   }
 }
