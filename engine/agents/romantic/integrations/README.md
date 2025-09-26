@@ -15,4 +15,4 @@
 
 1. Установите зависимости:
    ```bash
-   npm install node-telegram-bot-api
+   npm install node-telegram-bot-apiexport TELEGRAM_TOKEN=1234567890:ABCDEF...
