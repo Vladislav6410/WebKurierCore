@@ -1,39 +1,47 @@
 /**
  * Romantic Agent — Telegram Integration
- * --------------------------------------
- * Minimal Telegram bot connector.
- * Listens for messages and sends romantic replies
- * using romantic-agent.js core.
+ * -------------------------------------
+ * Коннектор для работы через Telegram-бота.
+ * Использует библиотеку node-telegram-bot-api.
+ *
+ * Установка:
+ *   npm install node-telegram-bot-api
+ *
+ * Запуск (после задания токена):
+ *   TELEGRAM_TOKEN=123456789:ABCDEF... node engine/agents/romantic/integrations/telegram.js
  */
 
-import { RomanticAgent } from '../romantic-agent.js';
 import TelegramBot from 'node-telegram-bot-api';
-import config from '../config.json' assert { type: 'json' };
+import { RomanticAgent } from '../romantic-agent.js';
 
-const token = config.telegram_token || process.env.TELEGRAM_TOKEN;
+const token = process.env.TELEGRAM_TOKEN || '';
 if (!token) {
-  console.error('⚠️ Telegram token is missing. Add to config.json or env TELEGRAM_TOKEN');
+  console.error('❌ TELEGRAM_TOKEN не задан. Установите переменную окружения.');
   process.exit(1);
 }
 
 const bot = new TelegramBot(token, { polling: true });
 const agent = new RomanticAgent();
 
+console.log('💌 Romantic Agent — Telegram бот запущен...');
+
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
-  const text = msg.text?.trim();
+  const text = msg.text || msg.caption || '';
 
   if (!text) return;
 
-  // Simple command
+  // Примитивная команда старта
   if (text.startsWith('/start')) {
-    await bot.sendMessage(chatId, '💞 Hello! I am your Romantic Agent. Tell me something...');
+    await bot.sendMessage(chatId, '💞 Привет! Я Romantic Agent. Напиши мне что-нибудь романтичное.');
     return;
   }
 
-  // Pass message to Romantic Agent core
-  const reply = await agent.respond(text, { userId: chatId });
-  await bot.sendMessage(chatId, reply);
+  try {
+    const reply = await agent.handle(text, { userId: chatId, mode: 'chat' });
+    await bot.sendMessage(chatId, reply);
+  } catch (err) {
+    console.error('Ошибка обработки сообщения:', err);
+    await bot.sendMessage(chatId, '⚠️ Ошибка обработки. Попробуйте позже.');
+  }
 });
-
-console.log('💌 Romantic Agent Telegram bot started...');
