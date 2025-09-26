@@ -29,4 +29,16 @@ memory/
   "history": [ { "ts": "...", "role": "user|agent", "text": "..." } ],
   "counters": { "likes": 0, "stories_used": 0, "compliments_used": 0 },
   "last_updated": "ISO8601"
-}
+}### Рекомендации
+- Хранить последние 20–50 сообщений в `history`.
+- Ограничивать общий размер файла до ~200 KB, при превышении удалять самые старые записи.
+- Кодировка UTF-8 без BOM.
+
+## Самообучение (feedback → prompts)
+Во время общения новые фразы складываются в:
+- `feedback/compliments_new.txt`
+- `feedback/date_ideas_new.txt`
+- `feedback/stories_new.txt`
+- `feedback/night_stories_new.txt`
+
+Запуск слияния:
