@@ -6,7 +6,16 @@
 - Ротация файла после ~200 KB.  
   Опция — синхронизировать в Dropbox при `dropbox_memory=true`.
 
-## Структура каталогов## Формат `users/*.json`
+## Структура каталоговreadme_structure = """\
+memory/
+├── users/
+│    └── u123.json             # персональная история и настройки пользователя
+└── feedback/
+     ├── compliments_new.txt   # новые комплименты
+     ├── date_ideas_new.txt    # новые идеи для свиданий
+     ├── stories_new.txt       # новые истории
+     └── night_stories_new.txt # новые ночные истории
+"""## Формат `users/*.json`
 ```json
 {
   "user_id": "u123",
