@@ -2,7 +2,7 @@
 ![Forks](https://img.shields.io/github/forks/Vladislav6410/WebKurierCore?style=social)
 ![License](https://img.shields.io/github/license/Vladislav6410/WebKurierCore)
 # WebKurierCore
-
+[![🚀 Открыть WebKurierCore](https://img.shields.io/badge/🚀_Открыть_WebKurierCore-0a84ff?style=for-the-badge)](https://vladislav6410.github.io/WebKurierCore/)
 [![GitHub Pages – Deploy](https://github.com/vladislav6410/WebKurierCore/actions/workflows/pages.yml/badge.svg)](https://github.com/vladislav6410/WebKurierCore/actions/workflows/pages.yml)
 [![Open Site](https://img.shields.io/badge/Open%20Site-Live-brightgreen)](https://vladislav6410.github.io/WebKurierCore/)
 ![Last Commit](https://img.shields.io/github/last-commit/vladislav6410/WebKurierCore)
