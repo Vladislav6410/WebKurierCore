@@ -17,6 +17,7 @@ jobs:
     name: Python Lint & Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
+
     steps:
       - uses: actions/checkout@v4
 
@@ -32,8 +33,7 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install --disable-pip-version-check -q flake8 pytest || true
 
-      # Сообщаем о стилевых ошибках, но не падаем
-      - name: Lint (flake8)
+      - name: Lint (flake8) — non-blocking
         continue-on-error: true
         run: |
           if command -v flake8 >/dev/null 2>&1; then
@@ -55,29 +55,61 @@ jobs:
     name: Node Lint & Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # Запускаем Node-джобу только если в корне есть package.json
+    if: ${{ hashFiles('package.json') != '' }}
+
     steps:
       - uses: actions/checkout@v4
 
-      # Выполняем настройку Node.js только если есть package.json
-      - name: Setup Node
-        if: ${{ hashFiles('package.json') != '' }}
+      # Вариант 1: npm + package-lock.json
+      - name: Setup Node (npm cache)
+        if: ${{ hashFiles('package-lock.json') != '' }}
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: package-lock.json
+          cache-dependency-path: 'package-lock.json'
 
-      - name: Install (npm ci / npm i)
-        if: ${{ hashFiles('package.json') != '' }}
+      # Вариант 2: yarn + yarn.lock
+      - name: Setup Node (yarn cache)
+        if: ${{ hashFiles('yarn.lock') != '' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+          cache-dependency-path: 'yarn.lock'
+
+      # Вариант 3: pnpm + pnpm-lock.yaml
+      - name: Setup Node (pnpm cache)
+        if: ${{ hashFiles('pnpm-lock.yaml') != '' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: 'pnpm-lock.yaml'
+
+      # Фолбэк: без кэша, если нет lock-файла
+      - name: Setup Node (no cache)
+        if: ${{ hashFiles('package-lock.json') == '' && hashFiles('yarn.lock') == '' && hashFiles('pnpm-lock.yaml') == '' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
         run: |
           if [ -f package-lock.json ]; then
             npm ci
+          elif [ -f yarn.lock ]; then
+            corepack enable || true
+            yarn install --frozen-lockfile
+          elif [ -f pnpm-lock.yaml ]; then
+            corepack enable || true
+            pnpm install --frozen-lockfile
           else
             npm i
           fi
 
       - name: Lint (ESLint)
-        if: ${{ hashFiles('package.json') != '' }}
         run: |
           if npm run | grep -q "^  lint"; then
             npm run lint
@@ -86,7 +118,6 @@ jobs:
           fi
 
       - name: Tests (Jest)
-        if: ${{ hashFiles('package.json') != '' }}
         run: |
           if npm run | grep -q "^  test"; then
             npm test --silent
