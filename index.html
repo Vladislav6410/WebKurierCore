@@ -191,7 +191,7 @@ if __name__ == "__main__":
   </section>
 
   <!-- ===== Панель агентов ===== -->
-<div id="agents-panel" class="agents-panel"></div>
+<div id="agents-panel" class="agents-panel" aria-label="Agents panel"></div>
 
 <style>
   /* ==== Стили панели агентов ==== */
@@ -202,44 +202,44 @@ if __name__ == "__main__":
     margin: 20px 0;
   }
 
-  .agent-button {
-    display: flex;
+  /* ВНИМАНИЕ: имя класса совпадает с loader.js => .agent-btn */
+  .agent-btn {
+    display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 8px 14px;
-    background: #0d6efd;      /* синий по умолчанию */
+    background: #0d6efd;       /* основной цвет */
     color: #fff;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
-    transition: background 0.2s ease;
+    line-height: 1;
+    transition: background 0.15s ease, transform 0.05s ease;
+    user-select: none;
   }
-
-  .agent-button:hover {
-    background: #0b5ed7;      /* темнее при наведении */
-  }
-
-  .agent-button.disabled {
-    background: #6c757d;      /* серый если агент выключен */
+  .agent-btn:hover { background: #0b5ed7; }
+  .agent-btn:active { transform: translateY(1px); }
+  .agent-btn[disabled] {
+    background: #6c757d;
     cursor: not-allowed;
-    opacity: 0.7;
+    opacity: .7;
   }
 </style>
 
 <script type="module">
   import { renderAgentButtons } from './engine/agents/loader.js';
 
+  // Ждём, когда DOM готов
   window.addEventListener('DOMContentLoaded', () => {
     const panel = document.getElementById('agents-panel');
-
     if (!panel) {
       console.warn('⚠️ Не найден элемент #agents-panel');
       return;
     }
 
     renderAgentButtons(panel, (key, meta, mod) => {
-      // Когда нажали на кнопку — что-то делаем
+      // Что делать при клике на кнопку агента
       if (mod?.run) {
         mod.run({ meta, key });
       } else {
