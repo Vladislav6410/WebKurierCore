@@ -190,6 +190,18 @@ if __name__ == "__main__":
     </div>
   </section>
 
-  <!-- ...остальные скрипты и закрывающие теги... -->
+  <!-- ...остальные скрипты и закрывающие теги... --><script type="module">
+  import { renderAgentButtons } from './engine/agents/loader.js';
+
+  const panel = document.getElementById('agents-panel');
+
+  renderAgentButtons(panel, (key, meta, mod) => {
+    if (mod?.run) {
+      mod.run({ meta, key });
+    } else {
+      console.log(`Агент "${meta.name}" загружен, но нет функции run()`, mod);
+    }
+  });
+</script>
 </body>
 </html>
