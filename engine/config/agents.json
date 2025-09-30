@@ -1,0 +1,47 @@
+{
+  "version": "1.0.0",
+  "description": "Конфигурация агентов WebKurierCore",
+  "agents": {
+    "intelligence": {
+      "path": "intelligence-agent.js",
+      "name": "Intelligence Agent",
+      "icon": "🧠",
+      "enabled": true
+    },
+    "drone": {
+      "path": "drone-agent.js",
+      "name": "Drone Agent",
+      "icon": "🚁",
+      "enabled": true
+    },
+    "designer": {
+      "path": "designer-agent.js",
+      "name": "Designer Agent",
+      "icon": "🎨",
+      "enabled": true
+    },
+    "marketing": {
+      "path": "marketing-agent.js",
+      "name": "Marketing Agent",
+      "icon": "📢",
+      "enabled": false
+    },
+    "voice": {
+      "path": "voice-agent.js",
+      "name": "Voice Agent",
+      "icon": "🎤",
+      "enabled": true
+    },
+    "techSupport": {
+      "path": "techsupport-agent.js",
+      "name": "Tech Support Agent",
+      "icon": "🛠️",
+      "enabled": true
+    },
+    "programmer": {
+      "path": "programmer-agent.js",
+      "name": "Programmer Agent",
+      "icon": "💻",
+      "enabled": true
+    }
+  }
