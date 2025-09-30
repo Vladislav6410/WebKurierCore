@@ -1,8 +1,9 @@
 name: GitHub Pages
 
 on:
-  push:
-    branches: [ main ]
+  push:          # запускать на каждый коммит
+    branches: ['**']
+  pull_request:  # и на PR (для проверки)
   workflow_dispatch:
 
 permissions:
@@ -16,6 +17,8 @@ concurrency:
 
 jobs:
   deploy:
+    # деплой выполняется только если это push в main
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -28,7 +31,7 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: "."
 
