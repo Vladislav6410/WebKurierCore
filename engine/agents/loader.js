@@ -6,47 +6,50 @@
 
 export async function renderAgentButtons(container, onClick) {
   try {
-    const config = await fetch('./engine/config/agents.json').then(r => {
-      if (!r.ok) throw new Error(`Не удалось загрузить конфиг агентов: ${r.status}`);
-      return r.json();
-    });
+    const res = await fetch('./engine/config/agents.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error(`Не удалось загрузить конфиг агентов: ${res.status}`);
+    const config = await res.json();
 
-    if (!config?.agents) {
+    if (!config || !config.agents) {
       container.innerHTML = '<p style="color:red;">Не найдено поле "agents" в конфиге</p>';
       return;
     }
 
-    // Очищаем контейнер
     container.innerHTML = '';
 
-    // Создаём кнопки для каждого агента
+    let rendered = 0;
+
     Object.entries(config.agents).forEach(([key, meta]) => {
-      if (meta.enabled) {
-        const btn = document.createElement('button');
-        btn.className = 'agent-btn';
-        btn.innerHTML = `${meta.icon ? meta.icon + ' ' : ''}${meta.name}`;
-        btn.style.margin = '5px';
-        btn.style.padding = '8px 12px';
-        btn.style.border = '1px solid #ccc';
-        btn.style.borderRadius = '6px';
-        btn.style.cursor = 'pointer';
-        btn.style.background = '#f8f8f8';
-        btn.style.fontSize = '14px';
+      const enabled = meta?.enabled !== false; // по умолчанию включено
+      if (!enabled) return;
 
-        btn.addEventListener('click', async () => {
-          try {
-            // Динамически импортируем модуль агента
-            const mod = await import(`./${meta.path}`);
-            onClick?.(key, meta, mod);
-          } catch (err) {
-            console.error(`Ошибка при загрузке агента ${key}:`, err);
-            alert(`Не удалось загрузить агента "${meta.name}"`);
-          }
-        });
+      // ожидаем, что meta.path — имя файла, напр. "intelligence-agent.js"
+      if (!meta?.path) return;
 
-        container.appendChild(btn);
-      }
+      const btn = document.createElement('button');
+      btn.className = 'agent-button';                         // <-- совпадает со стилями
+      btn.type = 'button';
+      btn.setAttribute('aria-label', meta.name || key);
+      btn.innerHTML = `${meta.icon ? `${meta.icon} ` : ''}${meta.name || key}`;
+
+      btn.addEventListener('click', async () => {
+        try {
+          // путь относительно engine/agents/loader.js
+          const mod = await import(`./${meta.path}`);
+          onClick?.(key, meta, mod);
+        } catch (err) {
+          console.error(`Ошибка при загрузке агента "${key}" из ${meta.path}:`, err);
+          alert(`Не удалось загрузить агента "${meta.name || key}"`);
+        }
+      });
+
+      container.appendChild(btn);
+      rendered++;
     });
+
+    if (!rendered) {
+      container.innerHTML = '<p style="opacity:.7;">Нет активированных агентов.</p>';
+    }
   } catch (err) {
     console.error('Ошибка загрузки конфигурации агентов:', err);
     container.innerHTML = '<p style="color:red;">Ошибка загрузки агентов</p>';
