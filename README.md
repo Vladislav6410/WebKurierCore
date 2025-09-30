@@ -1,7 +1,12 @@
 ![Stars](https://img.shields.io/github/stars/Vladislav6410/WebKurierCore?style=social)
 ![Forks](https://img.shields.io/github/forks/Vladislav6410/WebKurierCore?style=social)
 ![License](https://img.shields.io/github/license/Vladislav6410/WebKurierCore)
+# WebKurierCore
 
+[![GitHub Pages – Deploy](https://github.com/vladislav6410/WebKurierCore/actions/workflows/pages.yml/badge.svg)](https://github.com/vladislav6410/WebKurierCore/actions/workflows/pages.yml)
+[![Open Site](https://img.shields.io/badge/Open%20Site-Live-brightgreen)](https://vladislav6410.github.io/WebKurierCore/)
+![Last Commit](https://img.shields.io/github/last-commit/vladislav6410/WebKurierCore)
+![Repo Size](https://img.shields.io/github/repo-size/vladislav6410/WebKurierCore)
 🌐 [Открыть WebKurierCore онлайн](https://vladislav6410.github.io/WebKurierCore/)WebKurierCore
 
 🌐 HTML-интерфейс для автономного доступа к WebKurier: терминал, WebCoin-кошелёк, офлайн-доступ и поддержка QR.
