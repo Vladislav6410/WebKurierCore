@@ -8,7 +8,7 @@
 ![Last Commit](https://img.shields.io/github/last-commit/vladislav6410/WebKurierCore)
 ![Repo Size](https://img.shields.io/github/repo-size/vladislav6410/WebKurierCore)
 🌐 [Открыть WebKurierCore онлайн](https://vladislav6410.github.io/WebKurierCore/)WebKurierCore
-<div id="agents-panel"></div>
+
 🌐 HTML-интерфейс для автономного доступа к WebKurier: терминал, WebCoin-кошелёк, офлайн-доступ и поддержка QR.
 
 ---
