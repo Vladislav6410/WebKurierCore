@@ -11,7 +11,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: true
 
 jobs:
@@ -27,12 +27,10 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      # Если сайт статичный и лежит в корне — оставляем path: "."
-      # Если сборка (например, /dist), поменяй путь.
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: "."
+          path: .
 
       - name: Deploy to GitHub Pages
         id: deployment
