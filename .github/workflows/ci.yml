@@ -19,7 +19,8 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -55,13 +56,13 @@ jobs:
     name: Node Lint & Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    # Запускаем Node-джобу только если в корне есть package.json
     if: ${{ hashFiles('package.json') != '' }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      # Вариант 1: npm + package-lock.json
+      # npm + package-lock.json
       - name: Setup Node (npm cache)
         if: ${{ hashFiles('package-lock.json') != '' }}
         uses: actions/setup-node@v4
@@ -70,7 +71,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'
 
-      # Вариант 2: yarn + yarn.lock
+      # yarn + yarn.lock
       - name: Setup Node (yarn cache)
         if: ${{ hashFiles('yarn.lock') != '' }}
         uses: actions/setup-node@v4
@@ -79,7 +80,7 @@ jobs:
           cache: 'yarn'
           cache-dependency-path: 'yarn.lock'
 
-      # Вариант 3: pnpm + pnpm-lock.yaml
+      # pnpm + pnpm-lock.yaml
       - name: Setup Node (pnpm cache)
         if: ${{ hashFiles('pnpm-lock.yaml') != '' }}
         uses: actions/setup-node@v4
@@ -88,7 +89,7 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'pnpm-lock.yaml'
 
-      # Фолбэк: без кэша, если нет lock-файла
+      # Фолбэк без lock-файла
       - name: Setup Node (no cache)
         if: ${{ hashFiles('package-lock.json') == '' && hashFiles('yarn.lock') == '' && hashFiles('pnpm-lock.yaml') == '' }}
         uses: actions/setup-node@v4
