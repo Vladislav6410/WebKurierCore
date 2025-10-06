@@ -2,9 +2,19 @@
   "name": "webkuriercore",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
+    "dev": "node server/index.js",
     "lint": "eslint .",
-    "test": "echo \"No tests configured\" && exit 0"
+    "test": "jest --passWithNoTests",
+    "merge:feedback": "node engine/agents/romantic/tools/merge_feedback.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.0",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.4.0",
+    "express": "^4.19.2",
+    "stripe": "^14.0.0"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
