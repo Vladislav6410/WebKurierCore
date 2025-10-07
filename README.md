@@ -160,7 +160,7 @@ graph TD
     C -->|Log| H
     D -->|Store| G
     E -->|Report| H
-    F -->|Monitor| H
+    F -->|Monitor| H```markdown
 ---
 
 ## 🧠 Роли и назначение агентов
