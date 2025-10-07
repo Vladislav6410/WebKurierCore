@@ -70,7 +70,49 @@ WebKurierCore/
 
 ```
 
-📂 WebKurierCore
+## 🤖 Агентная экосистема WebKurierCore
+
+Система построена из независимых AI-агентов, каждый решает свою задачу (романтика, код, поддержка, перевод, голос и т.д.).  
+Агенты хранятся в `engine/agents/<agent>` и имеют собственные: ядро (`*-agent.js`), память (`memory/`), подсказки (`prompts/`), инструменты (`tools/`) и интеграции (`integrations/`).
+
+### ⚙️ Основные компоненты
+
+| Папка / файл | Назначение |
+|---|---|
+| `engine/agents/romantic/` | RomanticAgent — диалоги, эмоции, комплименты, истории |
+| `engine/agents/programmer/` | Генерация и рефакторинг кода, анализ PR |
+| `engine/agents/techsupport/` | Поддержка пользователей и диагностика |
+| `engine/agents/translator/` | Переводы и i18n (JSON-локализации) |
+| `engine/agents/voice/` | Голосовой интерфейс (TTS/STT) |
+| `engine/agents/autopilot/` | Автоматизация сценариев и действий |
+| `engine/agents/telemetry/` | Сбор метрик, логи, мониторинг |
+| `engine/agents/wallet/` | WebCoin-кошелёк и операции |
+| `engine/agents/hr/` | Кадровые процессы и анкеты |
+| `engine/agents/pilot/` | Управление потоками/интеграциями |
+| `engine/agents/designer-agent.js` | Дизайн-агент (UI/UX задачи) |
+| `engine/agents/engineer-agent.js` | Инженерные расчёты/планирование |
+| `engine/agents/intelligence-agent.js` | Аналитика/стратегия |
+| `engine/agents/marketing-agent.js` | Маркетинг и контент |
+| и др. `*-agent.js` | Дополнительные одиночные ядра агентов |
+
+### 🧩 Взаимодействие агентов
+
+```mermaid
+graph TD
+    subgraph Server
+        A[Express Webhook] -->|JSON POST| B[Engine Router]
+        B -->|route| C[agents/romantic]
+        B -->|route| D[agents/programmer]
+        B -->|route| E[agents/translator]
+        B -->|route| F[agents/techsupport]
+        B -->|route| G[agents/telemetry]
+        B -->|route| H[agents/voice]
+    end
+    C -->|feedback merge| B
+    D -->|diagnostics| B
+    E -->|translations| B
+    H -->|speech/audio| B
+    B -->|response| A📂 WebKurierCore
 	•	🧾 index.html — 🌐 Главная страница
 	•	💻 terminal.js — Интерфейс терминала
 	•	💰 wallet.js — Кошелёк WebCoin
