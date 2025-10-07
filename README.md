@@ -39,6 +39,9 @@
 📂 **Структура проекта**
 
 ```bash
+
+## 🤖 Архитектура проекта WebKurierCore
+
 WebKurierCore/
 ├── .github/                     # CI/CD, Actions
 │   └── workflows/
@@ -46,6 +49,13 @@ WebKurierCore/
 ├── WebKurierCore/               # фронтенд интерфейс / документация
 ├── engine/                      # ядро всех агентов
 │   ├── agents/
+│   │   ├── accountant/
+│   │   ├── autopilot/
+│   │   ├── hr/
+│   │   ├── layout/
+│   │   ├── pilot/
+│   │   ├── pl-tax-return/
+│   │   ├── programmer/
 │   │   ├── romantic/
 │   │   │   ├── integrations/    # Telegram, WhatsApp коннекторы
 │   │   │   ├── memory/          # история и feedback
@@ -53,9 +63,29 @@ WebKurierCore/
 │   │   │   ├── tools/           # служебные скрипты
 │   │   │   ├── romantic-agent.js
 │   │   │   └── config.json
-│   │   ├── programmer/
 │   │   ├── techsupport/
-│   │   └── ...
+│   │   ├── telemetry/
+│   │   ├── translator/
+│   │   ├── voice/
+│   │   └── wallet/
+│   │
+│   │   accountant-agent.js
+│   │   autopilot-agent.js
+│   │   designer-agent.js
+│   │   drone-agent.js
+│   │   engineer-agent.js
+│   │   identity-agent.js
+│   │   intelligence-agent.js
+│   │   loader.js
+│   │   marketing-agent.js
+│   │   master-agent.js
+│   │   programmer-agent.js
+│   │   techsupport-agent.js
+│   │   telemetry-agent.js
+│   │   tools-agent.js
+│   │   tools-ui.js
+│   │   voice-agent.js
+│   │
 │   ├── config/
 │   ├── logs/
 │   └── ...
@@ -63,7 +93,7 @@ WebKurierCore/
 │   └── index.js
 ├── .env                         # приватные ключи (в .gitignore)
 ├── .env.example                 # шаблон окружения для GitHub
-├── .gitignore                   # ⚙️ настройки исключений Git
+├── .gitignore                   # ⚙️ исключения для Git
 ├── package.json
 ├── README.md
 └── statuses.md
