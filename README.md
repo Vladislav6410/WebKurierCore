@@ -160,8 +160,10 @@ graph TD
     C -->|Log| H
     D -->|Store| G
     E -->|Report| H
-    F -->|Monitor| H```markdown
----
+    F -->|Monitor| H ```bash
+код
+``````bash
+кодmarkdown ---
 
 ## 🧠 Роли и назначение агентов
 
