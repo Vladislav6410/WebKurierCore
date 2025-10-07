@@ -68,8 +68,8 @@ WebKurierCore/
 ├── README.md
 └── statuses.md
 
-```bash
-код
+```
+
 📂 WebKurierCore
 	•	🧾 index.html — 🌐 Главная страница
 	•	💻 terminal.js — Интерфейс терминала
