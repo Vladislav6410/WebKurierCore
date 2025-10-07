@@ -66,8 +66,8 @@ WebKurierCore/
 ├── .gitignore                   # ⚙️ настройки исключений Git
 ├── package.json
 ├── README.md
-└── statuses.md
-📂 WebKurierCore
+└── statuses.md 
+ '''  📂 WebKurierCore
 	•	🧾 index.html — 🌐 Главная страница
 	•	💻 terminal.js — Интерфейс терминала
 	•	💰 wallet.js — Кошелёк WebCoin
