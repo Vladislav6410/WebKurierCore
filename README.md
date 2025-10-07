@@ -36,7 +36,37 @@
 - ✅ **Совместимость с Telegram-ботами (уровень 8 и выше)**
 
 ---
+📂 **Структура проекта**
 
+```bash
+project-root/
+├── .github/                     # CI/CD, Actions
+│   └── workflows/
+│       └── ci.yml
+├── WebKurierCore/               # фронтенд интерфейс / документация
+├── engine/                      # ядро всех агентов
+│   ├── agents/
+│   │   ├── romantic/
+│   │   │   ├── integrations/    # Telegram, WhatsApp коннекторы
+│   │   │   ├── memory/          # история и feedback
+│   │   │   ├── prompts/         # фразы, шаблоны
+│   │   │   ├── tools/           # служебные скрипты
+│   │   │   ├── romantic-agent.js
+│   │   │   └── config.json
+│   │   ├── programmer/
+│   │   ├── techsupport/
+│   │   └── ...                  # другие агенты
+│   ├── config/                  # конфигурации и shared-модули
+│   ├── logs/                    # логи и диагностика
+│   └── ...
+├── server/                      # Express-сервер и Webhook-интеграции
+│   └── index.js
+├── .env                         # приватные ключи (в .gitignore)
+├── .env.example                 # шаблон окружения для GitHub
+├── .gitignore                   # ⚙️ настройки исключений Git
+├── package.json
+├── README.md
+└── statuses.md
 📂 WebKurierCore
 	•	🧾 index.html — 🌐 Главная страница
 	•	💻 terminal.js — Интерфейс терминала
