@@ -66,7 +66,8 @@ WebKurierCore/
 ├── .gitignore                   # ⚙️ настройки исключений Git
 ├── package.json
 ├── README.md
-└── statuses.md ```bash
+└── statuses.md
+```bash
 код
 📂 WebKurierCore
 	•	🧾 index.html — 🌐 Главная страница
