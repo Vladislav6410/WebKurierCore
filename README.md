@@ -34,7 +34,34 @@
 - ✅ **QR-код и Telegram-ссылки**
 - ✅ **Минималистичный дизайн, чистый HTML/JS/CSS**
 - ✅ **Совместимость с Telegram-ботами (уровень 8 и выше)**
-
+WebKurierCore/
+├── .github/                     # CI/CD, Actions
+│   └── workflows/
+│       └── ci.yml
+├── WebKurierCore/               # фронтенд интерфейс / документация
+├── engine/                      # ядро всех агентов
+│   ├── agents/
+│   │   ├── romantic/
+│   │   │   ├── integrations/    # Telegram, WhatsApp коннекторы
+│   │   │   ├── memory/          # история и feedback
+│   │   │   ├── prompts/         # фразы, шаблоны
+│   │   │   ├── tools/           # служебные скрипты
+│   │   │   ├── romantic-agent.js
+│   │   │   └── config.json
+│   │   ├── programmer/
+│   │   ├── techsupport/
+│   │   └── ...
+│   ├── config/
+│   ├── logs/
+│   └── ...
+├── server/                      # Express-сервер и Webhook-интеграции
+│   └── index.js
+├── .env                         # приватные ключи (в .gitignore)
+├── .env.example                 # шаблон окружения для GitHub
+├── .gitignore                   # ⚙️ настройки исключений Git
+├── package.json
+├── README.md
+└── statuses.md
 ---
 📂 **Структура проекта**
 
