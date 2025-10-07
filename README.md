@@ -34,6 +34,11 @@
 - ✅ **QR-код и Telegram-ссылки**
 - ✅ **Минималистичный дизайн, чистый HTML/JS/CSS**
 - ✅ **Совместимость с Telegram-ботами (уровень 8 и выше)**
+
+---
+📂 **Структура проекта**
+
+```bash
 WebKurierCore/
 ├── .github/                     # CI/CD, Actions
 │   └── workflows/
@@ -62,11 +67,6 @@ WebKurierCore/
 ├── package.json
 ├── README.md
 └── statuses.md
----
-📂 **Структура проекта**
-
-```bash
-
 📂 WebKurierCore
 	•	🧾 index.html — 🌐 Главная страница
 	•	💻 terminal.js — Интерфейс терминала
