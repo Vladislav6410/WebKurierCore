@@ -1,15 +1,16 @@
 /**
- * Romantic Agent — WhatsApp Integration (Baileys)
- * -----------------------------------------------
- * Лёгкий коннектор на базе @adiwajshing/baileys.
- * Пересылает входящие сообщения в ядро romantic-agent.js
- * и отправляет ответ.
+ * Romantic Agent — WhatsApp Integration (Baileys) — funnel-ready
+ * --------------------------------------------------------------
+ * Режимы:
+ *  - FUNNEL: отправляем события в общую шину /webhook/ingest (рекомендуется)
+ *  - LOCAL:  используем локальное ядро RomanticAgent (как раньше)
  *
- * Установка:
- *   npm install @adiwajshing/baileys qrcode-terminal
+ * ENV:
+ *   FUNNEL_API=https://<your-api>/webhook/ingest   # включает режим FUNNEL
+ *   (опционально) WA_SESSION_DIR=engine/agents/romantic/.wa-auth-romantic
  *
- * Первый запуск создаст локальную папку сессии .wa-auth-romantic/
- * (её нужно добавить в .gitignore, см. ниже).
+ * Запуск:
+ *   node engine/agents/romantic/integrations/whatsapp.js
  */
 
 import makeWASocket, {
@@ -17,13 +18,23 @@ import makeWASocket, {
   Browsers
 } from '@adiwajshing/baileys';
 import qrcode from 'qrcode-terminal';
-import { RomanticAgent } from '../romantic-agent.js';
+import axios from 'axios';
 
-const SESSION_DIR = new URL('../.wa-auth-romantic', import.meta.url).pathname;
-const agent = new RomanticAgent();
+// Фолбэк на локальное ядро (при отсутствии FUNNEL_API)
+let LocalAgent = null;
+try {
+  const mod = await import('../romantic-agent.js');
+  LocalAgent = mod.RomanticAgent || null;
+} catch { /* локальное ядро необязательно */ }
+
+const DEFAULT_SESSION_DIR = new URL('../.wa-auth-romantic', import.meta.url).pathname;
+const SESSION_DIR = process.env.WA_SESSION_DIR || DEFAULT_SESSION_DIR;
+
+const FUNNEL_API = process.env.FUNNEL_API || '';
+const MODE = FUNNEL_API ? 'FUNNEL' : 'LOCAL';
+const agent = MODE === 'LOCAL' && LocalAgent ? new LocalAgent() : null;
 
 export async function startWhatsApp() {
-  // файловое хранилище ключей/сессии (не хранить в git!)
   const { state, saveCreds } = await useMultiFileAuthState(SESSION_DIR);
 
   const sock = makeWASocket({
@@ -32,19 +43,16 @@ export async function startWhatsApp() {
     browser: Browsers.appropriate('WebKurier', 'Romantic', '1.0')
   });
 
-  // сохраняем обновления ключей
   sock.ev.on('creds.update', saveCreds);
 
-  // QR + статус соединения
   sock.ev.on('connection.update', ({ qr, connection, lastDisconnect }) => {
     if (qr) qrcode.generate(qr, { small: true });
-    if (connection === 'open') console.log('💚 WhatsApp connected.');
+    if (connection === 'open') console.log(`💚 WhatsApp connected. Mode: ${MODE}`);
     if (connection === 'close') {
       console.log('WhatsApp closed:', lastDisconnect?.error?.message || 'unknown');
     }
   });
 
-  // входящие сообщения
   sock.ev.on('messages.upsert', async ({ messages }) => {
     try {
       const m = messages?.[0];
@@ -65,17 +73,29 @@ export async function startWhatsApp() {
         return;
       }
 
-      const reply = await agent.handle(text, { userId: jid, mode: 'chat' });
-      await sock.sendMessage(jid, { text: reply });
+      if (MODE === 'FUNNEL') {
+        // Отправляем событие в общую шину — она вернёт текст ответа
+        const { data } = await axios.post(FUNNEL_API, {
+          channel: 'whatsapp',
+          agent: 'romantic',
+          payload: { message: { from: jid, text } }
+        }, { timeout: 10000 });
+
+        const reply = data?.reply ?? '…';
+        await sock.sendMessage(jid, { text: reply });
+      } else {
+        if (!agent) throw new Error('Локальное ядро недоступно');
+        const reply = await agent.handle(text, { userId: jid, mode: 'chat' });
+        await sock.sendMessage(jid, { text: reply });
+      }
     } catch (err) {
-      console.error('WA handler error:', err);
+      console.error('WA handler error:', err?.message || err);
     }
   });
 
   return sock;
 }
 
-// Запуск напрямую: node engine/agents/romantic/integrations/whatsapp.js
 if (import.meta.url === `file://${process.argv[1]}`) {
   startWhatsApp().catch((e) => {
     console.error('WA start error:', e);
