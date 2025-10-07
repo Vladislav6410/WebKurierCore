@@ -128,7 +128,39 @@ WebKurierCore/
 ### 🧩 Взаимодействие агентов
 
 ```mermaid
+graph TD
+    subgraph Client
+        X[🌐 WebKurierCore Interface]
+        Y[💬 Telegram / WhatsApp / Webhook]
+    end
 
+    subgraph Server
+        A[Express API / Webhook Router]
+        B[Server Controller]
+    end
+
+    subgraph Engine
+        C[engine/agents/romantic-agent.js]
+        D[engine/agents/programmer-agent.js]
+        E[engine/agents/techsupport-agent.js]
+        F[engine/agents/telemetry-agent.js]
+    end
+
+    subgraph Data
+        G[(memory/feedback)]
+        H[(logs/)]
+    end
+
+    X -->|Input| Y
+    Y -->|Request| A
+    A -->|Route| B
+    B -->|Trigger| C
+    B -->|Trigger| D
+    B -->|Trigger| E
+    C -->|Log| H
+    D -->|Store| G
+    E -->|Report| H
+    F -->|Monitor| H
 ---
 
 ## 🧠 Роли и назначение агентов
