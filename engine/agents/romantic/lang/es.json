@@ -6,7 +6,14 @@
     "name_en": "Spanish",
     "admin_available": false,
     "rtl": false
-  },
+  },"modes": {
+  "title": "Modo",
+  "chat": "Chat",
+  "poetry": "Poesía",
+  "date_planner": "Planificador de citas",
+  "soothing": "Reconfortante",
+  "letters": "Cartas"
+},
   "app": {
     "title": "Agente Romántico",
     "tagline": "Un compañero de IA que entiende tu corazón"
