@@ -6,7 +6,14 @@
     "name_en": "Japanese",
     "admin_available": false,
     "rtl": false
-  },
+  },"modes": {
+  "title": "モード",
+  "chat": "チャット",
+  "poetry": "詩",
+  "date_planner": "デートプランナー",
+  "soothing": "癒し",
+  "letters": "手紙"
+},
   "app": {
     "title": "ロマンティック・エージェント",
     "tagline": "あなたの心に寄り添うAIコンパニオン"
