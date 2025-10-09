@@ -6,7 +6,14 @@
     "name_en": "Portuguese (Brazil)",
     "admin_available": false,
     "rtl": false
-  },
+  },"modes": {
+  "title": "Modo",
+  "chat": "Bate-papo",
+  "poetry": "Poesia",
+  "date_planner": "Planejador de encontros",
+  "soothing": "Calmante",
+  "letters": "Cartas"
+},
   "app": {
     "title": "Agente Romântico",
     "tagline": "Um companheiro de IA que entende o seu coração"
