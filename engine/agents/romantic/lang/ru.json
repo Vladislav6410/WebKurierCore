@@ -6,7 +6,14 @@
     "name_en": "Russian",
     "admin_available": true,
     "rtl": false
-  },
+  },"modes": {
+  "title": "Mode",
+  "chat": "Chat",
+  "poetry": "Poetry",
+  "date_planner": "Date planner",
+  "soothing": "Soothing",
+  "letters": "Letters"
+},
   "app": {
     "title": "Романтический Агент",
     "tagline": "Цифровой собеседник, понимающий твои чувства"
