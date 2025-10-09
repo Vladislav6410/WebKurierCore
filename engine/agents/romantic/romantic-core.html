@@ -1,37 +1,163 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
   <title>Romantic Companion · WebKurier</title>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+  <!-- Общий стиль Romantic Agent (градиент, RTL, мобильная адаптация) -->
+  <link rel="stylesheet" href="./romantic-style.css"/>
+
+  <!-- i18n (загрузка ./lang/<code>.json, dir=rtl, событие languageChanged) -->
+  <script src="./lang/lang-i18n.js" defer></script>
+
+  <!-- Твоя логика (если есть функции из старого romantic-ui.js, они подключатся тут) -->
+  <script src="./romantic-ui.js" defer></script>
+
   <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0b0c10;color:#e6e6e6;margin:0}
-    .card{max-width:880px;margin:24px auto;padding:20px;background:#151821;border:1px solid #2a3140;border-radius:12px}
-    input,select,button,textarea{border-radius:8px;border:1px solid #2a3140;background:#0f121a;color:#e6e6e6;padding:10px}
-    .row{display:flex;gap:8px}
+    /* Небольшая карточка контейнера (визуально ближе к твоему оригиналу) */
+    .card{
+      max-width: 880px;
+      margin: 72px auto 24px;
+      padding: 20px;
+      background: rgba(17, 22, 29, 0.9);
+      border: 1px solid #2a3140;
+      border-radius: 12px;
+      backdrop-filter: blur(6px);
+    }
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    input,select,button,textarea{
+      border-radius: 8px;
+      border: 1px solid #2a3140;
+      background: #0f121a;
+      color: #e6e6e6;
+      padding: 10px;
+    }
+    textarea{width:100%;min-height:120px;resize:vertical}
     .out{white-space:pre-wrap;margin-top:12px}
+    .topbar{
+      position:fixed;top:0;left:0;right:0;z-index:10;
+      display:flex;justify-content:space-between;align-items:center;
+      padding:10px 16px;background:rgba(0,0,0,0.25);backdrop-filter:blur(8px)
+    }
+    .icon-btn{background:none;border:none;font-size:18px;cursor:pointer}
+    .icon-left{color:#9cd4ff}.icon-right{color:#ff9dcc}
+    .hint{opacity:.65;font-size:12px}
   </style>
 </head>
-<body>
+<body data-theme="dark">
+  <!-- Верхняя панель: RTL/Theme -->
+  <div class="topbar">
+    <button id="toggleRTL" class="icon-btn icon-left" title="RTL">↔️</button>
+    <strong>💞 Romantic Companion</strong>
+    <button id="toggleTheme" class="icon-btn icon-right" title="Theme">🌙</button>
+  </div>
+
   <div class="card">
-    <h1>💞 Romantic Companion</h1>
-    <div class="row">
-      <select id="mode">
+    <h1 id="title" data-i18n="app.title">💞 Romantic Companion</h1>
+
+    <div class="row" style="margin-top:4px">
+      <label for="mode" class="hint">Mode</label>
+      <select id="mode" aria-label="Mode select">
         <option value="chat">Chat</option>
         <option value="poetry">Poetry</option>
         <option value="date-planner">Date planner</option>
         <option value="soothing">Soothing</option>
         <option value="letters">Letters</option>
       </select>
+      <!-- тут можно вставить твой компонент выбора языка (кнопки/селект) -->
+      <!-- <iframe src="./lang-menu.html" style="border:none;height:56px;flex:1"></iframe> -->
     </div>
-    <textarea id="input" rows="4" style="width:100%;margin-top:8px"
-      placeholder="Tell me what's on your heart..."></textarea>
+
+    <textarea id="input" placeholder="Tell me what's on your heart..." aria-label="Message"></textarea>
+
     <div class="row" style="margin-top:8px">
-      <button onclick="send()">Send</button>
-      <button onclick="clearOut()">Clear</button>
+      <button id="sendBtn" data-i18n="buttons.send" aria-label="Send">Send</button>
+      <button id="clearBtn" aria-label="Clear">Clear</button>
+      <span class="hint">Enter / ⌘+Enter — send • Esc — clear</span>
     </div>
-    <div id="out" class="out"></div>
+
+    <div id="out" class="out" aria-live="polite"></div>
   </div>
-  <script src="romantic-ui.js"></script>
+
+  <script>
+    // --- DOM
+    const modeEl   = document.getElementById('mode');
+    const inputEl  = document.getElementById('input');
+    const outEl    = document.getElementById('out');
+    const sendBtn  = document.getElementById('sendBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    // --- Состояние
+    const MODE_KEY = 'ra_mode';
+    const savedMode = localStorage.getItem(MODE_KEY);
+    if (savedMode) modeEl.value = savedMode;
+
+    // --- Вспомогательные
+    function addOut(text){
+      const block = document.createElement('div');
+      block.textContent = text;
+      outEl.appendChild(block);
+    }
+
+    function clearOut(){
+      outEl.innerHTML = '';
+    }
+
+    async function handleSend(){
+      const text = (inputEl.value || '').trim();
+      if (!text) return;
+
+      const mode = modeEl.value;
+      localStorage.setItem(MODE_KEY, mode);
+
+      addOut('👉 ' + text);
+      inputEl.value = '';
+
+      // Здесь можно прокинуть в твой romantic-ui.js реальный вызов к агенту
+      // Ниже — мок-ответы в зависимости от режима
+      const replies = {
+        'chat': "💖 I'm here, listening. Your feelings matter to me.",
+        'poetry': "🌸 In gentle words your heart unfolds — I'll keep them safe.",
+        'date-planner': "🗓️ Let's plan a warm evening: cozy cafe, slow walk, soft talk.",
+        'soothing': "✨ Breathe... you're safe here. I'm with you.",
+        'letters': "💌 I'll help you write a letter that carries your warmth."
+      };
+      // эмуляция задержки «ответа»
+      setTimeout(()=> addOut('💞 ' + (replies[mode] || replies.chat)), 600);
+    }
+
+    // --- События
+    sendBtn.addEventListener('click', handleSend);
+    clearBtn.addEventListener('click', clearOut);
+
+    inputEl.addEventListener('keydown', (e)=>{
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); handleSend(); }
+      else if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+      else if (e.key === 'Escape') { clearOut(); }
+    });
+
+    // --- Тема
+    const toggleTheme = document.getElementById('toggleTheme');
+    toggleTheme.addEventListener('click', ()=>{
+      const next = (document.body.dataset.theme === 'light') ? 'dark' : 'light';
+      document.body.dataset.theme = next;
+      toggleTheme.textContent = next === 'light' ? '☀️' : '🌙';
+    });
+
+    // --- RTL
+    const toggleRTL = document.getElementById('toggleRTL');
+    toggleRTL.addEventListener('click', ()=>{
+      const html = document.documentElement;
+      html.dir = (html.dir === 'rtl') ? 'ltr' : 'rtl';
+    });
+
+    // --- i18n: если подключён lang-i18n.js, он переведёт элементы с data-i18n (title, кнопки)
+    window.addEventListener('languageChanged', ()=>{
+      // При смене языка можно динамически менять placeholder:
+      inputEl.setAttribute('placeholder', inputEl.getAttribute('placeholder') || "Tell me what's on your heart...");
+      // Если добавишь ключи для mode.* в JSON — тут же можно обновлять option'ы
+    });
+  </script>
 </body>
 </html>
