@@ -1,0 +1,73 @@
+name: Update modes keys in lang JSON
+
+on:
+  workflow_dispatch: {}  # ручной запуск из вкладки Actions
+
+jobs:
+  patch-lang:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run patcher (add "modes" block if missing)
+        run: |
+          python3 - << 'PY'
+          import json, os, sys
+
+          LANG_DIR = "engine/agents/romantic/lang"
+          modes_dict = {
+              "ru": {"title":"Режим","chat":"Чат","poetry":"Поэзия","date_planner":"Планировщик свидания","soothing":"Успокаивающий","letters":"Письма"},
+              "en": {"title":"Mode","chat":"Chat","poetry":"Poetry","date_planner":"Date planner","soothing":"Soothing","letters":"Letters"},
+              "de": {"title":"Modus","chat":"Chat","poetry":"Poesie","date_planner":"Date-Planer","soothing":"Beruhigend","letters":"Briefe"},
+              "pl": {"title":"Tryb","chat":"Czat","poetry":"Poezja","date_planner":"Planer randek","soothing":"Kołyszący","letters":"Listy"},
+              "es": {"title":"Modo","chat":"Chat","poetry":"Poesía","date_planner":"Planificador de citas","soothing":"Reconfortante","letters":"Cartas"},
+              "pt": {"title":"Modo","chat":"Chat","poetry":"Poesia","date_planner":"Planejador de encontros","soothing":"Reconfortante","letters":"Cartas"},
+              "hi": {"title":"मोड","chat":"चैट","poetry":"कविता","date_planner":"डेट प्लानर","soothing":"सांत्वनादायक","letters":"पत्र"},
+              "ar": {"title":"الوضع","chat":"دردشة","poetry":"شِعر","date_planner":"مُخطِّط موعد","soothing":"مُهدِّئ","letters":"رسائل"},
+              "tr": {"title":"Mod","chat":"Sohbet","poetry":"Şiir","date_planner":"Randevu planlayıcı","soothing":"Rahatlatıcı","letters":"Mektuplar"},
+              "jp": {"title":"モード","chat":"チャット","poetry":"ポエム","date_planner":"デートプランナー","soothing":"リラックス","letters":"レター"},
+              "kr": {"title":"모드","chat":"채팅","poetry":"시","date_planner":"데이트 플래너","soothing":"진정","letters":"편지"}
+          }
+
+          changed = []
+          if not os.path.isdir(LANG_DIR):
+              print(f"❌ Not found: {LANG_DIR}")
+              sys.exit(1)
+
+          for file in os.listdir(LANG_DIR):
+              if not file.endswith(".json"): continue
+              code = file.split(".")[0]
+              path = os.path.join(LANG_DIR, file)
+              with open(path, encoding="utf-8") as f:
+                  data = json.load(f)
+
+              if "modes" not in data and code in modes_dict:
+                  data["modes"] = modes_dict[code]
+                  with open(path, "w", encoding="utf-8") as f:
+                      json.dump(data, f, ensure_ascii=False, indent=2)
+                  changed.append(file)
+                  print(f"✅ Added modes → {file}")
+              else:
+                  print(f"✔ Already has modes or no preset → {file}")
+
+          # маркер изменений для следующего шага
+          if changed:
+              with open(".__modes_changed__", "w") as f:
+                  f.write("\n".join(changed))
+          PY
+
+      - name: Create Pull Request if changed
+        if: hashFiles('.__modes_changed__') != ''
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore(i18n): add missing modes keys to lang/*.json"
+          title: "i18n: add 'modes' block to language files"
+          body: "Automated patch: adds missing `modes` section to JSON language files."
+          branch: chore/i18n-add-modes
+          delete-branch: true
