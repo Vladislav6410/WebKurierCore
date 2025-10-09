@@ -6,7 +6,14 @@
     "name_en": "Hindi",
     "admin_available": false,
     "rtl": false
-  },
+  },"modes": {
+  "title": "मोड",
+  "chat": "चैट",
+  "poetry": "कविता",
+  "date_planner": "डेट प्लानर",
+  "soothing": "सांत्वनादायक",
+  "letters": "पत्र"
+},
   "app": {
     "title": "रोमांटिक एजेंट",
     "tagline": "एक एआई साथी जो आपके दिल को समझता है"
