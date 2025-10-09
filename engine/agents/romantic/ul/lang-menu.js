@@ -47,4 +47,19 @@ export function createLangMenu(target){
   }
   syncActive();
   window.addEventListener('languageChanged', syncActive);
+}// romantic-ui.js
+import { t } from '../../i18n/lang-i18n.js';
+
+// пример: обновляем текстовые элементы при смене языка
+function updateUIText() {
+  document.querySelector('#sendBtn').textContent = t('buttons.send', 'Send');
+  document.querySelector('#settingsBtn').textContent = t('menu.settings', 'Settings');
+  document.querySelector('#title').textContent = t('app.title', 'Romantic Agent');
+  document.querySelector('#tagline').textContent = t('app.tagline', 'AI companion that understands your heart');
 }
+
+// вызываем при загрузке
+updateUIText();
+
+// реагируем на смену языка (из lang-menu)
+window.addEventListener('languageChanged', updateUIText);
