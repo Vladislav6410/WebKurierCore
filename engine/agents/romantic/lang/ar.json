@@ -6,7 +6,14 @@
     "name_en": "Arabic",
     "admin_available": false,
     "rtl": true
-  },
+  },"modes": {
+  "title": "الوضع",
+  "chat": "دردشة",
+  "poetry": "شِعر",
+  "date_planner": "مُخطِّط موعد",
+  "soothing": "مُهدِّئ",
+  "letters": "رسائل"
+},
   "app": {
     "title": "الوكيل الرومانسي",
     "tagline": "رفيق ذكاء اصطناعي يفهم قلبك"
