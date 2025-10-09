@@ -1,0 +1,18 @@
+<!-- language menu slot -->
+<div id="lang-menu-slot"></div>
+
+<script type="module">
+  import { i18nInit } from '../../i18n/lang-i18n.js';
+  import { createLangMenu } from './ui/lang-menu.js';
+
+  // 1) инициализируем i18n (загрузит ru или сохранённый в localStorage язык)
+  await i18nInit('ru');
+
+  // 2) рендерим компактное меню
+  const slot = document.getElementById('lang-menu-slot');
+  createLangMenu(slot);
+
+  // 3) пример автоперевода существующего DOM (если элементы отмечены data-i18n)
+  //    <span data-i18n="app.title"></span> и т.п.
+  //    см. ключи в твоих lang/*.json
+</script>
