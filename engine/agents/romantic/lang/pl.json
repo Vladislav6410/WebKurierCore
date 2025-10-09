@@ -6,7 +6,14 @@
     "name_en": "Polish",
     "admin_available": false,
     "rtl": false
-  },
+  },"modes": {
+  "title": "Tryb",
+  "chat": "Czat",
+  "poetry": "Poezja",
+  "date_planner": "Planer randek",
+  "soothing": "Uspokajający",
+  "letters": "Listy"
+},
   "app": {
     "title": "Romantic Agent",
     "tagline": "Sztuczna inteligencja, która rozumie Twoje serce"
