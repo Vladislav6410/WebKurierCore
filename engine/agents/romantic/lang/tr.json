@@ -7,12 +7,12 @@
     "admin_available": false,
     "rtl": false
   },"modes": {
-  "title": "Режим",
-  "chat": "Чат",
-  "poetry": "Поэзия",
-  "date_planner": "Планировщик свидания",
-  "soothing": "Успокаивающий",
-  "letters": "Письма"
+  "title": "Mod",
+  "chat": "Sohbet",
+  "poetry": "Şiir",
+  "date_planner": "Randevu planlayıcı",
+  "soothing": "Rahatlatıcı",
+  "letters": "Mektuplar"
 },
   "app": {
     "title": "Romantik Asistan",
