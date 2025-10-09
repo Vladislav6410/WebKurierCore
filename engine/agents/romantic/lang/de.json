@@ -6,7 +6,14 @@
     "name_en": "German",
     "admin_available": false,
     "rtl": false
-  },
+  },"modes": {
+  "title": "Modus",
+  "chat": "Chat",
+  "poetry": "Poesie",
+  "date_planner": "Date-Planer",
+  "soothing": "Beruhigend",
+  "letters": "Briefe"
+},
   "app": {
     "title": "Romantic Agent",
     "tagline": "Ein KI-Gesprächspartner, der dein Herz versteht"
