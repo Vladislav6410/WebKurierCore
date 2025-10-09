@@ -6,7 +6,14 @@
     "name_en": "English",
     "admin_available": false,
     "rtl": false
-  },
+  },"modes": {
+  "title": "Mode",
+  "chat": "Chat",
+  "poetry": "Poetry",
+  "date_planner": "Date planner",
+  "soothing": "Soothing",
+  "letters": "Letters"
+},
   "app": {
     "title": "Romantic Agent",
     "tagline": "An AI companion that understands your heart"
