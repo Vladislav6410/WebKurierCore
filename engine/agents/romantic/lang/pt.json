@@ -1,0 +1,134 @@
+{
+  "language": {
+    "code": "pt",
+    "flag": "🇧🇷",
+    "name_native": "Português",
+    "name_en": "Portuguese (Brazil)",
+    "admin_available": false,
+    "rtl": false
+  },
+  "app": {
+    "title": "Agente Romântico",
+    "tagline": "Um companheiro de IA que entende o seu coração"
+  },
+  "formatting": {
+    "date_format": "DD/MM/YYYY",
+    "time_format": "HH:mm",
+    "number_separator": ".",
+    "decimal_point": ","
+  },
+  "menu": {
+    "language": "Idioma",
+    "voice": "Voz",
+    "persona": "Personalidade",
+    "store": "Loja",
+    "settings": "Configurações",
+    "help": "Ajuda",
+    "privacy": "Privacidade",
+    "logout": "Sair"
+  },
+  "buttons": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "back": "Voltar",
+    "ok": "OK",
+    "close": "Fechar",
+    "start": "Iniciar",
+    "stop": "Parar",
+    "upgrade": "Atualizar",
+    "buy": "Comprar",
+    "send": "Enviar"
+  },
+  "labels": {
+    "male": "Masculino",
+    "female": "Feminino",
+    "neutral": "Neutro",
+    "typing": "Digitando...",
+    "online": "Online",
+    "offline": "Offline",
+    "language_select": "Selecionar idioma",
+    "voice_select": "Selecionar voz",
+    "persona_select": "Selecionar personalidade"
+  },
+  "chat": {
+    "placeholder": "Digite sua mensagem aqui...",
+    "greeting_new": "Olá, {username}! Como você está hoje?",
+    "greeting_return": "Bem-vindo de volta, {username}. Senti sua falta.",
+    "session_resumed": "Conversa retomada."
+  },
+  "personas": {
+    "romantic_soft": "Romântico (Suave)",
+    "gentle_support": "Apoio Gentil",
+    "poetic": "Poético",
+    "friendly": "Amigável",
+    "flirty_pg13": "Flertador (PG-13)",
+    "calm_listener": "Ouvinte Calmo",
+    "descriptions": {
+      "romantic_soft": "Comunicação carinhosa, respeitosa e afetuosa.",
+      "gentle_support": "Empático, acolhedor e encorajador.",
+      "poetic": "Expressa emoções com metáforas e leveza.",
+      "friendly": "Tom leve, descontraído e alegre.",
+      "flirty_pg13": "Flertes sutis dentro dos limites seguros.",
+      "calm_listener": "Escuta atenciosamente e responde com calma."
+    }
+  },
+  "safety": {
+    "safe_mode": "Modo Seguro",
+    "safe_mode_on": "Modo Seguro: Ativado (PG-13)",
+    "safe_mode_off": "Modo Seguro: Desativado",
+    "content_filter_note": "O conteúdo é ajustado automaticamente para sua região.",
+    "report": "Denunciar conteúdo inadequado"
+  },
+  "store": {
+    "coins": "Moedas",
+    "balance": "Saldo: {amount}",
+    "gifts": "Presentes Digitais",
+    "characters": "Personagens",
+    "buy_coins": "Comprar Moedas",
+    "send_gift": "Enviar Presente"
+  },
+  "subscription": {
+    "basic": "Básico",
+    "premium": "Premium",
+    "monthly_price": "Mensal {price}",
+    "yearly_price": "Anual {price}",
+    "upgrade_cta": "Atualizar para Premium",
+    "premium_features": [
+      "Mensagens ilimitadas",
+      "Conversas por voz",
+      "Memória emocional avançada",
+      "Personagens e presentes exclusivos"
+    ]
+  },
+  "voice": {
+    "title": "Configurações de Voz",
+    "male": "Voz Masculina",
+    "female": "Voz Feminina",
+    "neutral": "Voz Neutra",
+    "rate": "Velocidade",
+    "pitch": "Tom",
+    "test": "Testar Voz"
+  },
+  "admin": {
+    "panel": "Painel de Administração",
+    "dev_language_note": "O idioma padrão para desenvolvimento e administração é o russo.",
+    "export_logs": "Exportar Logs",
+    "reset_memory": "Redefinir Memória de Conversa"
+  },
+  "errors": {
+    "network": "Erro de rede. Verifique sua conexão.",
+    "rate_limit": "Muitas solicitações. Tente novamente mais tarde.",
+    "invalid_input": "Entrada inválida.",
+    "unknown": "Ocorreu um erro desconhecido."
+  },
+  "tooltips": {
+    "hold_to_save": "Segure para salvar",
+    "double_tap": "Toque duas vezes para ver detalhes",
+    "swipe_left": "Deslize para a esquerda para voltar"
+  },
+  "privacy": {
+    "title": "Privacidade",
+    "data_use": "Os dados das conversas podem ser anonimizados para melhorar a qualidade.",
+    "gdpr": "Conforme com o GDPR."
+  }
+}
