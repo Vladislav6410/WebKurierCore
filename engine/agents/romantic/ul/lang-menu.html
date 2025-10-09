@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Language Menu · RomanticAgent</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{ --card:#11151a; --fg:#e9eef4; --muted:#aab7c4; --border:#263241; --accent:#5fb0ff; }
+    body{ margin:0; font:14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#0b0f14; color:var(--fg); }
+    .wrap{ max-width:840px; margin:24px auto; padding:16px; }
+    .card{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; }
+    .row{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .lang-btn{
+      display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border:1px solid var(--border);
+      background:#0f141a; color:var(--fg); border-radius:10px; cursor:pointer; user-select:none;
+      transition:transform .05s ease, border-color .15s ease;
+    }
+    .lang-btn:hover{ border-color:var(--accent); }
+    .lang-btn.active{ outline:2px solid var(--accent); }
+    .flag{ font-size:18px; }
+    .code{ color:var(--muted); font-size:12px; letter-spacing:.3px; }
+    .spacer{ height:10px; }
+    .select{ width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:#0f141a; color:var(--fg); }
+    .note{ color:var(--muted); font-size:12px; }
+    .grid{ display:grid; grid-template-columns: repeat(auto-fill,minmax(160px,1fr)); gap:10px; }
+    /* demo area for i18n */
+    .demo{ margin-top:16px; padding:12px; border:1px dashed var(--border); border-radius:10px; }
+    [dir="rtl"] .row{ flex-direction: row-reverse; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h2 style="margin:0 0 8px" data-i18n="menu.language">Language</h2>
+      <p class="note" data-i18n="labels.language_select">Select Language</p>
+
+      <!-- Вариант: кнопки с флагами -->
+      <div id="langButtons" class="row"></div>
+
+      <div class="spacer"></div>
+
+      <!-- Вариант: выпадающий список (на случай маленького экрана) -->
+      <select id="langSelect" class="select" aria-label="Language select"></select>
+
+      <div class="demo">
+        <strong data-i18n="app.title">Romantic Agent</strong><br/>
+        <span data-i18n="app.tagline">An AI companion that understands your heart</span>
+        <hr/>
+        <button class="lang-btn" disabled>
+          <span class="flag">💬</span>
+          <span data-i18n="buttons.send">Send</span>
+        </button>
+        <span class="code" id="rtlInfo">dir: ltr</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ——— конфигурация языков (соответствует файлам ./lang/*.json)
+    const LANGS = [
+      { code:'jp', flag:'🇯🇵', name:'日本語' },
+      { code:'kr', flag:'🇰🇷', name:'한국어' },
+      { code:'en', flag:'🇺🇸', name:'English' },
+      { code:'de', flag:'🇩🇪', name:'Deutsch' },
+      { code:'pl', flag:'🇵🇱', name:'Polski' },
+      { code:'hi', flag:'🇮🇳', name:'हिन्दी' },
+      { code:'tr', flag:'🇹🇷', name:'Türkçe' },
+      { code:'ar', flag:'🇸🇦', name:'العربية' },
+      { code:'pt', flag:'🇧🇷', name:'Português' },
+      { code:'es', flag:'🇪🇸', name:'Español' },
+      { code:'ru', flag:'🇷🇺', name:'Русский' } // админ/разработка
+    ];
+
+    const DEFAULT_CODE = localStorage.getItem('ra_lang') || 'ru';
+
+    const els = {
+      buttons: document.getElementById('langButtons'),
+      select: document.getElementById('langSelect'),
+      rtlInfo: document.getElementById('rtlInfo')
+    };
+
+    // построение UI
+    function buildUI(){
+      // кнопки
+      els.buttons.innerHTML = '';
+      LANGS.forEach(l => {
+        const b = document.createElement('button');
+        b.className = 'lang-btn';
+        b.dataset.code = l.code;
+        b.innerHTML = `<span class="flag">${l.flag}</span><span>${l.name}</span><span class="code">(${l.code})</span>`;
+        b.addEventListener('click', () => setLanguage(l.code));
+        els.buttons.appendChild(b);
+      });
+
+      // селект
+      els.select.innerHTML = LANGS
+        .map(l => `<option value="${l.code}">${l.flag} ${l.name} (${l.code})</option>`)
+        .join('');
+      els.select.addEventListener('change', e => setLanguage(e.target.value));
+    }
+
+    // загрузка json и применение
+    async function setLanguage(code){
+      try{
+        const res = await fetch(`../lang/${code}.json`);
+        if(!res.ok) throw new Error('Lang file not found: ' + code);
+        const dict = await res.json();
+
+        // dir / rtl
+        const isRTL = !!dict?.language?.rtl;
+        document.documentElement.setAttribute('dir', isRTL ? 'rtl' : 'ltr');
+        els.rtlInfo.textContent = 'dir: ' + (isRTL ? 'rtl' : 'ltr');
+
+        // простая i18n: все элементы с data-i18n заменяем по ключу
+        document.querySelectorAll('[data-i18n]').forEach(node => {
+          const key = node.getAttribute('data-i18n');
+          const text = getByPath(dict, key) || node.textContent;
+          node.textContent = text;
+        });
+
+        // выделить активную кнопку + селект
+        document.querySelectorAll('.lang-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.code === code);
+        });
+        els.select.value = code;
+
+        // сохранить выбор
+        localStorage.setItem('ra_lang', code);
+
+        // уведомить остальной интерфейс
+        window.dispatchEvent(new CustomEvent('languageChanged', { detail:{ code, dict } }));
+      }catch(err){
+        console.error(err);
+        alert('Language load error: ' + err.message);
+      }
+    }
+
+    // утилита для доступа к вложенным ключам: "menu.language" → dict.menu.language
+    function getByPath(obj, path){
+      return path.split('.').reduce((o,k)=> (o && k in o)? o[k] : undefined, obj);
+    }
+
+    // init
+    buildUI();
+    setLanguage(DEFAULT_CODE);
+  </script>
+</body>
+</html>
