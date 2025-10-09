@@ -7,12 +7,12 @@
     "admin_available": true,
     "rtl": false
   },"modes": {
-  "title": "Mode",
-  "chat": "Chat",
-  "poetry": "Poetry",
-  "date_planner": "Date planner",
-  "soothing": "Soothing",
-  "letters": "Letters"
+  "title": "Режим",
+  "chat": "Чат",
+  "poetry": "Поэзия",
+  "date_planner": "Планировщик свиданий",
+  "soothing": "Успокаивающий",
+  "letters": "Письма"
 },
   "app": {
     "title": "Романтический Агент",
