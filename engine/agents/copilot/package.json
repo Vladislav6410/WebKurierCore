@@ -1,0 +1,13 @@
+{
+  "name": "webkurier-copilot",
+  "version": "0.1.0",
+  "private": true,
+  "main": "ai-copilot.js",
+  "scripts": {
+    "start": "node ai-copilot.js"
+  },
+  "dependencies": {
+    "mqtt": "^4.4.1",
+    "say": "^0.16.0"
+  }
+}
