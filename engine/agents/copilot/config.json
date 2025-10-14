@@ -1,0 +1,20 @@
+{
+  "mqtt": {
+    "url": "mqtt://192.168.1.20:1883",
+    "telemetryTopic": "drone/telemetry",
+    "commandTopic": "drone/commands",
+    "qos": 1
+  },
+  "safety": {
+    "minBattery": 20,
+    "obstacleDistanceThreshold": 3.0
+  },
+  "autopilot": {
+    "engageAutolandOnCritical": true
+  },
+  "voice": {
+    "enabled": true,
+    "voiceLocale": "ru"
+  },
+  "mode": "onboard"
+}
