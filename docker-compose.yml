@@ -5,15 +5,26 @@ services:
     build: .
     container_name: webkurier
     restart: always
+
+    # Файл окружения (переменные среды)
     env_file:
       - .env
+
+    # Привязка локальных папок к контейнеру
     volumes:
-      - ./engine/config:/app/engine/config:ro
-      - ./engine/memory:/app/engine/memory
-      - ./engine/logs:/app/engine/logs
-      - ./engine/agents:/app/engine/agents:ro
+      - ./engine/config:/app/engine/config:ro       # Конфигурация (только чтение)
+      - ./engine/memory:/app/engine/memory          # Память / данные
+      - ./engine/logs:/app/engine/logs              # Логи и отладка
+      - ./engine/agents:/app/engine/agents:ro       # Агенты (только чтение)
+
+    # 🔌 Порты: 
+    # левая часть (HOST_HTTP_PORT) — порт на хосте (твой компьютер или сервер)
+    # правая часть (8080) — порт внутри контейнера, где работает FastAPI
+    # если .env не найден, используется значение по умолчанию 8080
     ports:
       - "${HOST_HTTP_PORT:-8080}:8080"
+
+    # Проверка, что процесс успешно запущен
     healthcheck:
       test: ["CMD", "bash", "-c", "pgrep -f startup_loader.py >/dev/null"]
       interval: 30s
