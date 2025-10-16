@@ -1,0 +1,8 @@
+your.domain {
+  encode gzip
+  reverse_proxy webkurier:8080
+  @health path /healthz
+  handle @health {
+    respond "ok" 200
+  }
+}
