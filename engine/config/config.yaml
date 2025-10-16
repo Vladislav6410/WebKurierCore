@@ -1,4 +1,47 @@
-import yaml
-with open('engine/config/config.yaml', 'r', encoding='utf-8') as f:
-    cfg = yaml.safe_load(f)
-    print(cfg['modules']['geodesist']['description'])
+project: WebKurierCore
+version: "1.2.0"
+updated: "2025-10-16"
+description: Конфигурация ядра WebKurierCore — агенты и инструменты
+
+modules:
+  master:
+    name: Master Agent
+    path: /engine/agents/master/
+    source: local
+    description: Главный управляющий агент
+    enabled: true
+
+  security:
+    name: Security Agent
+    path: /engine/agents/security/
+    source: local
+    description: Проверка токенов и окружения
+    enabled: true
+
+  pilot:
+    name: Pilot Agent
+    path: /engine/agents/pilot/
+    source: local
+    description: Управление дроном и миссиями
+    enabled: true
+
+  geodesist:
+    name: Geodesy Agent
+    path: /engine/agents/geodesist/
+    source: local
+    description: Геообработка, отчёты, NDVI
+    enabled: true
+
+  tools:
+    name: Tools Panel
+    path: /engine/agents/tools/
+    source: local
+    description: Панель инструментов / шаблонов / экспорта
+    enabled: true
+
+settings:
+  language: ru
+  theme: dark
+  dropbox_sync: true
+  telegram_bot: "@WebKurierBot"
+  memory_file: /engine/memory/assistant_memory.json
