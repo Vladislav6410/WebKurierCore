@@ -247,6 +247,71 @@ if __name__ == "__main__":
       }
     });
   });
+</script><script type="module">
+  import { AIDesigner } from './engine/agents/tools/ai-builder.js';
+
+  const designer = new AIDesigner();
+
+  // Мини-панель: поле + две кнопки
+  const panel = document.createElement('div');
+  panel.style.cssText = 'position:fixed;right:16px;bottom:16px;max-width:420px;background:#151821;border:1px solid #2a3140;border-radius:12px;padding:12px;z-index:9999';
+  panel.innerHTML = `
+    <div style="font-weight:600;margin-bottom:8px">AI Builder</div>
+    <textarea id="aiPrompt" rows="3" placeholder="Опиши страницу: тёмная тема, hero, 3 карточки, форма..." style="width:100%;padding:8px;border-radius:10px;border:1px solid #2a3140;background:transparent;color:#e6e6e6"></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button id="btnGen" style="flex:1">Сгенерировать</button>
+      <button id="btnZip" style="flex:1">Экспорт ZIP</button>
+    </div>
+    <div id="aiStatus" style="opacity:.7;margin-top:6px"></div>
+  `;
+  document.body.appendChild(panel);
+
+  const status = panel.querySelector('#aiStatus');
+
+  async function generate() {
+    status.textContent = 'Генерация...';
+    const prompt = panel.querySelector('#aiPrompt').value.trim();
+    try {
+      // пока offline-режим (без бэкенда):
+      const { html, css } = await designer.generateOffline(prompt || 'hero, 3 cards, contact form, dark');
+      // откроем предпросмотр в новом окне
+      const blob = new Blob([html.replace('</head>', `<style>${css}</style></head>`)], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      status.textContent = 'Готово: предпросмотр открыт.';
+    } catch (e) {
+      console.error(e);
+      status.textContent = 'Ошибка генерации (см. консоль).';
+    }
+  }
+
+  async function exportZip() {
+    status.textContent = 'Собираю ZIP...';
+
+    // Импортируем JSZip динамически (добавь jszip в проект при необходимости)
+    const JSZip = (await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm')).default;
+
+    const prompt = panel.querySelector('#aiPrompt').value.trim();
+    const { html, css } = await designer.generateOffline(prompt || 'hero, 3 cards, contact form, dark');
+
+    const zip = new JSZip();
+    zip.file('index.html', html.replace('</head>', `<link rel="stylesheet" href="styles.css"></head>`));
+    zip.file('styles.css', css || '/* styles */');
+
+    const blob = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'webkurier_autobuild.zip';
+    a.click();
+    URL.revokeObjectURL(url);
+
+    status.textContent = 'ZIP готов.';
+  }
+
+  panel.querySelector('#btnGen').addEventListener('click', generate);
+  panel.querySelector('#btnZip').addEventListener('click', exportZip);
 </script>
 </body>
 </html>
