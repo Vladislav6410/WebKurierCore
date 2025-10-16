@@ -14,4 +14,24 @@
 
 ---
 
-## 1) Что уже есть в репозитории
+## 1) Что уже есть в репозиторииWebKurierCore/
+├─ Dockerfile
+├─ requirements.txt
+├─ engine/startup_loader.py      # FastAPI + Basic-Auth (/ , /status, /healthz)
+└─ .github/workflows/deploy-cloudrun.yml  # CI для Cloud Run> Панель слушает порт `8080` (совпадает с Cloud Run).
+
+---
+
+## 2) Настраиваем Google Cloud (один раз)
+
+### 2.1. Артефакты и регионы
+Рекомендуемые EU-регионы:
+- Cloud Run / Region: `europe-west1` (Бельгия) или `europe-west4` (Нидерланды)
+- Artifact Registry / Location: такой же регион
+
+Создай Artifact Registry (имя репозитория, например `webkurier`):
+```bash
+gcloud artifacts repositories create webkurier \
+  --repository-format=docker \
+  --location=europe-west1 \
+  --description="WebKurierCore images"
