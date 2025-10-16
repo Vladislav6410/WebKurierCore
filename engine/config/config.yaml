@@ -1,0 +1,4 @@
+import yaml
+with open('engine/config/config.yaml', 'r', encoding='utf-8') as f:
+    cfg = yaml.safe_load(f)
+    print(cfg['modules']['geodesist']['description'])
