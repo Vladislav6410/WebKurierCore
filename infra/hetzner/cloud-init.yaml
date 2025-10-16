@@ -4,6 +4,7 @@ package_upgrade: true
 packages:
   - docker.io
   - docker-compose-plugin
+
 runcmd:
   - usermod -aG docker ubuntu
   - mkdir -p /opt/webkurier
@@ -12,3 +13,4 @@ runcmd:
   - ufw --force enable
   - sysctl -w net.ipv4.ip_unprivileged_port_start=0
   - echo "net.ipv4.ip_unprivileged_port_start=0" >> /etc/sysctl.conf
+  - echo "✅ Cloud-init completed. Docker & firewall configured." > /opt/webkurier/INSTALL_LOG.txt
