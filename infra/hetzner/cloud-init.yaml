@@ -1,0 +1,14 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+packages:
+  - docker.io
+  - docker-compose-plugin
+runcmd:
+  - usermod -aG docker ubuntu
+  - mkdir -p /opt/webkurier
+  - ufw allow 80/tcp
+  - ufw allow 443/tcp
+  - ufw --force enable
+  - sysctl -w net.ipv4.ip_unprivileged_port_start=0
+  - echo "net.ipv4.ip_unprivileged_port_start=0" >> /etc/sysctl.conf
