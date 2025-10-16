@@ -1,50 +1,53 @@
-[
-  {
-    "title": "Кнопка действия",
-    "description": "Простая кнопка с надписью",
-    "preview": "button.png",
-    "html": "<button>Нажми меня</button>"
-  },
-  {
-    "title": "Заголовок",
-    "description": "Большой заголовок страницы",
-    "preview": "heading.png",
-    "html": "<h1>Добро пожаловать!</h1>"
-  },
-  {
-    "title": "Двухколоночный блок",
-    "description": "Разметка с двумя колонками",
-    "preview": "columns.png",
-    "html": "<div style='display:flex; gap:20px;'><div style='flex:1;'>Левая колонка</div><div style='flex:1;'>Правая колонка</div></div>"
-  },
-  {
-    "title": "Список",
-    "description": "Маркированный список",
-    "preview": "list.png",
-    "html": "<ul><li>Пункт 1</li><li>Пункт 2</li><li>Пункт 3</li></ul>"
-  },
-  {
-    "title": "Форма входа",
-    "description": "Поле логина и пароля",
-    "preview": "login.png",
-    "html": "<form><input type='text' placeholder='Логин'><br><input type='password' placeholder='Пароль'><br><button>Войти</button></form>"
-  },
-  {
-    "title": "Галерея",
-    "description": "Сетка изображений в блоке",
-    "preview": "preview-gallery.jpg",
-    "html": "<div style='display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;'>\n  <img src='img1.jpg' style='width:100%'>\n  <img src='img2.jpg' style='width:100%'>\n  <img src='img3.jpg' style='width:100%'>\n</div>"
-  },
-  {
-    "title": "Подвал сайта",
-    "description": "Блок с контактами и копирайтом",
-    "preview": "preview-footer.jpg",
-    "html": "<footer style='padding:20px; background:#333; color:#fff;'>\n  <p>Контакты: info@example.com</p>\n  <p>© 2025 WebKurier</p>\n</footer>"
-  },
-  {
-    "title": "Обложка (Hero)",
-    "description": "Шапка сайта с фоном и заголовком",
-    "preview": "preview-hero.jpg",
-    "html": "<section style='background:#467; color:#fff; padding:60px; text-align:center;'>\n  <h1>🚀 WebKurierCore</h1>\n  <p>Твоя стартовая платформа</p>\n</section>"
-  }
-]
+{
+  "baseCSS": "body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0b0c10;color:#e6e6e6} section{padding:60px 16px;max-width:960px;margin:0 auto;text-align:center} h1,h2,h3{margin-bottom:12px}",
+  "blocks": [
+    {
+      "title": "Кнопка действия",
+      "description": "Простая кнопка с надписью",
+      "preview": "button.png",
+      "html": "<button>Нажми меня</button>"
+    },
+    {
+      "title": "Заголовок",
+      "description": "Большой заголовок страницы",
+      "preview": "heading.png",
+      "html": "<h1>Добро пожаловать!</h1>"
+    },
+    {
+      "title": "Двухколоночный блок",
+      "description": "Разметка с двумя колонками",
+      "preview": "columns.png",
+      "html": "<div style='display:flex; gap:20px;'><div style='flex:1;'>Левая колонка</div><div style='flex:1;'>Правая колонка</div></div>"
+    },
+    {
+      "title": "Список",
+      "description": "Маркированный список",
+      "preview": "list.png",
+      "html": "<ul><li>Пункт 1</li><li>Пункт 2</li><li>Пункт 3</li></ul>"
+    },
+    {
+      "title": "Форма входа",
+      "description": "Поле логина и пароля",
+      "preview": "login.png",
+      "html": "<form><input type='text' placeholder='Логин'><br><input type='password' placeholder='Пароль'><br><button>Войти</button></form>"
+    },
+    {
+      "title": "Галерея",
+      "description": "Сетка изображений в блоке",
+      "preview": "preview-gallery.jpg",
+      "html": "<div style='display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;'>\n  <img src='img1.jpg' style='width:100%'>\n  <img src='img2.jpg' style='width:100%'>\n  <img src='img3.jpg' style='width:100%'>\n</div>"
+    },
+    {
+      "title": "Подвал сайта",
+      "description": "Блок с контактами и копирайтом",
+      "preview": "preview-footer.jpg",
+      "html": "<footer style='padding:20px; background:#333; color:#fff;'>\n  <p>Контакты: info@example.com</p>\n  <p>© 2025 WebKurier</p>\n</footer>"
+    },
+    {
+      "title": "Обложка (Hero)",
+      "description": "Шапка сайта с фоном и заголовком",
+      "preview": "preview-hero.jpg",
+      "html": "<section style='background:#467; color:#fff; padding:60px; text-align:center;'>\n  <h1>🚀 WebKurierCore</h1>\n  <p>Твоя стартовая платформа</p>\n</section>"
+    }
+  ]
+}
