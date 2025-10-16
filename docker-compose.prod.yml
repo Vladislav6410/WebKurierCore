@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  webkurier:
+    build: .
+    container_name: webkurier
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - PORT=8080
+    volumes:
+      - ./engine/config:/app/engine/config:ro
+      - ./engine/memory:/app/engine/memory
+      - ./engine/logs:/app/engine/logs
+      - ./engine/agents:/app/engine/agents:ro
+    networks: [ net ]
+
+  caddy:
+    image: caddy:2.8
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [ net ]
+
+networks:
+  net:
+
+volumes:
+  caddy_data:
+  caddy_config:
