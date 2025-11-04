@@ -1,0 +1,31 @@
+name: Monitoring Agent
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"   # каждые 30 минут
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps
+        run: npm ci || npm i
+
+      - name: Run Monitoring checks
+        env:
+          RELAY_API_KEY: ${{ secrets.RELAY_API_KEY }}
+          RELAY_WORKFLOW_ID: ${{ secrets.RELAY_WORKFLOW_ID }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_FALLBACK_KEY: ${{ secrets.OPENAI_FALLBACK_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO: ${{ secrets.GITHUB_REPO }}
+        run: node -e "new (require('./engine/agents/monitoring/monitoring-agent'))().checkRelayWorkflows().then(ok=>{ if(!ok) process.exit(1) })"
