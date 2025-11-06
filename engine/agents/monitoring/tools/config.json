@@ -1,5 +1,0 @@
-{
-  "poll_interval_sec": 900,
-  "relay": { "max_tokens": 4000, "enable_search": false },
-  "levels": { "issue_opened": "warning", "workflow_failure": "critical" }
-}

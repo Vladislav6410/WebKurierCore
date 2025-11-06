@@ -1,5 +1,0 @@
-{
-  "relay_openai_quota": "Relay: quota exceeded. Switched to fallback and restarted without search.",
-  "relay_request": "Relay request failed: {{message}}",
-  "workflow_failure": "Workflow failed: {{message}}"
-}
