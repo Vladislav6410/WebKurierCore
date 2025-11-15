@@ -1,73 +1,110 @@
-![Stars](https://img.shields.io/github/stars/Vladislav6410/WebKurierCore?style=social)
-![Forks](https://img.shields.io/github/forks/Vladislav6410/WebKurierCore?style=social)
-![License](https://img.shields.io/github/license/Vladislav6410/WebKurierCore)
-# WebKurierCore <a class="btn-primary" href="report-ui.html">📄 Сформировать отчёт</a>
-[![🚀 Открыть WebKurierCore](https://img.shields.io/badge/🚀_Открыть_WebKurierCore-0a84ff?style=for-the-badge)](https://vladislav6410.github.io/WebKurierCore/)
-[![GitHub Pages – Deploy](https://github.com/vladislav6410/WebKurierCore/actions/workflows/pages.yml/badge.svg)](https://github.com/vladislav6410/WebKurierCore/actions/workflows/pages.yml)
-[![Open Site](https://img.shields.io/badge/Open%20Site-Live-brightgreen)](https://vladislav6410.github.io/WebKurierCore/)
-![Last Commit](https://img.shields.io/github/last-commit/vladislav6410/WebKurierCore)
-![Repo Size](https://img.shields.io/github/repo-size/vladislav6410/WebKurierCore)
-🌐 [Открыть WebKurierCore онлайн](https://vladislav6410.github.io/WebKurierCore/)WebKurierCore
+📘 README.md — WebKurierCore (EN + RU)
 
-🌐 HTML-интерфейс для автономного доступа к WebKurier: терминал, WebCoin-кошелёк, офлайн-доступ и поддержка QR.
+Unified Web Interface • Agents Engine • Bots • Multilingual • Offline-ready
 
----
+Made in Germany 🇩🇪
+Core of the WebKurier Ecosystem
 
-## 🚀 О проекте
+⸻
 
-**WebKurierCore** — это автономный HTML-интерфейс, который работает без сервера и подключений, прямо в браузере. Он предназначен для использования как локальный помощник или загрузочная оболочка WebKurier на GitHub Pages, флешке или ISO-диске.
+🇬🇧 WebKurierCore — Universal Web Interface & Agent Engine
 
----
-### 🔧 Setup
-1. Скопируйте `.env.example` → `.env`
-2. Укажите реальные ключи (`TELEGRAM_TOKEN`, `STRIPE_SECRET`, `MAKE_WEBHOOK_URL`)
-3. Запустите сервер:
-   ```bash
-   npm run dev
-## 🧩 Возможности
+WebKurierCore is the central HTML/JS interface and agent engine of the WebKurier ecosystem.
+It works offline, directly in the browser, with full support for:
+	•	Web-based terminal
+	•	WebCoin wallet
+	•	Multilingual UI
+	•	Telegram & WhatsApp bots
+	•	Local AI agents
+	•	Admin control panel
+	•	Integration with drones, security modules, blockchain, accountant, and mobile apps
 
-- ✅ **WebCoin-кошелёк** с локальным сохранением
-- ✅ **Интерактивный терминал** с командами (ping, help, info)
-- ✅ **Тёмная/светлая тема** (автоматическое переключение)
-- ✅ **Офлайн-режим** (можно открыть без интернета)
-- ✅ **Поддержка GitHub Pages** (`index.html` в корне)
-- ✅ **QR-код и Telegram-ссылки**
-- ✅ **Минималистичный дизайн, чистый HTML/JS/CSS**
-- ✅ **Совместимость с Telegram-ботами (уровень 8 и выше)**
+It can run from:
+	•	GitHub Pages
+	•	USB stick
+	•	Local folder
+	•	ISO LiveCD
+	•	Any static web server
 
----
-📂 **Структура проекта**
+⸻
 
-```bash
+🚀 Project Overview
 
-## 🤖 Архитектура проекта WebKurierCore
+WebKurierCore provides:
+
+✅ Autonomous HTML-based interface
+✅ Terminal with commands (ping, help, info, /security, /pilot, /geo)
+✅ WebCoin wallet with local storage
+✅ Full offline mode
+✅ GitHub Pages support
+✅ QR and direct links to Telegram bots
+✅ Multilingual UI (EN/DE/RU/UK now, more later)
+✅ Integration with WebKurierDroneHybrid, WebKurierChain, PhoneCore
+✅ Full agent-based architecture (engine/agents/*)
+
+This is the central brain of the WebKurier system.
+
+⸻
+
+🔧 Setup
+	1.	Copy .env.example → .env
+	2.	Insert real keys:
+	•	TELEGRAM_TOKEN
+	•	STRIPE_SECRET
+	•	MAKE_WEBHOOK_URL
+	•	(optional) GPT / AI provider keys
+	3.	Start the local server:
+
+npm install
+npm run dev
+
+
+⸻
+
+🧩 Features
+	•	WebCoin Wallet
+	•	Interactive Terminal
+	•	Theme switcher (dark/light/auto)
+	•	Offline mode (no server needed)
+	•	Full integration with bots
+	•	Minimal, fast HTML/JS/CSS
+	•	Public Web UI for all WebKurier subsystems
+	•	Language selector with flags
+	•	Connection to PhoneCore (translator, lessons, calls)
+	•	Connection to DroneHybrid (autopilot, missions, geodesy)
+	•	Connection to Security (scan, quarantine, alerts)
+	•	Connection to Chain (blockchain storage, accountant)
+
+⸻
+
+📂 Updated Project Structure
 
 WebKurierCore/
-├── .github/                     # CI/CD, Actions
-│   └── workflows/
-│       └── ci.yml
-├── WebKurierCore/               # фронтенд интерфейс / документация
-├── engine/                      # ядро всех агентов
+├── .github/
+│   └── workflows/ci.yml
+├── WebKurierCore/                  # Frontend root
+├── i18n/                            # Localizations (EN, DE, RU, UK…)
+│   ├── en.json
+│   ├── de.json
+│   ├── ru.json
+│   └── uk.json
+├── engine/
 │   ├── agents/
-│   │   ├── accountant/
-│   │   ├── autopilot/
+│   │   ├── accountant/             # (linked to Chain)
+│   │   ├── autopilot/              # DroneHybrid integration
 │   │   ├── hr/
 │   │   ├── layout/
 │   │   ├── pilot/
 │   │   ├── pl-tax-return/
 │   │   ├── programmer/
 │   │   ├── romantic/
-│   │   │   ├── integrations/    # Telegram, WhatsApp коннекторы
-│   │   │   ├── memory/          # история и feedback
-│   │   │   ├── prompts/         # фразы, шаблоны
-│   │   │   ├── tools/           # служебные скрипты
-│   │   │   ├── romantic-agent.js
-│   │   │   └── config.json
 │   │   ├── techsupport/
 │   │   ├── telemetry/
-│   │   ├── translator/
-│   │   ├── voice/
-│   │   └── wallet/
+│   │   ├── translator/             # PhoneCore connection
+│   │   ├── voice/                  # TTS/STT
+│   │   ├── wallet/
+│   │   ├── legal/                  # (moved from legal repo)
+│   │   └── security/               # hooks from WebKurierSecurity
 │   │
 │   │   accountant-agent.js
 │   │   autopilot-agent.js
@@ -89,123 +126,136 @@ WebKurierCore/
 │   ├── config/
 │   ├── logs/
 │   └── ...
-├── server/                      # Express-сервер и Webhook-интеграции
-│   └── index.js
-├── .env                         # приватные ключи (в .gitignore)
-├── .env.example                 # шаблон окружения для GitHub
-├── .gitignore                   # ⚙️ исключения для Git
+├── bots/
+│   ├── telegram/
+│   │   ├── level8/
+│   │   └── geodesy_bot/
+│   ├── whatsapp/
+│   └── web-admin/
+│       ├── index.html
+│       ├── roles/
+│       └── auth-check.js
+├── server/
+│   └── index.js                   # Webhook router
+├── terminal.js
+├── wallet.js
+├── styles.css
+├── index.html
+├── .env
+├── .env.example
 ├── package.json
-├── README.md
-└── statuses.md
+└── README.md
 
-```
 
-## 🤖 Агентная экосистема WebKurierCore
+⸻
 
-Система построена из независимых AI-агентов, каждый решает свою задачу (романтика, код, поддержка, перевод, голос и т.д.).  
-Агенты хранятся в `engine/agents/<agent>` и имеют собственные: ядро (`*-agent.js`), память (`memory/`), подсказки (`prompts/`), инструменты (`tools/`) и интеграции (`integrations/`).
+🤖 Agent Ecosystem (Updated)
 
-### ⚙️ Основные компоненты
+Agents are modular AI units.
+Each agent has:
+	•	*-agent.js core
+	•	memory/
+	•	tools/
+	•	prompts/
+	•	config.json
 
-| Папка / файл | Назначение |
-|---|---|
-| `engine/agents/romantic/` | RomanticAgent — диалоги, эмоции, комплименты, истории |
-| `engine/agents/programmer/` | Генерация и рефакторинг кода, анализ PR |
-| `engine/agents/techsupport/` | Поддержка пользователей и диагностика |
-| `engine/agents/translator/` | Переводы и i18n (JSON-локализации) |
-| `engine/agents/voice/` | Голосовой интерфейс (TTS/STT) |
-| `engine/agents/autopilot/` | Автоматизация сценариев и действий |
-| `engine/agents/telemetry/` | Сбор метрик, логи, мониторинг |
-| `engine/agents/wallet/` | WebCoin-кошелёк и операции |
-| `engine/agents/hr/` | Кадровые процессы и анкеты |
-| `engine/agents/pilot/` | Управление потоками/интеграциями |
-| `engine/agents/designer-agent.js` | Дизайн-агент (UI/UX задачи) |
-| `engine/agents/engineer-agent.js` | Инженерные расчёты/планирование |
-| `engine/agents/intelligence-agent.js` | Аналитика/стратегия |
-| `engine/agents/marketing-agent.js` | Маркетинг и контент |
-| и др. `*-agent.js` | Дополнительные одиночные ядра агентов |
+New integrations:
 
-### 🧩 Взаимодействие агентов
+Agent	Purpose
+translator	Linked to WebKurierPhoneCore
+autopilot	Linked to WebKurierDroneHybrid
+security	Linked to WebKurierSecurity
+accountant	Data stored in WebKurierChain
+lawyer/legal	lives now inside Core (security repo moved here)
+pilot	manages multi-agent decisions
+AI-case	supports lessons, tasks, forms
 
-```mermaid
-graph TD
-    subgraph Client
-        X[🌐 WebKurierCore Interface]
-        Y[💬 Telegram / WhatsApp / Webhook]
-    end
 
-    subgraph Server
-        A[Express API / Webhook Router]
-        B[Server Controller]
-    end
+⸻
 
-    subgraph Engine
-        C[engine/agents/romantic-agent.js]
-        D[engine/agents/programmer-agent.js]
-        E[engine/agents/techsupport-agent.js]
-        F[engine/agents/telemetry-agent.js]
-    end
+🔗 Global Integration Map
 
-    subgraph Data
-        G[(memory/feedback)]
-        H[(logs/)]
-    end
+WebKurierCore
+   ├── Bots (Telegram, WhatsApp, WebApp)
+   ├── Agents Engine
+   ├── Web UI (terminal + wallet + admin)
+   │
+   ├──→ WebKurierDroneHybrid      # autopilot, geodesy, missions
+   ├──→ WebKurierSecurity         # scans, quarantine, GDPR
+   ├──→ WebKurierChain            # blockchain, accountant
+   ├──→ WebKurierPhoneCore        # translator, calls, lessons
+   └──→ WebKurierSite             # landing & documentation
 
-    X -->|Input| Y
-    Y -->|Request| A
-    A -->|Route| B
-    B -->|Trigger| C
-    B -->|Trigger| D
-    B -->|Trigger| E
-    C -->|Log| H
-    D -->|Store| G
-    E -->|Report| H
-    F -->|Monitor| H
 
-   ```
+⸻
 
- ---
+🧠 Roles of Key Agents (EN/RU)
 
-## 🧠 Роли и назначение агентов
+Agent	Description (EN)	Описание (RU)
+accountant	Finance, reports, tax logic	Финансы, отчёты, НДС
+autopilot	Controls DroneHybrid	Управление автопилотом
+translator	PhoneCore translator	Переводчик + уроки
+voice	Voice interface	Голосовой ввод/вывод
+security	Alerts, scanning	Безопасность, сканирование
+legal	Legal templates checker	Юридический помощник
+techsupport	Diagnostics	Техподдержка
+programmer	Code generation	Программирование
+romantic	Creative dialogues	Романтика/истории
+pilot	Multi-agent orchestrator	Управление другими агентами
+intelligence	Analysis	Аналитика
+wallet	WebCoin	Система WebCoin
 
-Каждый агент в WebKurierCore — это автономный модуль, выполняющий свою специализированную задачу.  
-Они взаимодействуют через общее ядро `engine/agents/`, обмениваясь данными и командами.
 
-| Агент | Назначение |
-|-------|-------------|
-| 🤝 **accountant** | Финансовые операции, расчёты, отчётность |
-| 🧭 **autopilot** | Самоуправляемые сценарии, автономные процессы |
-| 👥 **hr** | Управление командами, собеседования, профили |
-| 🧩 **layout** | Интерфейс, визуальные компоненты и адаптивные блоки |
-| ✈️ **pilot** | Управление другими агентами, распределение задач |
-| 💼 **pl-tax-return** | Налоговая отчётность для Польши |
-| 👨‍💻 **programmer** | Разработка, написание и анализ кода |
-| 💌 **romantic** | Эмоциональный интеллект, коммуникации и контент |
-| 🛠️ **techsupport** | Техническая поддержка, диагностика, справка |
-| 📡 **telemetry** | Мониторинг системы и логирование действий |
-| 🌍 **translator** | Переводы между языками и локализация |
-| 🎙️ **voice** | Голосовой ввод и синтез речи |
-| 💰 **wallet** | Управление токенами и WebCoin-кошелёк |
+⸻
 
-🧩 Архитектура поддерживает **добавление новых агентов**,  
-а также взаимодействие между ними (например, `programmer` → `techsupport` → `romantic`).  
+🎛 Terminal Commands (Updated)
 
-Каждый агент имеет:
-- собственный `*-agent.js` (основная логика)
-- папку с вспомогательными модулями (`tools/`, `prompts/`, `memory/`)
-- конфигурацию `config.json`  
-- общий доступ к ядру `engine/` и логам `logs/`.
+ping
+help
+info
+/security scan
+/wallet balance
+/pilot status
+/geo analyze
+/phone call user
+/bot restart
 
----
 
-🧠 В сумме агенты образуют **модульную нейроархитектуру WebKurierCore**,  
-где каждый компонент автономен, но способен взаимодействовать с другими,  
-что делает систему гибкой, расширяемой и самоуправляемой.
+⸻
 
-	•	🧾 index.html — 🌐 Главная страница
-	•	💻 terminal.js — Интерфейс терминала
-	•	💰 wallet.js — Кошелёк WebCoin
-	•	🎨 styles.css — Стили сайта
-	•	📘 README.md — Инструкция проекта
-	•	📁 i18n/
+🌐 Multilingual UI
+
+Supported:
+	•	English 🇬🇧
+	•	German 🇩🇪
+	•	Russian 🇷🇺
+	•	Ukrainian 🇺🇦
+
+Expandable to:
+	•	Polish, Croatian, Spanish, Italian…
+
+⸻
+
+🧾 Reports
+
+Core can generate:
+	•	PDF (Unicode DejaVu support)
+	•	DOCX
+	•	JSON
+	•	ZIP
+	•	HTML exports
+
+⸻
+
+📜 License
+
+© 2025 Vladyslav Hushchyn
+Made in Germany 🇩🇪
+Part of the WebKurier Ecosystem.
+
+⸻
+
+✅ ГОТОВО
+
+
   
