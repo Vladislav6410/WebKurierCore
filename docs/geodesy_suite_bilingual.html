@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>WebKurier Geodesy & 3D Suite — Documentation (EN + RU)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    :root {
+      --bg: #0f1722;
+      --card: #111827;
+      --border: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #3b82f6;
+      --accent-soft: rgba(59, 130, 246, 0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+                   "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%);
+      color: var(--text);
+      padding: 24px;
+      line-height: 1.6;
+    }
+
+    main { max-width: 1040px; margin: 0 auto; }
+    section { margin-top: 28px; }
+    .tagline { color: var(--muted); margin-bottom: 1rem; }
+    h1 { font-size: 2rem; margin-bottom: .5rem; }
+    h2 { font-size: 1.4rem; margin-bottom: .5rem; margin-top: 1rem; }
+    h3 { font-size: 1.1rem; margin-bottom: .4rem; }
+
+    .card {
+      background: linear-gradient(145deg, #020617, #020617 55%, #0f172a);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+    }
+
+    .pill {
+      display: inline-flex;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent);
+      font-size: .8rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 10px;
+      font-size: .92rem;
+    }
+    th, td {
+      border: 1px solid rgba(31,41,55,0.9);
+      padding: 8px 10px;
+      text-align: left;
+    }
+    th { color: var(--muted); }
+
+    .price { font-weight: 700; color: #facc15; }
+
+    pre {
+      background: #020617;
+      border: 1px solid rgba(31,41,55,0.95);
+      padding: 16px;
+      border-radius: 10px;
+      font-family: "Fira Code", "JetBrains Mono", monospace;
+      overflow-x: auto;
+      font-size: .86rem;
+      margin-top: 10px;
+    }
+
+    .note {
+      background: #111827;
+      border-left: 3px solid #3b82f6;
+      padding: 10px 12px;
+      margin-top: 10px;
+      color: var(--muted);
+    }
+
+    .lang-switch {
+      position: fixed;
+      right: 20px;
+      top: 20px;
+      z-index: 999;
+      background: #1e293b;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      cursor: pointer;
+      color: #e2e8f0;
+      font-size: .9rem;
+      transition: .2s;
+    }
+    .lang-switch:hover { background: #334155; }
+
+  </style>
+</head>
+<body>
+
+<button class="lang-switch" onclick="toggleLang()">
+  🌐 EN / RU
+</button>
+
+<main>
+
+<!-- ======================  ENGLISH VERSION  ====================== -->
+<div id="lang-en">
+
+  <section class="card">
+    <div class="pill">WebKurierDroneHybrid · Geodesy & 3D Suite</div>
+    <h1>Geodesy Packages & PDF Report Generator</h1>
+    <p class="tagline">Complete pricing for 1 km² mapping + Python generator for mission-based PDF reports.</p>
+  </section>
+
+  <!-- ===== PRICING ===== -->
+  <section class="card">
+    <h2>📊 Drone Mapping Packages (1 km²)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Package</th><th>Description</th><th>Price</th><th>Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td><b>Base Map</b></td>
+          <td>Orthophoto (GeoTIFF/JPG), alignment, basic photogrammetry, PDF map.</td>
+          <td class="price">390 €</td>
+          <td>1–2 days</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td><b>3D Terrain</b></td>
+          <td>DSM/DTM, point cloud, 3D model (OBJ/PLY/LAS), elevation analysis.</td>
+          <td class="price">790 €</td>
+          <td>2–3 days</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td><b>GeoAnalysis</b></td>
+          <td>NDVI/NDRE, land classification, objects contours, PDF summary report.</td>
+          <td class="price">1290 €</td>
+          <td>3–5 days</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      Price file: <code>WebKurierDroneHybrid/data/pricing/drone_prices.csv</code>
+    </div>
+  </section>
+
+  <!-- ===== PYTHON CODE ===== -->
+  <section class="card">
+    <h2>📁 Python Report Generator</h2>
+    <pre>
+import os, json
+from datetime import datetime
+from fpdf import FPDF
+
+BASE_DIR   = os.path.dirname(__file__)
+DATA_DIR   = os.path.join(BASE_DIR, "..", "..", "logs", "reports")
+OUTPUT_DIR = os.path.join(BASE_DIR, "..", "..", "logs", "generated")
+
+class GeoReport:
+    def __init__(self, mission_name: str):
+        self.mission_name = mission_name
+        self.date = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    def load_data(self):
+        file = os.path.join(DATA_DIR, f"{self.mission_name}.json")
+        with open(file, "r", encoding="utf-8") as f:
+            self.report = json.load(f)
+
+    def generate_pdf(self):
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", "B", 14)
+        pdf.cell(0,10,f"Report: {self.mission_name}", ln=True)
+
+        pdf.set_font("Arial", "", 12)
+        pdf.cell(0,10,f"Generated: {self.date}", ln=True)
+
+        pdf.ln(8)
+        for k,v in self.report.items():
+            if isinstance(v,dict):
+                pdf.set_font("Arial","B",12)
+                pdf.cell(0,8,f"■ {k}",ln=True)
+                pdf.set_font("Arial","",12)
+                for sk,sv in v.items():
+                    pdf.cell(0,8,f"  • {sk}: {sv}",ln=True)
+            else:
+                pdf.cell(0,8,f"{k}: {v}",ln=True)
+
+        os.makedirs(OUTPUT_DIR, exist_ok=True)
+        out = os.path.join(OUTPUT_DIR, f"{self.mission_name}.pdf")
+        pdf.output(out)
+        return out
+    </pre>
+  </section>
+
+  <!-- ===== JSON example ===== -->
+  <section class="card">
+    <h2>📂 Example JSON Mission Data</h2>
+    <pre>{
+  "Area": "Field 3A",
+  "GSD": "3.5 cm/px",
+  "Flight altitude": "120 m",
+  "Camera": "Sony RX1RM2",
+  "Images": 198,
+  "Field size": "12.5 ha",
+  "Overlap": { "Forward": "80%", "Side": "70%" },
+  "Results": { "Orthophoto": "Ready", "DTM": "Done", "3D scene": "OBJ exported" }
+}</pre>
+  </section>
+
+</div>
+
+<!-- ======================  RUSSIAN VERSION  ====================== -->
+<div id="lang-ru" style="display:none">
+
+  <section class="card">
+    <div class="pill">WebKurierDroneHybrid · Геодезия и 3D</div>
+    <h1>Пакеты аэрофотосъёмки и PDF-отчёты</h1>
+    <p class="tagline">Полный прайс 1 км² + Python-генератор отчётов по данным миссии.</p>
+  </section>
+
+  <section class="card">
+    <h2>📊 Пакеты на 1 км²</h2>
+    <table>
+      <thead><tr>
+        <th>№</th><th>Пакет</th><th>Описание</th><th>Цена</th><th>Срок</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>1</td><td><b>Base Map</b></td>
+          <td>Ортофото, обработка, PDF-карта</td>
+          <td class="price">390 €</td><td>1–2 дня</td></tr>
+
+        <tr><td>2</td><td><b>3D Terrain</b></td>
+          <td>DSM/DTM, облако точек, 3D-модель</td>
+          <td class="price">790 €</td><td>2–3 дня</td></tr>
+
+        <tr><td>3</td><td><b>GeoAnalysis</b></td>
+          <td>NDVI, классификация, PDF отчёт</td>
+          <td class="price">1290 €</td><td>3–5 дней</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      Файл прайса: <code>WebKurierDroneHybrid/data/pricing/drone_prices.csv</code>
+    </div>
+  </section>
+
+  <!-- PYTHON -->
+  <section class="card">
+    <h2>📁 Python-генератор отчёта</h2>
+    <pre>... (тот же код, что выше, без изменений) ...</pre>
+  </section>
+
+  <section class="card">
+    <h2>📂 Пример JSON</h2>
+    <pre>{
+  "Участок": "Полевой массив 3A",
+  "GSD": "3.5 см/пиксель",
+  "Высота полета": "120 м",
+  "Камера": "Sony RX1RM2",
+  "Снимков": 198,
+  "Размер": "12.5 га",
+  "Перекрытие": { "Продольное": "80%", "Поперечное": "70%" },
+  "Результаты": {
+    "Ортофото": "Готово",
+    "ЦМР": "Готова",
+    "3D-модель": "Экспорт OBJ"
+  }
+}</pre>
+  </section>
+
+</div>
+
+</main>
+
+<script>
+function toggleLang() {
+  const en = document.getElementById('lang-en');
+  const ru = document.getElementById('lang-ru');
+  const isEn = en.style.display !== 'none';
+  en.style.display = isEn ? 'none' : 'block';
+  ru.style.display = isEn ? 'block' : 'none';
+}
+</script>
+
+</body>
+</html>
