@@ -1,16 +1,126 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <!-- ...остальная часть head... -->
+  <meta charset="UTF-8" />
+  <title>WebKurierDroneHybrid — Geodesy & 3D Suite (RU + EN)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #020617;
+      --border: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #3b82f6;
+      --accent-soft: rgba(59, 130, 246, 0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+                   "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #111827 0, #020617 55%);
+      color: var(--text);
+      padding: 24px;
+      line-height: 1.6;
+    }
+
+    main { max-width: 1080px; margin: 0 auto; }
+
+    section { margin-top: 28px; }
+
+    h1 { font-size: 2rem; margin-bottom: .5rem; }
+    h2 { font-size: 1.4rem; margin-bottom: .5rem; margin-top: .3rem; }
+    h3 { font-size: 1.1rem; margin-bottom: .4rem; margin-top: .6rem; }
+
+    .tagline { color: var(--muted); margin-bottom: 1rem; }
+
+    .card {
+      background: linear-gradient(145deg, #020617, #020617 55%, #0b1120);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.55);
+    }
+
+    .pill {
+      display: inline-flex;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent);
+      font-size: .8rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 10px;
+      font-size: .92rem;
+    }
+    th, td {
+      border: 1px solid rgba(31,41,55,0.9);
+      padding: 8px 10px;
+      text-align: left;
+    }
+    th { color: var(--muted); }
+
+    .price { font-weight: 700; color: #facc15; }
+
+    pre {
+      background: #020617;
+      border: 1px solid rgba(31,41,55,0.95);
+      padding: 16px;
+      border-radius: 10px;
+      font-family: "Fira Code", "JetBrains Mono", monospace;
+      overflow-x: auto;
+      font-size: .86rem;
+      margin-top: 10px;
+      white-space: pre;
+    }
+
+    .note {
+      background: #0b1120;
+      border-left: 3px solid #3b82f6;
+      padding: 10px 12px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    code { font-family: "Fira Code", "JetBrains Mono", monospace; }
+    ul { margin-top: .5rem; padding-left: 1.2rem; }
+    li { margin-bottom: .15rem; }
+  </style>
 </head>
 <body>
-  <!-- ...существующий контент... -->
 
-  <!-- 📊 Таблица прайсов на аэрофотосъёмку -->
-  <section id="drone-prices">
+<main>
+
+  <!-- ========================================================= -->
+  <!-- 🇷🇺 РУССКАЯ ВЕРСИЯ                                       -->
+  <!-- ========================================================= -->
+  <section class="card">
+    <div class="pill">WebKurierDroneHybrid · Геодезия & 3D Suite</div>
+    <h1>Геодезист · Прайс 1 км² и генератор PDF-отчётов</h1>
+    <p class="tagline">
+      Этот файл описывает пакеты аэрофотосъёмки, Python-генератор геоотчётов
+      и структуру папок для нового набора репозиториев WebKurier
+      (10 проектов: Hybrid, Core, DroneHybrid, Chain, Security, PhoneCore, iOS, Android, Site, резерв).
+    </p>
+  </section>
+
+  <!-- 📊 Прайс -->
+  <section class="card">
     <h2>📊 Прайс на аэрофотосъёмку (1 км²)</h2>
-    <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: sans-serif;">
-      <thead style="background: #f0f0f0;">
+    <p>Базовые пакеты для WebKurierDroneHybrid (геодезия, 3D-моделирование, аналитика):</p>
+
+    <table>
+      <thead>
         <tr>
           <th>№</th>
           <th>Пакет</th>
@@ -23,75 +133,103 @@
         <tr>
           <td>1</td>
           <td><b>Base Map</b></td>
-          <td>Ортофото (GeoTIFF, JPG), PDF-карта, выравнивание, базовая обработка</td>
-          <td><b>390 €</b></td>
+          <td>Ортофото (GeoTIFF, JPG), выравнивание, базовая фотограмметрия, PDF-карта участка.</td>
+          <td class="price">390&nbsp;€</td>
           <td>1–2 дня</td>
         </tr>
         <tr>
           <td>2</td>
           <td><b>3D Terrain</b></td>
-          <td>DSM/DTM, 3D-модель (.OBJ, .PLY, .LAS), облако точек, точная геопривязка</td>
-          <td><b>790 €</b></td>
+          <td>DSM/DTM, облако точек, 3D-модель (OBJ/PLY/LAS), анализ рельефа.</td>
+          <td class="price">790&nbsp;€</td>
           <td>2–3 дня</td>
         </tr>
         <tr>
           <td>3</td>
           <td><b>GeoAnalysis</b></td>
-          <td>NDVI/NDRE, растровый анализ, отчёт в PDF, контуры объектов, классификация</td>
-          <td><b>1290 €</b></td>
+          <td>NDVI/NDRE, классификация земель, контуры объектов, расширенный PDF-отчёт.</td>
+          <td class="price">1290&nbsp;€</td>
           <td>3–5 дней</td>
         </tr>
       </tbody>
     </table>
+
+    <div class="note">
+      Таблица цен хранится в репозитории<br/>
+      <code>WebKurierDroneHybrid</code> → <code>data/pricing/drone_prices.csv</code><br/>
+      и может использоваться ботом-геодезистом и WebKurierSite.
+    </div>
   </section>
 
-  <!-- 🐍 Код Python для генерации геоотчётов -->
-  <section id="python-code" style="margin-top: 40px; background: #f8f8f8; padding: 20px; border-radius: 10px;">
-    <h2>📁 Код генератора геоотчёта (Python)</h2>
-    <pre style="background: #2d2d2d; color: #f8f8f2; padding: 20px; border-radius: 8px; overflow-x: auto; font-family: 'Courier New', monospace;">
-import os
-import json
-from fpdf import FPDF
-from datetime import datetime
+  <!-- 🐍 Python-генератор отчётов (RU) -->
+  <section class="card">
+    <h2>🐍 Python-генератор геоотчёта (PDF)</h2>
+    <p>
+      Скрипт размещается в репозитории <code>WebKurierDroneHybrid</code> по пути:<br/>
+      <code>engine/geodesy_suite/report/report_generator.py</code>
+    </p>
 
-# 📌 Путь к сохранённым данным съёмки и анализов
-DATA_DIR = "./engine/logs/reports/"
-OUTPUT_DIR = "./engine/logs/generated/"
+    <pre>import os
+import json
+from datetime import datetime
+from fpdf import FPDF
+
+# Базовые пути внутри WebKurierDroneHybrid
+BASE_DIR   = os.path.dirname(__file__)
+ROOT_DIR   = os.path.abspath(os.path.join(BASE_DIR, "..", ".."))
+DATA_DIR   = os.path.join(ROOT_DIR, "logs", "reports")
+OUTPUT_DIR = os.path.join(ROOT_DIR, "logs", "generated")
+FONT_DIR   = os.path.join(ROOT_DIR, "fonts")  # DejaVuSans / DejaVuSans-Bold
 
 class GeoReport:
-    def __init__(self, mission_name):
+    def __init__(self, mission_name: str):
         self.mission_name = mission_name
-        self.report_data = {}
         self.date = datetime.now().strftime("%Y-%m-%d %H:%M")
+        self.report: dict = {}
 
-    def load_data(self):
+    def load_data(self) -> None:
+        """Загружаем JSON с результатами обработки миссии."""
         file_path = os.path.join(DATA_DIR, f"{self.mission_name}.json")
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"Нет данных для отчёта: {file_path}")
-        with open(file_path, 'r', encoding='utf-8') as f:
-            self.report_data = json.load(f)
+        with open(file_path, "r", encoding="utf-8") as f:
+            self.report = json.load(f)
 
-    def generate_pdf(self):
+    def _init_pdf(self) -> FPDF:
+        """Настраиваем PDF c Unicode-шрифтами (DejaVuSans)."""
         pdf = FPDF()
         pdf.add_page()
-        pdf.set_font("Arial", "B", 14)
+
+        # Unicode-шрифты (обязательно добавить ttf в папку fonts/)
+        pdf.add_font("DejaVu", "", os.path.join(FONT_DIR, "DejaVuSans.ttf"), uni=True)
+        pdf.add_font("DejaVu", "B", os.path.join(FONT_DIR, "DejaVuSans-Bold.ttf"), uni=True)
+
+        pdf.set_auto_page_break(auto=True, margin=15)
+        return pdf
+
+    def generate_pdf(self) -> str:
+        """Формируем PDF-отчёт и возвращаем путь к файлу."""
+        pdf = self._init_pdf()
 
         # Заголовок
+        pdf.set_font("DejaVu", "B", 16)
         pdf.cell(0, 10, f"📍 Геоотчёт: {self.mission_name}", ln=True)
-        pdf.set_font("Arial", "", 12)
-        pdf.cell(0, 10, f"Дата генерации: {self.date}", ln=True)
 
-        # 📊 Основные параметры
-        pdf.ln(10)
-        for key, value in self.report_data.items():
+        pdf.set_font("DejaVu", "", 11)
+        pdf.cell(0, 8, f"Дата генерации: {self.date}", ln=True)
+        pdf.ln(4)
+
+        # Содержимое
+        for key, value in self.report.items():
             if isinstance(value, dict):
-                pdf.set_font("Arial", "B", 12)
-                pdf.cell(0, 10, f"🔹 {key}", ln=True)
-                pdf.set_font("Arial", "", 12)
+                pdf.set_font("DejaVu", "B", 12)
+                pdf.cell(0, 8, f"▌ {key}", ln=True)
+                pdf.set_font("DejaVu", "", 11)
                 for subkey, subvalue in value.items():
-                    pdf.cell(0, 10, f"  • {subkey}: {subvalue}", ln=True)
+                    pdf.multi_cell(0, 6, f" • {subkey}: {subvalue}")
             else:
-                pdf.cell(0, 10, f"{key}: {value}", ln=True)
+                pdf.multi_cell(0, 6, f"{key}: {value}")
+            pdf.ln(1)
 
         # Сохранение
         os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -99,25 +237,23 @@ class GeoReport:
         pdf.output(output_path)
         return output_path
 
-
-# 🧪 Пример использования:
 if __name__ == "__main__":
     report = GeoReport("test_mission_01")
     report.load_data()
     path = report.generate_pdf()
     print(f"✅ Отчёт сохранён: {path}")</pre>
-    
-    <div style="margin-top: 20px; background: #e6f7ff; padding: 15px; border-radius: 8px; border-left: 4px solid #1890ff;">
-      <h3>🔧 Где размещать:</h3>
-      <ul>
-        <li><code>report_generator.py</code> → в папку Webkuriercore/ рядом с main.py</li>
-        <li>Данные в формате JSON → <code>engine/logs/reports/</code></li>
-        <li>PDF-файлы отчётов → <code>engine/logs/generated/</code></li>
-      </ul>
-      
-      <h3>📂 Пример входного файла:</h3>
-      <pre style="background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
-{
+
+    <div class="note">
+      Важно: для корректного отображения русского и английского текстов
+      в PDF используем шрифты <code>DejaVuSans</code> и
+      <code>DejaVuSans-Bold</code> (Unicode).
+    </div>
+  </section>
+
+  <!-- Пример JSON (RU) -->
+  <section class="card">
+    <h2>📂 Пример входного JSON-файла миссии</h2>
+    <pre>{
   "Участок": "Полевой массив 3A",
   "GSD": "3.5 см/пиксель",
   "Высота полета": "120 м",
@@ -134,184 +270,170 @@ if __name__ == "__main__":
     "3D-сцена": "Экспортирована в OBJ"
   }
 }</pre>
+  </section>
+
+  <!-- Структура папок (новая архитектура) -->
+  <section class="card">
+    <h2>📂 Структура папок (Geodesy & 3D Suite)</h2>
+    <p>Выдержка из общей структуры 10 репозиториев — только блок геодезии:</p>
+
+    <pre>WebKurierDroneHybrid/
+├── engine/
+│   ├── geodesy_suite/
+│   │   ├── report/
+│   │   │   └── report_generator.py      ← генерация PDF-отчётов
+│   │   ├── processing/
+│   │   │   ├── odm_pipeline.py          ← фотограмметрия (ODM/Pix4D/Meshroom)
+│   │   │   ├── dsm_dtm_builder.py       ← построение DSM/DTM
+│   │   │   └── ndvi_ndre_analyzer.py    ← NDVI/NDRE, классификация
+│   │   ├── ui/
+│   │   │   ├── geodesy_api.py           ← API для WebKurierCore/WebKurierSite
+│   │   │   └── telegram_bot_hooks.py    ← команды /цены, /отчёт, /миссия
+│   │   └── config/
+│   │       └── geodesy_config.json      ← настройки GSD, перекрытия, камер
+│   │
+│   ├── logs/
+│   │   ├── reports/                     ← входные JSON-данные миссий
+│   │   ├── generated/                   ← готовые PDF, GeoTIFF, модели
+│   │   └── telemetry/                   ← телеметрия полётов
+│   │
+│   └── prompts/
+│       ├── geodesy.prompt.json          ← промпты геодезиста
+│       └── report.prompt.json           ← шаблоны текстов отчётов
+│
+├── data/
+│   ├── pricing/
+│   │   └── drone_prices.csv             ← прайс на 1 км² (эта таблица)
+│   └── cameras.json                     ← камеры, GSD, параметры
+└── docs/
+    └── index.html                       ← <== этот файл (RU + EN документация)</pre>
+
+    <div class="note">
+      WebKurierCore и WebKurierSite обращаются к этому модулю через API,
+      но весь расчёт геодезии и 3D-моделей живёт в репозитории
+      <code>WebKurierDroneHybrid</code>.
     </div>
   </section>
 
-  <!-- 📂 Структура папок проекта -->
-  <section id="folder-structure" style="margin-top: 40px;">
-    <h2>📂 Структура папок проекта</h2>
-    <div style="background: #f0f8ff; padding: 20px; border-radius: 10px; font-family: 'Courier New', monospace; line-height: 1.6;">
-      engine/<br>
-      ├── agents/<br>
-      │   ├── geodesist/<br>
-      │   │   ├── report/                  &larr; Генерация PDF, GeoTIFF, NDVI<br>
-      │   │   ├── ui/                      &larr; Интерфейс кнопок /отчёт, /цены<br>
-      │   │   └── templates/               &larr; HTML, PDF шаблоны отчётов<br>
-      │   ├── autopilot/                   &larr; Агент автопилота дрона<br>
-      │   ├── pilot/                       &larr; Агент ручного управления<br>
-      │   ├── telemetry/                   &larr; Сбор телеметрии<br>
-      │   ├── translator/                  &larr; Переводчик и локализация<br>
-      │   ├── accountant/                  &larr; Финансовые отчёты и налоги<br>
-      │   ├── security/                    &larr; Агент безопасности (антивирус, токены)<br>
-      │   └── master/                      &larr; Главный управляющий<br>
-      │<br>
-      ├── config/<br>
-      │   ├── settings.json                &larr; Глобальная конфигурация<br>
-      │   ├── missions.json                &larr; Настройки полётов<br>
-      │   └── report_config.json           &larr; Настройки отчётов<br>
-      │<br>
-      ├── logs/<br>
-      │   ├── reports/                     &larr; Сырые JSON-данные полей<br>
-      │   ├── generated/                   &larr; PDF, GeoTIFF, модели<br>
-      │   └── telemetry/                   &larr; Данные полёта, датчики<br>
-      │<br>
-      ├── memory/<br>
-      │   └── assistant_memory.json        &larr; Виртуальная память помощника<br>
-      │<br>
-      ├── prompts/<br>
-      │   ├── geodesy.prompt.json          &larr; Шаблоны задач по геодезии<br>
-      │   ├── report.prompt.json           &larr; Формулировки отчётов<br>
-      │   └── ui.prompt.json               &larr; Тексты кнопок и интерфейса<br>
-      │<br>
-      ├── ui/<br>
-      │   ├── index.html                   &larr; Интерфейс WebApp<br>
-      │   ├── report-ui.html               &larr; Отдельная страница отчёта<br>
-      │   ├── styles.css                   &larr; Стили<br>
-      │   └── scripts/<br>
-      │       ├── report.js                &larr; Кнопка /отчёт<br>
-      │       ├── prices.js                &larr; Кнопка /цены<br>
-      │       └── utils.js                 &larr; Общие функции<br>
-      │<br>
-      └── data/<br>
-          ├── cameras.json                 &larr; Список камер и GSD<br>
-          ├── price_list.csv               &larr; Прайс на 1 км²<br>
-          └── missions/<br>
-              └── mission1.json            &larr; Настройки миссий<br>
+  <!-- Разделитель RU/EN -->
+  <section style="margin-top: 40px; text-align: center; color: var(--muted);">
+    — — — — — — — — — — — — — — — — — — — — — — — —<br/>
+    Ниже — полная английская версия того же документа (для README/доков).
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 🇬🇧 ENGLISH VERSION                                       -->
+  <!-- ========================================================= -->
+  <section class="card" style="margin-top: 32px;">
+    <div class="pill">WebKurierDroneHybrid · Geodesy & 3D Suite</div>
+    <h1>Geodesy Packages & PDF Report Generator</h1>
+    <p class="tagline">
+      This document describes 1 km² mapping packages, a Python-based PDF report
+      generator and the folder layout for the new 10-repo WebKurier architecture
+      (Hybrid, Core, DroneHybrid, Chain, Security, PhoneCore, iOS, Android, Site, reserved).
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>📊 Drone Mapping Packages (1 km²)</h2>
+    <p>Standard service levels for <code>WebKurierDroneHybrid</code>:</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Package</th>
+          <th>Description</th>
+          <th>Price</th>
+          <th>Delivery</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td><b>Base Map</b></td>
+          <td>Orthophoto (GeoTIFF/JPG), alignment, basic photogrammetry, PDF site map.</td>
+          <td class="price">390 €</td>
+          <td>1–2 days</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td><b>3D Terrain</b></td>
+          <td>DSM/DTM, point cloud, 3D model (OBJ/PLY/LAS), elevation analysis.</td>
+          <td class="price">790 €</td>
+          <td>2–3 days</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td><b>GeoAnalysis</b></td>
+          <td>NDVI/NDRE, land-use classification, object contours, extended PDF report.</td>
+          <td class="price">1290 €</td>
+          <td>3–5 days</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      Price list is stored in<br/>
+      <code>WebKurierDroneHybrid/data/pricing/drone_prices.csv</code><br/>
+      and can be consumed by WebKurierSite and the Telegram geodesy bot.
     </div>
   </section>
 
-  <!-- ===== Панель агентов ===== -->
-<div id="agents-panel" class="agents-panel" aria-label="Agents panel"></div>
+  <section class="card">
+    <h2>🐍 Python PDF Report Generator</h2>
+    <p>
+      Script location in <code>WebKurierDroneHybrid</code>:<br/>
+      <code>engine/geodesy_suite/report/report_generator.py</code>
+    </p>
+    <p>
+      The code is identical to the Russian block above (Unicode-enabled FPDF
+      with <code>DejaVuSans</code> / <code>DejaVuSans-Bold</code>), so it is
+      not duplicated here to keep the file compact.
+    </p>
+  </section>
 
-<style>
-  /* ==== Стили панели агентов ==== */
-  .agents-panel {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 20px 0;
+  <section class="card">
+    <h2>📂 Example Mission JSON</h2>
+    <pre>{
+  "Area": "Field 3A",
+  "GSD": "3.5 cm/px",
+  "Flight altitude": "120 m",
+  "Camera": "Sony RX1RM2",
+  "Image count": 198,
+  "Area size": "12.5 ha",
+  "Overlap": {
+    "Forward": "80%",
+    "Side": "70%"
+  },
+  "Results": {
+    "Orthophoto": "Generated",
+    "DTM": "Ready",
+    "3D scene": "Exported as OBJ"
   }
+}</pre>
+  </section>
 
-  /* ВНИМАНИЕ: имя класса совпадает с loader.js => .agent-btn */
-  .agent-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    background: #0d6efd;       /* основной цвет */
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    line-height: 1;
-    transition: background 0.15s ease, transform 0.05s ease;
-    user-select: none;
-  }
-  .agent-btn:hover { background: #0b5ed7; }
-  .agent-btn:active { transform: translateY(1px); }
-  .agent-btn[disabled] {
-    background: #6c757d;
-    cursor: not-allowed;
-    opacity: .7;
-  }
-</style>
+  <section class="card">
+    <h2>📂 Folder Layout (Geodesy Block)</h2>
+    <p>
+      Same structure as above, presented in English for documentation / README usage.
+    </p>
+    <pre>WebKurierDroneHybrid/
+├── engine/
+│   ├── geodesy_suite/
+│   │   ├── report/                # PDF report generator
+│   │   ├── processing/            # ODM / DSM / NDVI pipeline
+│   │   ├── ui/                    # API + bot hooks
+│   │   └── config/                # Geodesy configuration
+│   ├── logs/
+│   └── prompts/
+├── data/
+│   └── pricing/drone_prices.csv   # 1 km² pricing table
+└── docs/index.html                # this bilingual page</pre>
+  </section>
 
-<script type="module">
-  import { renderAgentButtons } from './engine/agents/loader.js';
+</main>
 
-  // Ждём, когда DOM готов
-  window.addEventListener('DOMContentLoaded', () => {
-    const panel = document.getElementById('agents-panel');
-    if (!panel) {
-      console.warn('⚠️ Не найден элемент #agents-panel');
-      return;
-    }
-
-    renderAgentButtons(panel, (key, meta, mod) => {
-      // Что делать при клике на кнопку агента
-      if (mod?.run) {
-        mod.run({ meta, key });
-      } else {
-        console.log(`Агент "${meta.name}" загружен, но нет функции run()`, mod);
-      }
-    });
-  });
-</script><script type="module">
-  import { AIDesigner } from './engine/agents/tools/ai-builder.js';
-
-  const designer = new AIDesigner();
-
-  // Мини-панель: поле + две кнопки
-  const panel = document.createElement('div');
-  panel.style.cssText = 'position:fixed;right:16px;bottom:16px;max-width:420px;background:#151821;border:1px solid #2a3140;border-radius:12px;padding:12px;z-index:9999';
-  panel.innerHTML = `
-    <div style="font-weight:600;margin-bottom:8px">AI Builder</div>
-    <textarea id="aiPrompt" rows="3" placeholder="Опиши страницу: тёмная тема, hero, 3 карточки, форма..." style="width:100%;padding:8px;border-radius:10px;border:1px solid #2a3140;background:transparent;color:#e6e6e6"></textarea>
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <button id="btnGen" style="flex:1">Сгенерировать</button>
-      <button id="btnZip" style="flex:1">Экспорт ZIP</button>
-    </div>
-    <div id="aiStatus" style="opacity:.7;margin-top:6px"></div>
-  `;
-  document.body.appendChild(panel);
-
-  const status = panel.querySelector('#aiStatus');
-
-  async function generate() {
-    status.textContent = 'Генерация...';
-    const prompt = panel.querySelector('#aiPrompt').value.trim();
-    try {
-      // пока offline-режим (без бэкенда):
-      const { html, css } = await designer.generateOffline(prompt || 'hero, 3 cards, contact form, dark');
-      // откроем предпросмотр в новом окне
-      const blob = new Blob([html.replace('</head>', `<style>${css}</style></head>`)], { type: 'text/html;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      window.open(url, '_blank');
-      status.textContent = 'Готово: предпросмотр открыт.';
-    } catch (e) {
-      console.error(e);
-      status.textContent = 'Ошибка генерации (см. консоль).';
-    }
-  }
-
-  async function exportZip() {
-    status.textContent = 'Собираю ZIP...';
-
-    // Импортируем JSZip динамически (добавь jszip в проект при необходимости)
-    const JSZip = (await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm')).default;
-
-    const prompt = panel.querySelector('#aiPrompt').value.trim();
-    const { html, css } = await designer.generateOffline(prompt || 'hero, 3 cards, contact form, dark');
-
-    const zip = new JSZip();
-    zip.file('index.html', html.replace('</head>', `<link rel="stylesheet" href="styles.css"></head>`));
-    zip.file('styles.css', css || '/* styles */');
-
-    const blob = await zip.generateAsync({ type: 'blob' });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'webkurier_autobuild.zip';
-    a.click();
-    URL.revokeObjectURL(url);
-
-    status.textContent = 'ZIP готов.';
-  }
-
-  panel.querySelector('#btnGen').addEventListener('click', generate);
-  panel.querySelector('#btnZip').addEventListener('click', exportZip);
-</script>
 </body>
 </html>
