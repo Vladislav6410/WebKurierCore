@@ -1,45 +1,61 @@
-name: CI
+// engine/i18n/i18n.js
+// Базовый каркас i18n для WebKurierCore
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+// текущий язык (по умолчанию английский)
+let WK_LANG = 'en';
 
-jobs:
-  webkuriercore-ci:
-    runs-on: ubuntu-latest
+// простейший словарь-заглушка (потом расширим)
+const WK_I18N_DICT = {
+  en: {},
+  de: {},
+  ru: {},
+  uk: {}
+};
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+// применить переводы к странице (пока заглушка)
+function wkApplyTranslations() {
+  // здесь позже добавим поиск data-i18n ключей и подстановку текста
+  // сейчас просто ничего не делаем, чтобы не ломать интерфейс
+}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+/**
+ * Инициализация i18n.
+ * Загружает язык из localStorage и применяет переводы.
+ */
+function i18nInit() {
+  try {
+    const saved = localStorage.getItem('WK_LANG');
+    if (saved && WK_I18N_DICT[saved]) {
+      WK_LANG = saved;
+    }
+  } catch (e) {
+    // в режиме без localStorage просто игнорируем
+  }
 
-      - name: Install dependencies
-        run: |
-          if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
-            npm ci
-          else
-            npm install
-          fi
+  wkApplyTranslations();
+  console.log('i18nInit()', 'lang =', WK_LANG);
+}
 
-      - name: Run lint (optional)
-        run: |
-          if npm run | grep -q "lint"; then
-            npm run lint
-          else
-            echo "No lint script. Skipping."
-          fi
+/**
+ * Смена языка (каркас).
+ */
+function i18nSetLanguage(lang) {
+  if (!WK_I18N_DICT[lang]) return;
 
-      - name: Build (optional)
-        run: |
-          if npm run | grep -q "build"; then
-            npm run build
-          else
-            echo "No build script. Skipping."
-          fi
+  WK_LANG = lang;
+  try {
+    localStorage.setItem('WK_LANG', lang);
+  } catch (e) {
+    // ignore
+  }
+  wkApplyTranslations();
+}
+
+// Делаем функции глобальными для браузера
+// чтобы их можно было вызвать из index.html и других скриптов
+// и чтобы ESLint не ругался.
+if (typeof window !== 'undefined') {
+  window.i18nInit = i18nInit;
+  window.i18nSetLanguage = i18nSetLanguage;
+}
         
