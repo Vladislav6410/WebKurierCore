@@ -1,4 +1,4 @@
-##📘README.md — WebKurierCore (EN + RU)
+#📘README.md — WebKurierCore (EN + RU)
 
 Unified Web Interface • Agents Engine • Bots • Multilingual • Offline-ready
 
