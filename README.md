@@ -343,6 +343,6 @@ Made in Germany
 Создано Владиславом Гущиным · Все права защищены
 Произведено в Германии
 
+--------
 
-
-  
+  License type / Тип лицензии: VLADOEXPORT License v1.0 (MIT-compatible).
