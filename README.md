@@ -1,5 +1,3 @@
-С учётом варианта B (часть анализа/оркестрации в Hybrid, тяжёлые вычисления в DroneHybrid) даю стабильный финальный README для репозитория №3 – WebKurierDroneHybrid. Его можно вставлять как есть в README.md.
-
 # WebKurierDroneHybrid · Drones · Geodesy · GeoViz3D · Autopilot
 
 Unified drone hub for geodesy, 3D mapping, GeoViz3D visualization, swarm missions and hybrid autopilot modes.  
