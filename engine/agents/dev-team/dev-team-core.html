@@ -1,6 +1,189 @@
-<section id="agents-section">
-  <h2 id="agents-title">Агенты WebKurier</h2>
-  <div id="agents-menu" class="agents-menu"></div>
-</section>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>WebKurier • Dev & Build Team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #111827 0, #020617 55%);
+      color: #e5e7eb;
+    }
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 1.9rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+    p.tagline {
+      text-align: center;
+      color: #9ca3af;
+      margin-bottom: 20px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .card {
+      background: linear-gradient(145deg, #020617, #020617 55%, #0b1120);
+      border: 1px solid #1f2937;
+      border-radius: 14px;
+      padding: 16px 18px;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.5);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .card-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    .card-icon {
+      font-size: 1.6rem;
+      margin-right: 6px;
+    }
+    .badge {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+    .btn-row {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .btn {
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: #e5e7eb;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:hover {
+      border-color: #3b82f6;
+    }
+    .section-title {
+      margin-top: 28px;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    ul {
+      margin-top: 6px;
+      padding-left: 1.2rem;
+      color: #9ca3af;
+      font-size: 0.95rem;
+    }
+    a {
+      color: #60a5fa;
+    }
+  </style>
+</head>
+<body>
+<main>
 
-<script src="engine/ui/agents-menu.js"></script>
+  <h1>Команда разработки WebKurier</h1>
+  <p class="tagline">
+    Стартовая панель для сборки проекта: MasterAgent, Инженер и Программист.
+  </p>
+
+  <section class="grid">
+    <!-- MasterAgent -->
+    <article class="card">
+      <div class="card-header">
+        <div>
+          <span class="card-icon">🧭</span>
+          <span class="card-title">MasterAgent</span>
+        </div>
+        <span class="badge">Оркестратор</span>
+      </div>
+      <p>
+        Главный управляющий агент: координирует других помощников,
+        запускает сценарии, следит за структурой репозиториев и статусом модулей.
+      </p>
+      <div class="btn-row">
+        <a class="btn" href="../master/master-core.html">
+          Открыть MasterAgent UI
+        </a>
+      </div>
+    </article>
+
+    <!-- Engineer -->
+    <article class="card">
+      <div class="card-header">
+        <div>
+          <span class="card-icon">🧠</span>
+          <span class="card-title">EngineerAgent</span>
+        </div>
+        <span class="badge">Структура и файлы</span>
+      </div>
+      <p>
+        Цифровой инженер по проекту: структура папок, конфиги, чек-листы,
+        подсказки по установке, связь с GitHub/Dropbox и терминалом.
+      </p>
+      <div class="btn-row">
+        <a class="btn" href="../engineer/engineer-core.html">
+          Открыть Engineer UI
+        </a>
+      </div>
+    </article>
+
+    <!-- Programmer -->
+    <article class="card">
+      <div class="card-header">
+        <div>
+          <span class="card-icon">💻</span>
+          <span class="card-title">Programmer</span>
+        </div>
+        <span class="badge">Код и фиксы</span>
+      </div>
+      <p>
+        Помощник-программист: генерация кода, фиксы модулей, шаблоны
+        для Python/JS, блоков API и тестов. Работает в связке с инженером.
+      </p>
+      <div class="btn-row">
+        <a class="btn" href="../programmer/programmer-core.html">
+          Открыть Programmer UI
+        </a>
+      </div>
+    </article>
+  </section>
+
+  <section>
+    <h2 class="section-title">Рекомендованный порядок работы</h2>
+    <ul>
+      <li><b>1.</b> Зайти в <b>MasterAgent</b> — выбрать репозиторий и задачу (Core, Drone, Chain и т.д.).</li>
+      <li><b>2.</b> Через <b>Engineer</b> — проверить структуру папок, конфиги, TODO-файлы.</li>
+      <li><b>3.</b> Зайти в <b>Programmer</b> — дописать или поправить код по чек-листу.</li>
+      <li><b>4.</b> При необходимости — перейти в терминал или другие агенты из главного портала.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="section-title">Возврат в портал агентов</h2>
+    <p>
+      Вернуться к общему порталу агентов:
+      <a href="../../../index.html">главная страница WebKurierCore</a>
+    </p>
+  </section>
+
+</main>
+</body>
+</html>
