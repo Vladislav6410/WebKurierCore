@@ -95,6 +95,67 @@
     code { font-family: "Fira Code", "JetBrains Mono", monospace; }
     ul { margin-top: .5rem; padding-left: 1.2rem; }
     li { margin-bottom: .15rem; }
+
+    /* ====== Блок меню агентов ====== */
+    .agents-menu {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .agent-group-card {
+      border: 1px solid #444;
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: #020617;
+    }
+
+    .agent-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .agent-group-title {
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+
+    .agent-group-icon {
+      font-size: 1.4rem;
+      margin-right: 6px;
+    }
+
+    .agent-group-agents {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .agent-chip {
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      border: 1px solid #555;
+      cursor: pointer;
+      white-space: nowrap;
+      background: #020617;
+      color: var(--text);
+    }
+
+    .agent-chip.disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    .agent-access-badge {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
   </style>
 </head>
 <body>
@@ -112,6 +173,12 @@
       и структуру папок для нового набора репозиториев WebKurier
       (10 проектов: Hybrid, Core, DroneHybrid, Chain, Security, PhoneCore, iOS, Android, Site, резерв).
     </p>
+  </section>
+
+  <!-- 🔌 Меню агентов WebKurier -->
+  <section id="agents-section">
+    <h2 id="agents-title">Агенты WebKurier</h2>
+    <div id="agents-menu" class="agents-menu"></div>
   </section>
 
   <!-- 📊 Прайс -->
@@ -435,5 +502,10 @@ if __name__ == "__main__":
 
 </main>
 
+<!-- Подключение логики меню агентов -->
+<script src="engine/ui/agents-menu.js"></script>
+
 </body>
 </html>
+
+
