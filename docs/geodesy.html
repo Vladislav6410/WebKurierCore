@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>WebKurierDroneHybrid · Geodesy & 3D Suite</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      padding: 20px 16px 40px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #111827 0, #020617 55%);
+      color: #e5e7eb;
+    }
+    main {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    .card {
+      background: linear-gradient(145deg, #020617, #020617 55%, #0b1120);
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      padding: 20px 22px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.55);
+      margin-top: 22px;
+    }
+    h1 { font-size: 2rem; margin-bottom: .5rem; }
+    h2 { font-size: 1.4rem; margin-bottom: .5rem; margin-top: .3rem; }
+    p.tagline { color: #9ca3af; margin-bottom: 1rem; }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 10px;
+      font-size: .92rem;
+    }
+    th, td {
+      border: 1px solid rgba(31,41,55,0.9);
+      padding: 8px 10px;
+      text-align: left;
+    }
+    th { color: #9ca3af; }
+    .price { font-weight: 700; color: #facc15; }
+    pre {
+      background: #020617;
+      border: 1px solid rgba(31,41,55,0.95);
+      padding: 16px;
+      border-radius: 10px;
+      font-family: "Fira Code", "JetBrains Mono", monospace;
+      overflow-x: auto;
+      font-size: .86rem;
+      margin-top: 10px;
+      white-space: pre;
+    }
+    .note {
+      background: #0b1120;
+      border-left: 3px solid #3b82f6;
+      padding: 10px 12px;
+      margin-top: 10px;
+      color: #9ca3af;
+      font-size: .9rem;
+    }
+    a { color: #60a5fa; text-decoration: none; }
+  </style>
+</head>
+<body>
+<main>
+
+  <section class="card">
+    <h1>WebKurierDroneHybrid · Geodesy &amp; 3D Suite</h1>
+    <p class="tagline">
+      Прайс на аэрофотосъёмку 1 км², Python-генератор PDF-отчётов и структура папок
+      модуля геодезии. Этот файл можно использовать как документацию и базу для README.
+    </p>
+    <p>
+      Вернуться в ядро WebKurierCore: <a href="../index.html">index.html</a>
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>📊 Прайс на аэрофотосъёмку (1 км²)</h2>
+    <p>Базовые пакеты для WebKurierDroneHybrid (геодезия, 3D-моделирование, аналитика):</p>
+    <table>
+      <thead>
+        <tr>
+          <th>№</th>
+          <th>Пакет</th>
+          <th>Описание</th>
+          <th>Цена</th>
+          <th>Срок</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td><b>Base Map</b></td>
+          <td>Ортофото (GeoTIFF, JPG), выравнивание, базовая фотограмметрия, PDF-карта участка.</td>
+          <td class="price">390&nbsp;€</td>
+          <td>1–2 дня</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td><b>3D Terrain</b></td>
+          <td>DSM/DTM, облако точек, 3D-модель (OBJ/PLY/LAS), анализ рельефа.</td>
+          <td class="price">790&nbsp;€</td>
+          <td>2–3 дня</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td><b>GeoAnalysis</b></td>
+          <td>NDVI/NDRE, классификация земель, контуры объектов, расширенный PDF-отчёт.</td>
+          <td class="price">1290&nbsp;€</td>
+          <td>3–5 дней</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      Таблица цен хранится в репозитории<br/>
+      <code>WebKurierDroneHybrid/data/pricing/drone_prices.csv</code><br/>
+      и может использоваться ботом-геодезистом и WebKurierSite.
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>🐍 Python-генератор геоотчёта (PDF)</h2>
+    <p>
+      Скрипт размещается в <code>WebKurierDroneHybrid</code> по пути:<br/>
+      <code>engine/geodesy_suite/report/report_generator.py</code>
+    </p>
+    <pre>import os
+import json
+from datetime import datetime
+from fpdf import FPDF
+
+BASE_DIR   = os.path.dirname(__file__)
+ROOT_DIR   = os.path.abspath(os.path.join(BASE_DIR, "..", ".."))
+DATA_DIR   = os.path.join(ROOT_DIR, "logs", "reports")
+OUTPUT_DIR = os.path.join(ROOT_DIR, "logs", "generated")
+FONT_DIR   = os.path.join(ROOT_DIR, "fonts")  # DejaVuSans / DejaVuSans-Bold
+
+class GeoReport:
+    def __init__(self, mission_name: str):
+        self.mission_name = mission_name
+        self.date = datetime.now().strftime("%Y-%m-%d %H:%M")
+        self.report: dict = {}
+
+    def load_data(self) -> None:
+        file_path = os.path.join(DATA_DIR, f"{self.mission_name}.json")
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"Нет данных для отчёта: {file_path}")
+        with open(file_path, "r", encoding="utf-8") as f:
+            self.report = json.load(f)
+
+    def _init_pdf(self) -> FPDF:
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.add_font("DejaVu", "", os.path.join(FONT_DIR, "DejaVuSans.ttf"), uni=True)
+        pdf.add_font("DejaVu", "B", os.path.join(FONT_DIR, "DejaVuSans-Bold.ttf"), uni=True)
+        pdf.set_auto_page_break(auto=True, margin=15)
+        return pdf
+
+    def generate_pdf(self) -> str:
+        pdf = self._init_pdf()
+        pdf.set_font("DejaVu", "B", 16)
+        pdf.cell(0, 10, f"📍 Геоотчёт: {self.mission_name}", ln=True)
+
+        pdf.set_font("DejaVu", "", 11)
+        pdf.cell(0, 8, f"Дата генерации: {self.date}", ln=True)
+        pdf.ln(4)
+
+        for key, value in self.report.items():
+            if isinstance(value, dict):
+                pdf.set_font("DejaVu", "B", 12)
+                pdf.cell(0, 8, f"▌ {key}", ln=True)
+                pdf.set_font("DejaVu", "", 11)
+                for subkey, subvalue in value.items():
+                    pdf.multi_cell(0, 6, f" • {subkey}: {subvalue}")
+            else:
+                pdf.multi_cell(0, 6, f"{key}: {value}")
+            pdf.ln(1)
+
+        os.makedirs(OUTPUT_DIR, exist_ok=True)
+        output_path = os.path.join(OUTPUT_DIR, f"{self.mission_name}_report.pdf")
+        pdf.output(output_path)
+        return output_path
+
+if __name__ == "__main__":
+    report = GeoReport("test_mission_01")
+    report.load_data()
+    path = report.generate_pdf()
+    print(f"✅ Отчёт сохранён: {path}")</pre>
+
+    <div class="note">
+      Для корректного отображения русского и английского текстов
+      используем шрифты <code>DejaVuSans</code> и <code>DejaVuSans-Bold</code>.
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>📂 Структура папок (Geodesy &amp; 3D Suite)</h2>
+    <pre>WebKurierDroneHybrid/
+├── engine/
+│   ├── geodesy_suite/
+│   │   ├── report/
+│   │   │   └── report_generator.py
+│   │   ├── processing/
+│   │   │   ├── odm_pipeline.py
+│   │   │   ├── dsm_dtm_builder.py
+│   │   │   └── ndvi_ndre_analyzer.py
+│   │   ├── ui/
+│   │   │   ├── geodesy_api.py
+│   │   │   └── telegram_bot_hooks.py
+│   │   └── config/
+│   │       └── geodesy_config.json
+│   ├── logs/
+│   │   ├── reports/
+│   │   ├── generated/
+│   │   └── telemetry/
+│   └── prompts/
+│       ├── geodesy.prompt.json
+│       └── report.prompt.json
+├── data/
+│   ├── pricing/
+│   │   └── drone_prices.csv
+│   └── cameras.json
+└── docs/
+    └── geodesy.html</pre>
+  </section>
+
+</main>
+</body>
+</html>
