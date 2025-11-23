@@ -1,1 +1,92 @@
-try
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>WebKurier • Admin Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  body {
+    margin: 0;
+    padding: 20px;
+    background: #0d0f14;
+    color: #e5e5e5;
+    font-family: system-ui, sans-serif;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1.9rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .card {
+    background: #1a1d22;
+    padding: 18px;
+    border-radius: 12px;
+    border: 1px solid #2e323a;
+    cursor: pointer;
+    text-align: center;
+    transition: 0.25s;
+  }
+  .card:hover {
+    background: #232831;
+    transform: translateY(-2px);
+  }
+  .icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+  .footer {
+    margin-top: 35px;
+    text-align: center;
+    font-size: 0.9rem;
+    opacity: 0.6;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>Панель администратора WebKurier</h1>
+
+<div class="grid">
+
+  <div class="card" onclick="openPage('terminal.html')">
+    <div class="icon">⌨️</div>
+    <div>Открыть терминал</div>
+  </div>
+
+  <div class="card" onclick="openPage('logs.html')">
+    <div class="icon">📜</div>
+    <div>Логи системы</div>
+  </div>
+
+  <div class="card" onclick="openPage('status.html')">
+    <div class="icon">📊</div>
+    <div>Статус системы</div>
+  </div>
+
+  <div class="card" onclick="openPage('../engine/agents/security/security-core.html')">
+    <div class="icon">🛡️</div>
+    <div>Security Scanner</div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Доступ только для администратора • WebKurierCore © 2025
+</div>
+
+<script>
+function openPage(page) {
+  window.location.href = page;
+}
+</script>
+
+</body>
+</html>
