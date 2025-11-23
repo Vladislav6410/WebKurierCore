@@ -4,7 +4,10 @@
   "groups": [
     {
       "id": "geo_drone",
-      "title": { "ru": "Дроны и геодезия", "en": "Drones & Geodesy" },
+      "title": {
+        "ru": "Дроны и геодезия",
+        "en": "Drones & Geodesy"
+      },
       "icon": "🛰",
       "access": "pro",
       "agents": [
@@ -66,10 +69,12 @@
         }
       ]
     },
-
     {
       "id": "language",
-      "title": { "ru": "Языки и связь", "en": "Languages & Communication" },
+      "title": {
+        "ru": "Языки и связь",
+        "en": "Languages & Communication"
+      },
       "icon": "🌐",
       "access": "base",
       "agents": [
@@ -99,10 +104,12 @@
         }
       ]
     },
-
     {
       "id": "finance",
-      "title": { "ru": "Финансы", "en": "Finance" },
+      "title": {
+        "ru": "Финансы",
+        "en": "Finance"
+      },
       "icon": "💶",
       "access": "pro",
       "agents": [
@@ -132,10 +139,12 @@
         }
       ]
     },
-
     {
       "id": "business",
-      "title": { "ru": "Бизнес", "en": "Business" },
+      "title": {
+        "ru": "Бизнес",
+        "en": "Business"
+      },
       "icon": "🏢",
       "access": "pro",
       "agents": [
@@ -165,10 +174,12 @@
         }
       ]
     },
-
     {
       "id": "devtools",
-      "title": { "ru": "Разработка", "en": "Dev Tools" },
+      "title": {
+        "ru": "Разработка",
+        "en": "Dev Tools"
+      },
       "icon": "🛠",
       "access": "base",
       "agents": [
@@ -222,10 +233,12 @@
         }
       ]
     },
-
     {
       "id": "security_system",
-      "title": { "ru": "Безопасность", "en": "Security" },
+      "title": {
+        "ru": "Безопасность",
+        "en": "Security"
+      },
       "icon": "🛡",
       "access": "admin",
       "agents": [
@@ -259,6 +272,65 @@
           "icon": "⌨️",
           "route": "admin/terminal.html",
           "tags": ["root"],
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "dev_team",
+      "title": {
+        "ru": "Команда разработки",
+        "en": "Dev & Build Team"
+      },
+      "icon": "🛠",
+      "access": "pro",
+      "agents": [
+        {
+          "id": "master",
+          "title": { "ru": "MasterAgent", "en": "Master Agent" },
+          "icon": "🧭",
+          "route": "engine/agents/master/master-core.html",
+          "tags": ["manager", "orchestrator"],
+          "enabled": true
+        },
+        {
+          "id": "engineer",
+          "title": { "ru": "Инженер", "en": "Engineer Agent" },
+          "icon": "🧠",
+          "route": "engine/agents/engineer/engineer-core.html",
+          "tags": ["structure", "files", "config"],
+          "enabled": true
+        },
+        {
+          "id": "programmer",
+          "title": { "ru": "Программист", "en": "Programmer" },
+          "icon": "💻",
+          "route": "engine/agents/programmer/programmer-core.html",
+          "tags": ["code", "fix", "modules"],
+          "enabled": true
+        },
+        {
+          "id": "designer",
+          "title": { "ru": "Верстальщик", "en": "Designer" },
+          "icon": "🎨",
+          "route": "engine/agents/designer/designer-core.html",
+          "tags": ["html", "css", "ui"],
+          "enabled": true
+        },
+        {
+          "id": "tools",
+          "title": { "ru": "Tools Panel", "en": "Tools Panel" },
+          "icon": "🧰",
+          "route": "engine/agents/tools/tools-core.html",
+          "tags": ["templates", "zip-export"],
+          "enabled": true
+        },
+        {
+          "id": "editor",
+          "title": { "ru": "Редактор", "en": "Editor" },
+          "icon": "✍️",
+          "route": "engine/agents/editor/editor-core.html",
+          "tags": ["docs", "readme"],
           "enabled": true
         }
       ]
