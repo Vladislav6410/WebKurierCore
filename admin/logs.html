@@ -8,22 +8,40 @@
   <style>
     body {
       margin: 0;
-      padding: 20px;
+      padding: 16px 16px 24px;
       font-family: "Courier New", monospace;
       background: #0d0d0f;
       color: #e5e5e5;
     }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .nav-links a {
+      color: #9ca3af;
+      text-decoration: none;
+      font-size: 0.9rem;
+      margin-right: 10px;
+    }
+    .nav-links a:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
     h1 {
       text-align: center;
-      margin-bottom: 20px;
-      font-size: 1.8rem;
+      margin: 10px 0 18px;
+      font-size: 1.6rem;
     }
 
     .controls {
       display: flex;
       gap: 10px;
       justify-content: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       flex-wrap: wrap;
     }
 
@@ -42,10 +60,14 @@
       border-color: #2222cc;
     }
 
+    button:hover {
+      background: #3f3fff;
+    }
+
     #logs-container {
-      margin-top: 15px;
+      margin-top: 10px;
       border: 1px solid #333;
-      padding: 15px;
+      padding: 12px;
       border-radius: 8px;
       background: #111;
       max-height: 70vh;
@@ -67,10 +89,24 @@
     .log-warning { color: #ffe37c; }
     .log-error { color: #ff7c7c; }
     .log-debug { color: #9e9e9e; }
+
+    .footer {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 0.85rem;
+      opacity: 0.6;
+    }
   </style>
 </head>
 
 <body>
+
+<header>
+  <div class="nav-links">
+    <a href="../index.html">← Портал WebKurierCore</a>
+    <a href="panel.html">← Панель администратора</a>
+  </div>
+</header>
 
 <h1>📜 Логи системы WebKurier</h1>
 
@@ -97,57 +133,79 @@
     <option value="500">500 записей</option>
   </select>
 
-  <button onclick="loadLogs()">Загрузить</button>
+  <button type="button" onclick="loadLogs()">Загрузить</button>
 </div>
 
-<div id="logs-container">Нажмите “Загрузить”.</div>
+<div id="logs-container">Нажмите “Загрузить” или подождите автообновление…</div>
 
 <script>
-  const ADMIN_TOKEN = "ADMIN_TOKEN_HERE"; // ← подменишь
+  // TODO: подставь реальный токен администратора
+  const ADMIN_TOKEN = "CHANGE_ME_ADMIN_TOKEN";
 
   async function loadLogs() {
     const source = document.getElementById("source").value;
     const level  = document.getElementById("level").value;
     const limit  = document.getElementById("limit").value;
 
-    const url = `/api/admin/logs?source=${source}&level=${level}&limit=${limit}`;
+    const url = `/api/admin/logs?source=${encodeURIComponent(source)}&level=${encodeURIComponent(level)}&limit=${encodeURIComponent(limit)}`;
 
-    const res = await fetch(url, {
-      headers: {
-        "Authorization": "Bearer " + ADMIN_TOKEN
-      }
-    });
-
-    const data = await res.json();
     const box = document.getElementById("logs-container");
+    box.textContent = "Загрузка логов...";
 
-    if (!data.ok) {
-      box.innerHTML = "Ошибка загрузки логов.";
-      return;
-    }
+    try {
+      const res = await fetch(url, {
+        headers: {
+          "Authorization": "Bearer " + ADMIN_TOKEN
+        }
+      });
 
-    box.innerHTML = "";
-    data.entries.forEach(entry => {
-      const el = document.createElement("div");
-      el.classList.add("log-entry");
+      const data = await res.json();
 
-      let lvlClass = "log-info";
-      if (entry.level === "warning") lvlClass = "log-warning";
-      if (entry.level === "error") lvlClass = "log-error";
-      if (entry.level === "debug") lvlClass = "log-debug";
+      if (!data.ok) {
+        box.textContent = "Ошибка загрузки логов: " + (data.error || "unknown");
+        return;
+      }
 
-      el.innerHTML =
-        `[${entry.timestamp}] <span class="${lvlClass}">${entry.level.toUpperCase()}</span> `
-        + `[${entry.source}] — ${entry.message}`;
+      box.innerHTML = "";
+      if (!data.entries || data.entries.length === 0) {
+        box.textContent = "Логи отсутствуют.";
+        return;
+      }
 
-      box.appendChild(el);
-    });
+      data.entries.forEach(entry => {
+        const el = document.createElement("div");
+        el.classList.add("log-entry");
 
-    if (data.entries.length === 0) {
-      box.innerHTML = "Логи отсутствуют.";
+        let lvlClass = "log-info";
+        if (entry.level === "warning") lvlClass = "log-warning";
+        if (entry.level === "error") lvlClass = "log-error";
+        if (entry.level === "debug") lvlClass = "log-debug";
+
+        const ts = entry.timestamp || "";
+        const src = entry.source || "sys";
+        const msg = entry.message || "";
+
+        el.innerHTML =
+          `[${ts}] <span class="${lvlClass}">${(entry.level || "").toUpperCase()}</span> `
+          + `[${src}] — ${msg}`;
+
+        box.appendChild(el);
+      });
+
+    } catch (err) {
+      box.textContent = "Ошибка сети / API: " + err;
     }
   }
+
+  // авто-загрузка логов при открытии страницы
+  window.addEventListener("load", () => {
+    loadLogs();
+  });
 </script>
+
+<div class="footer">
+  Admin Logs • Только для внутреннего использования
+</div>
 
 </body>
 </html>
