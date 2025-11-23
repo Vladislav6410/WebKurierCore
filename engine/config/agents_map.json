@@ -1,0 +1,350 @@
+{
+  "version": "1.0",
+  "updated_at": "2025-11-23",
+  "groups": [
+    {
+      "id": "communication",
+      "title": {
+        "en": "Communication & Languages",
+        "ru": "Перевод и общение"
+      },
+      "icon": "🗣️",
+      "description": {
+        "en": "Translator, calls and language lessons.",
+        "ru": "Переводчик, звонки и языковые курсы."
+      },
+      "access": "commercial", 
+      "agents": [
+        {
+          "id": "translator",
+          "type": "service",
+          "title": { "en": "Translator", "ru": "Переводчик" },
+          "icon": "🌐",
+          "route": "/agents/translator/",
+          "tags": ["text", "voice", "files"]
+        },
+        {
+          "id": "voice",
+          "type": "service",
+          "title": { "en": "Voice Assistant", "ru": "Голосовой помощник" },
+          "icon": "🎙️",
+          "route": "/agents/voice/",
+          "tags": ["tts", "stt", "calls"]
+        },
+        {
+          "id": "phone",
+          "type": "service",
+          "title": { "en": "Calls & Telephony", "ru": "Звонки и телефония" },
+          "icon": "📞",
+          "route": "/agents/phone/",
+          "tags": ["sip", "webrtc"]
+        },
+        {
+          "id": "lessons",
+          "type": "service",
+          "title": { "en": "Language Courses", "ru": "Языковые курсы" },
+          "icon": "📚",
+          "route": "/agents/lessons/",
+          "tags": ["a1-c1", "progress"]
+        }
+      ]
+    },
+    {
+      "id": "finance",
+      "title": {
+        "en": "Finance & Taxes",
+        "ru": "Финансы и налоги"
+      },
+      "icon": "💶",
+      "description": {
+        "en": "Accounting, tax returns and WebCoin wallet.",
+        "ru": "Бухгалтерия, декларации и кошелёк WebCoin."
+      },
+      "access": "commercial",
+      "agents": [
+        {
+          "id": "accountant",
+          "type": "service",
+          "title": { "en": "Accountant", "ru": "Бухгалтер" },
+          "icon": "📊",
+          "route": "/agents/accountant/",
+          "tags": ["reports", "analytics"]
+        },
+        {
+          "id": "tax_return",
+          "type": "service",
+          "title": { "en": "Tax Return", "ru": "Налоговая декларация" },
+          "icon": "🧾",
+          "route": "/agents/tax-return/",
+          "tags": ["de", "pl", "elster"]
+        },
+        {
+          "id": "wallet",
+          "type": "service",
+          "title": { "en": "WebCoin Wallet", "ru": "Кошелёк WebCoin" },
+          "icon": "👛",
+          "route": "/agents/wallet/",
+          "tags": ["balance", "rewards", "exchange"]
+        }
+      ]
+    },
+    {
+      "id": "drone",
+      "title": {
+        "en": "Drones & Geodesy",
+        "ru": "Дроны и геодезия"
+      },
+      "icon": "🚁",
+      "description": {
+        "en": "Drone missions, mapping, PV planning and reports.",
+        "ru": "Миссии дронов, карты, PV-планирование и отчёты."
+      },
+      "access": "commercial",
+      "agents": [
+        {
+          "id": "geodesy",
+          "type": "service",
+          "title": { "en": "Geodesy", "ru": "Геодезия" },
+          "icon": "📐",
+          "route": "/agents/geodesy/",
+          "tags": ["gsd", "mapping"]
+        },
+        {
+          "id": "drone",
+          "type": "service",
+          "title": { "en": "Drone Control", "ru": "Управление дроном" },
+          "icon": "🛰️",
+          "route": "/agents/drone/",
+          "tags": ["missions", "telemetry"]
+        },
+        {
+          "id": "autopilot",
+          "type": "service",
+          "title": { "en": "Autopilot", "ru": "Автопилот" },
+          "icon": "🤖",
+          "route": "/agents/autopilot/",
+          "tags": ["px4", "mavlink"]
+        },
+        {
+          "id": "geoviz3d",
+          "type": "service",
+          "title": { "en": "GeoViz3D", "ru": "GeoViz3D" },
+          "icon": "🌍",
+          "route": "/agents/geoviz3d/",
+          "tags": ["3d", "visualization"]
+        },
+        {
+          "id": "pv_planner",
+          "type": "service",
+          "title": { "en": "PV Planner", "ru": "PV-планировщик" },
+          "icon": "☀️",
+          "route": "/agents/pv-planner/",
+          "tags": ["solar", "roof"]
+        },
+        {
+          "id": "geo_report",
+          "type": "service",
+          "title": { "en": "Geo Reports", "ru": "Гео-отчёты" },
+          "icon": "📎",
+          "route": "/agents/geo-report/",
+          "tags": ["pdf", "geotiff"]
+        }
+      ]
+    },
+    {
+      "id": "security",
+      "title": {
+        "en": "Security & Legal",
+        "ru": "Безопасность и право"
+      },
+      "icon": "🛡️",
+      "description": {
+        "en": "Security scanning and legal assistant.",
+        "ru": "Сканирование безопасности и юридический помощник."
+      },
+      "access": "commercial",
+      "agents": [
+        {
+          "id": "security",
+          "type": "service",
+          "title": { "en": "Security Agent", "ru": "Агент безопасности" },
+          "icon": "🔒",
+          "route": "/agents/security/",
+          "tags": ["scan", "quarantine"]
+        },
+        {
+          "id": "legal",
+          "type": "service",
+          "title": { "en": "Legal Agent", "ru": "Юрист" },
+          "icon": "⚖️",
+          "route": "/agents/legal/",
+          "tags": ["contracts", "license"]
+        }
+      ]
+    },
+    {
+      "id": "career",
+      "title": {
+        "en": "Work & Career",
+        "ru": "Работа и карьера"
+      },
+      "icon": "💼",
+      "description": {
+        "en": "HR, vacancies and marketing advisor.",
+        "ru": "HR, вакансии и маркетинговый советник."
+      },
+      "access": "commercial",
+      "agents": [
+        {
+          "id": "hr",
+          "type": "service",
+          "title": { "en": "HR Agent", "ru": "HR-агент" },
+          "icon": "🧑‍💼",
+          "route": "/agents/hr/",
+          "tags": ["cv", "vacancies"]
+        },
+        {
+          "id": "marketing",
+          "type": "service",
+          "title": { "en": "Marketing Agent", "ru": "Маркетолог" },
+          "icon": "📢",
+          "route": "/agents/marketing/",
+          "tags": ["promo", "strategy"]
+        }
+      ]
+    },
+    {
+      "id": "dev_tools",
+      "title": {
+        "en": "Creation & Development",
+        "ru": "Создание и разработка"
+      },
+      "icon": "🛠️",
+      "description": {
+        "en": "Engineer, coding, layout and tools.",
+        "ru": "Инженер, программирование, верстка и инструменты."
+      },
+      "access": "pro", 
+      "agents": [
+        {
+          "id": "engineer",
+          "type": "service",
+          "title": { "en": "Engineer", "ru": "Инженер" },
+          "icon": "🧠",
+          "route": "/agents/engineer/",
+          "tags": ["terminal", "specs"]
+        },
+        {
+          "id": "programmer",
+          "type": "service",
+          "title": { "en": "Programmer", "ru": "Программист" },
+          "icon": "💻",
+          "route": "/agents/programmer/",
+          "tags": ["code", "review"]
+        },
+        {
+          "id": "designer",
+          "type": "service",
+          "title": { "en": "Layout & UI", "ru": "Верстальщик и UI" },
+          "icon": "🎨",
+          "route": "/agents/designer/",
+          "tags": ["html", "css", "responsive"]
+        },
+        {
+          "id": "tools",
+          "type": "service",
+          "title": { "en": "Tools Panel", "ru": "Панель инструментов" },
+          "icon": "🧰",
+          "route": "/agents/tools/",
+          "tags": ["templates", "zip"]
+        },
+        {
+          "id": "editor",
+          "type": "service",
+          "title": { "en": "Content Editor", "ru": "Редактор контента" },
+          "icon": "✏️",
+          "route": "/agents/editor/",
+          "tags": ["text", "proofread"]
+        },
+        {
+          "id": "dream",
+          "type": "service",
+          "title": { "en": "DreamMaker", "ru": "DreamMaker" },
+          "icon": "✨",
+          "route": "/agents/dream/",
+          "tags": ["media", "generation"]
+        }
+      ]
+    },
+    {
+      "id": "romantic",
+      "title": {
+        "en": "Personal & Romantic",
+        "ru": "Личная жизнь и романтика"
+      },
+      "icon": "💘",
+      "description": {
+        "en": "Romantic assistant and communication help.",
+        "ru": "Романтический помощник и помощь в общении."
+      },
+      "access": "commercial",
+      "agents": [
+        {
+          "id": "romantic",
+          "type": "service",
+          "title": { "en": "Romantic Agent", "ru": "Романтический агент" },
+          "icon": "💌",
+          "route": "/agents/romantic/",
+          "tags": ["dating", "messages"]
+        }
+      ]
+    },
+    {
+      "id": "system",
+      "title": {
+        "en": "System & Internal",
+        "ru": "Системные и внутренние"
+      },
+      "icon": "⚙️",
+      "description": {
+        "en": "Internal agents for orchestration and memory.",
+        "ru": "Внутренние агенты для оркестрации и памяти."
+      },
+      "access": "internal",
+      "agents": [
+        {
+          "id": "master",
+          "type": "system",
+          "title": { "en": "Master Agent", "ru": "Мастер-агент" },
+          "icon": "🏛️",
+          "route": "/admin/master/",
+          "tags": ["orchestrator"]
+        },
+        {
+          "id": "memory",
+          "type": "system",
+          "title": { "en": "Memory Agent", "ru": "Агент памяти" },
+          "icon": "🧬",
+          "route": "/admin/memory/",
+          "tags": ["storage"]
+        },
+        {
+          "id": "config",
+          "type": "system",
+          "title": { "en": "Config & Identity", "ru": "Конфиг и идентичность" },
+          "icon": "🧩",
+          "route": "/admin/config/",
+          "tags": ["tokens", "keys"]
+        },
+        {
+          "id": "support",
+          "type": "system",
+          "title": { "en": "Tech Support", "ru": "Техподдержка" },
+          "icon": "🆘",
+          "route": "/admin/support/",
+          "tags": ["logs", "help"]
+        }
+      ]
+    }
+  ]
+}
