@@ -13,6 +13,8 @@
   --coin-bg: #3a3a3a;
 }
 
+/* ---------------------- BODY / THEME ---------------------- */
+
 body {
   margin: 0;
   padding: 0;
@@ -27,6 +29,8 @@ body.dark-theme {
   color: var(--text-dark);
 }
 
+/* ---------------------- TITLES / LINKS ---------------------- */
+
 h1, h2, h3 {
   text-align: center;
   margin-top: 20px;
@@ -39,6 +43,8 @@ a {
 body.dark-theme a {
   color: var(--link-dark);
 }
+
+/* ---------------------- BUTTONS ---------------------- */
 
 button, .btn {
   padding: 10px 20px;
@@ -57,6 +63,8 @@ body.dark-theme .btn {
   background-color: var(--btn-bg-dark);
   color: var(--text-dark);
 }
+
+/* ---------------------- WALLET ---------------------- */
 
 .wallet {
   margin-top: 30px;
@@ -89,6 +97,8 @@ body.dark-theme .btn {
   display: inline-block;
 }
 
+/* ---------------------- TERMINAL ---------------------- */
+
 .terminal {
   background-color: #000;
   color: #00ff00;
@@ -118,11 +128,14 @@ body.dark-theme .btn {
   color: #000;
   font-family: 'Courier New', monospace;
 }
+
 body.dark-theme #terminal-input {
   background-color: #1a1a1a;
   color: #f4f4f4;
   border: 1px solid #555;
 }
+
+/* ---------------------- THEME TOGGLE ---------------------- */
 
 .toggle-theme {
   position: fixed;
@@ -140,6 +153,8 @@ body.dark-theme .toggle-theme {
   background-color: var(--accent-dark);
 }
 
+/* ---------------------- PRELOADER ---------------------- */
+
 #preloader {
   position: fixed;
   width: 100%;
@@ -156,6 +171,7 @@ body.dark-theme .toggle-theme {
 body.dark-theme #preloader {
   background: var(--bg-dark);
 }
+
 .loader {
   width: 40px;
   height: 40px;
@@ -168,13 +184,77 @@ body.dark-theme #preloader {
   to { transform: rotate(360deg); }
 }
 
+/* ---------------------- MOBILE ---------------------- */
+
 @media (max-width: 600px) {
   button, .btn {
     width: 90%;
     font-size: 14px;
   }
-
   #terminal-input {
     font-size: 14px;
   }
 }
+
+/* ========================================================== */
+/*                🧠 БЛОК МЕНЮ ВСЕХ АГЕНТОВ                   */
+/* ========================================================== */
+
+.agents-menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.agent-group-card {
+  border: 1px solid #444;
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: #111;
+}
+
+.agent-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.agent-group-title {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.agent-group-icon {
+  font-size: 1.4rem;
+  margin-right: 6px;
+}
+
+.agent-group-agents {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.agent-chip {
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  border: 1px solid #555;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.agent-chip.disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.agent-access-badge {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
