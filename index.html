@@ -2,101 +2,252 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>WebKurierDroneHybrid — Geodesy & 3D Suite (RU + EN)</title>
+  <title>WebKurierCore · Терминал, WebCoin и агенты</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
     :root {
-      --bg: #020617;
-      --card: #020617;
-      --border: #1f2937;
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-      --accent: #3b82f6;
-      --accent-soft: rgba(59, 130, 246, 0.15);
+      --bg-light: #f4f4f4;
+      --bg-dark: #121212;
+      --text-light: #1a1a1a;
+      --text-dark: #f4f4f4;
+      --link-light: #007acc;
+      --link-dark: #66ccff;
+      --accent-light: #007acc;
+      --accent-dark: #00bfff;
+      --btn-bg-light: #ffffff;
+      --btn-bg-dark: #1e1e1e;
+      --btn-border: #ccc;
+      --coin-bg: #3a3a3a;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* ---------------------- BODY / THEME ---------------------- */
 
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont,
-                   "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #111827 0, #020617 55%);
-      color: var(--text);
-      padding: 24px;
-      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      font-family: 'Courier New', Courier, monospace;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      transition: background-color 0.3s, color 0.3s;
     }
 
-    main { max-width: 1080px; margin: 0 auto; }
+    body.dark-theme {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
 
-    section { margin-top: 28px; }
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+    }
 
-    h1 { font-size: 2rem; margin-bottom: .5rem; }
-    h2 { font-size: 1.4rem; margin-bottom: .5rem; margin-top: .3rem; }
-    h3 { font-size: 1.1rem; margin-bottom: .4rem; margin-top: .6rem; }
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-    .tagline { color: var(--muted); margin-bottom: 1rem; }
+    h1, h2, h3 {
+      text-align: center;
+      margin-top: 20px;
+      margin-bottom: 8px;
+    }
+
+    p.subtitle {
+      margin-top: 6px;
+      font-size: 0.95rem;
+      opacity: 0.8;
+    }
+
+    a {
+      color: var(--link-light);
+      text-decoration: none;
+    }
+    body.dark-theme a {
+      color: var(--link-dark);
+    }
+
+    /* ---------------------- BUTTONS ---------------------- */
+
+    button, .btn {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      border: 1px solid var(--btn-border);
+      background-color: var(--btn-bg-light);
+      color: var(--text-light);
+      transition: background-color 0.3s, color 0.3s;
+      border-radius: 5px;
+    }
+
+    body.dark-theme button,
+    body.dark-theme .btn {
+      background-color: var(--btn-bg-dark);
+      color: var(--text-dark);
+    }
+
+    /* ---------------------- CARDS / LAYOUT ---------------------- */
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      align-items: flex-start;
+      margin-top: 10px;
+    }
 
     .card {
-      background: linear-gradient(145deg, #020617, #020617 55%, #0b1120);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px 22px;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.55);
+      border-radius: 10px;
+      border: 1px solid var(--btn-border);
+      padding: 16px 18px;
+      box-sizing: border-box;
+      background-color: rgba(255,255,255,0.8);
     }
 
-    .pill {
-      display: inline-flex;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      border: 1px solid var(--accent);
-      font-size: .8rem;
-      color: var(--accent);
-      margin-bottom: 1rem;
+    body.dark-theme .card {
+      background-color: rgba(0,0,0,0.4);
     }
 
-    table {
-      border-collapse: collapse;
-      width: 100%;
+    .card-half {
+      flex: 1 1 280px;
+      max-width: 460px;
+    }
+
+    /* ---------------------- WALLET ---------------------- */
+
+    .wallet {
       margin-top: 10px;
-      font-size: .92rem;
+      padding: 16px;
+      border: 1px solid var(--btn-border);
+      border-radius: 8px;
+      background-color: rgba(255,255,255,0.05);
+      display: inline-block;
     }
-    th, td {
-      border: 1px solid rgba(31,41,55,0.9);
-      padding: 8px 10px;
+    .wallet h2 {
+      margin-bottom: 10px;
       text-align: left;
     }
-    th { color: var(--muted); }
+    .wallet .balance-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin-bottom: 4px;
+    }
+    .wallet .balance {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .wallet button {
+      font-weight: bold;
+      font-size: 14px;
+      margin: 4px 4px 0 0;
+    }
 
-    .price { font-weight: 700; color: #facc15; }
+    #balance-display {
+      font-size: 18px;
+      margin-top: 10px;
+      background-color: var(--coin-bg);
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 8px;
+      display: inline-block;
+    }
 
-    pre {
-      background: #020617;
-      border: 1px solid rgba(31,41,55,0.95);
+    /* ---------------------- TERMINAL ---------------------- */
+
+    .terminal {
+      background-color: #000;
+      color: #00ff00;
+      font-family: 'Courier New', monospace;
       padding: 16px;
+      margin-top: 10px;
+      min-height: 260px;
+      overflow-y: auto;
       border-radius: 10px;
-      font-family: "Fira Code", "JetBrains Mono", monospace;
-      overflow-x: auto;
-      font-size: .86rem;
-      margin-top: 10px;
-      white-space: pre;
+      border: 1px solid #444;
+      white-space: pre-wrap;
+      text-align: left;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
 
-    .note {
-      background: #0b1120;
-      border-left: 3px solid #3b82f6;
-      padding: 10px 12px;
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: .9rem;
+    #terminal-input {
+      display: block;
+      margin: 12px auto 0;
+      width: 100%;
+      font-size: 14px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid #aaa;
+      background-color: #fff;
+      color: #000;
+      font-family: 'Courier New', monospace;
+      box-sizing: border-box;
     }
 
-    code { font-family: "Fira Code", "JetBrains Mono", monospace; }
-    ul { margin-top: .5rem; padding-left: 1.2rem; }
-    li { margin-bottom: .15rem; }
+    body.dark-theme #terminal-input {
+      background-color: #1a1a1a;
+      color: #f4f4f4;
+      border: 1px solid #555;
+    }
 
-    /* ====== Блок меню агентов ====== */
+    /* ---------------------- THEME TOGGLE ---------------------- */
+
+    .toggle-theme {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 1000;
+      padding: 8px 16px;
+      border-radius: 5px;
+      background-color: var(--accent-light);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    body.dark-theme .toggle-theme {
+      background-color: var(--accent-dark);
+    }
+
+    /* ---------------------- PRELOADER ---------------------- */
+
+    #preloader {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-light);
+      z-index: 9999;
+      top: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s;
+    }
+    body.dark-theme #preloader {
+      background: var(--bg-dark);
+    }
+
+    .loader {
+      width: 40px;
+      height: 40px;
+      border: 5px solid #ccc;
+      border-top-color: #333;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ---------------------- AGENTS MENU ---------------------- */
+
+    #agents-section {
+      margin-top: 30px;
+    }
+
     .agents-menu {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -108,7 +259,12 @@
       border: 1px solid #444;
       border-radius: 10px;
       padding: 12px 14px;
-      background: #020617;
+      background: #111;
+      color: #f4f4f4;
+    }
+
+    body.dark-theme .agent-group-card {
+      background: #111;
     }
 
     .agent-group-header {
@@ -142,8 +298,8 @@
       border: 1px solid #555;
       cursor: pointer;
       white-space: nowrap;
-      background: #020617;
-      color: var(--text);
+      background: #000;
+      color: #f4f4f4;
     }
 
     .agent-chip.disabled {
@@ -156,354 +312,279 @@
       text-transform: uppercase;
       opacity: 0.7;
     }
+
+    /* ---------------------- FOOTER / LINKS ---------------------- */
+
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 0.85rem;
+      opacity: 0.7;
+    }
+
+    footer a {
+      text-decoration: underline;
+    }
+
+    /* ---------------------- MOBILE ---------------------- */
+
+    @media (max-width: 600px) {
+      button, .btn {
+        width: 90%;
+        font-size: 14px;
+      }
+      #terminal-input {
+        font-size: 14px;
+      }
+      .row {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
 
-<main>
+  <!-- Прелоадер -->
+  <div id="preloader">
+    <div class="loader"></div>
+  </div>
 
-  <!-- ========================================================= -->
-  <!-- 🇷🇺 РУССКАЯ ВЕРСИЯ                                       -->
-  <!-- ========================================================= -->
-  <section class="card">
-    <div class="pill">WebKurierDroneHybrid · Геодезия & 3D Suite</div>
-    <h1>Геодезист · Прайс 1 км² и генератор PDF-отчётов</h1>
-    <p class="tagline">
-      Этот файл описывает пакеты аэрофотосъёмки, Python-генератор геоотчётов
-      и структуру папок для нового набора репозиториев WebKurier
-      (10 проектов: Hybrid, Core, DroneHybrid, Chain, Security, PhoneCore, iOS, Android, Site, резерв).
-    </p>
-  </section>
+  <!-- Переключатель темы -->
+  <button class="toggle-theme" id="toggle-theme-btn">🌓 Theme</button>
 
-  <!-- 🔌 Меню агентов WebKurier -->
-  <section id="agents-section">
-    <h2 id="agents-title">Агенты WebKurier</h2>
-    <div id="agents-menu" class="agents-menu"></div>
-  </section>
+  <main>
+    <header>
+      <h1>WebKurierCore · Терминал и агенты</h1>
+      <p class="subtitle">
+        Единое ядро: WebCoin-кошелёк, терминал инженера и доступ к агентам WebKurier.
+      </p>
+    </header>
 
-  <!-- 📊 Прайс -->
-  <section class="card">
-    <h2>📊 Прайс на аэрофотосъёмку (1 км²)</h2>
-    <p>Базовые пакеты для WebKurierDroneHybrid (геодезия, 3D-моделирование, аналитика):</p>
+    <!-- Основной ряд: кошелёк + терминал -->
+    <div class="row">
+      <!-- WebCoin-кошелёк -->
+      <section class="card card-half">
+        <h2>WebCoin Wallet</h2>
+        <p style="font-size:0.9rem; opacity:0.8;">
+          Локальный тестовый баланс. Подключается к WebKurierChain и Telegram/WebApp.
+        </p>
 
-    <table>
-      <thead>
-        <tr>
-          <th>№</th>
-          <th>Пакет</th>
-          <th>Описание</th>
-          <th>Цена</th>
-          <th>Срок</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1</td>
-          <td><b>Base Map</b></td>
-          <td>Ортофото (GeoTIFF, JPG), выравнивание, базовая фотограмметрия, PDF-карта участка.</td>
-          <td class="price">390&nbsp;€</td>
-          <td>1–2 дня</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td><b>3D Terrain</b></td>
-          <td>DSM/DTM, облако точек, 3D-модель (OBJ/PLY/LAS), анализ рельефа.</td>
-          <td class="price">790&nbsp;€</td>
-          <td>2–3 дня</td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td><b>GeoAnalysis</b></td>
-          <td>NDVI/NDRE, классификация земель, контуры объектов, расширенный PDF-отчёт.</td>
-          <td class="price">1290&nbsp;€</td>
-          <td>3–5 дней</td>
-        </tr>
-      </tbody>
-    </table>
+        <div class="wallet">
+          <div class="balance-label">Текущий баланс:</div>
+          <div id="balance-display">0 WEB</div>
 
-    <div class="note">
-      Таблица цен хранится в репозитории<br/>
-      <code>WebKurierDroneHybrid</code> → <code>data/pricing/drone_prices.csv</code><br/>
-      и может использоваться ботом-геодезистом и WebKurierSite.
+          <div style="margin-top:10px;">
+            <button onclick="addCoins(10)">+10 WEB</button>
+            <button onclick="addCoins(50)">+50 WEB</button>
+            <button onclick="resetCoins()">🔁 Сброс</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Терминал -->
+      <section class="card card-half">
+        <h2>Терминал инженера</h2>
+        <p style="font-size:0.9rem; opacity:0.8;">
+          Команды: <code>help</code>, <code>ping</code>, <code>balance</code>, <code>/add &lt;число&gt;</code>.
+        </p>
+
+        <div id="terminal" class="terminal"></div>
+        <input
+          id="terminal-input"
+          type="text"
+          placeholder="Введите команду и нажмите Enter..."
+        />
+      </section>
     </div>
-  </section>
 
-  <!-- 🐍 Python-генератор отчётов (RU) -->
-  <section class="card">
-    <h2>🐍 Python-генератор геоотчёта (PDF)</h2>
-    <p>
-      Скрипт размещается в репозитории <code>WebKurierDroneHybrid</code> по пути:<br/>
-      <code>engine/geodesy_suite/report/report_generator.py</code>
-    </p>
+    <!-- Меню агентов -->
+    <section id="agents-section">
+      <h2 id="agents-title">Агенты WebKurier</h2>
+      <p style="text-align:center; font-size:0.9rem; opacity:0.8;">
+        Ниже отображаются группы агентов. Набор и доступ зависят от подписки пользователя.
+      </p>
+      <div id="agents-menu" class="agents-menu"></div>
+    </section>
 
-    <pre>import os
-import json
-from datetime import datetime
-from fpdf import FPDF
+    <!-- Ссылки на дополнительные страницы / документацию -->
+    <footer>
+      <p>
+        Подробности по геодезии и 3D-набору см. на странице:<br />
+        <a href="docs/geodesy.html">Geodesy &amp; 3D Suite (WebKurierDroneHybrid)</a>
+      </p>
+      <p>© WebKurier, произведено в Германии.</p>
+    </footer>
+  </main>
 
-# Базовые пути внутри WebKurierDroneHybrid
-BASE_DIR   = os.path.dirname(__file__)
-ROOT_DIR   = os.path.abspath(os.path.join(BASE_DIR, "..", ".."))
-DATA_DIR   = os.path.join(ROOT_DIR, "logs", "reports")
-OUTPUT_DIR = os.path.join(ROOT_DIR, "logs", "generated")
-FONT_DIR   = os.path.join(ROOT_DIR, "fonts")  # DejaVuSans / DejaVuSans-Bold
+  <!-- Логика темы и прелоадера -->
+  <script>
+    (function() {
+      const STORAGE_KEY = 'webkurier_theme';
+      const body = document.body;
+      const btn = document.getElementById('toggle-theme-btn');
 
-class GeoReport:
-    def __init__(self, mission_name: str):
-        self.mission_name = mission_name
-        self.date = datetime.now().strftime("%Y-%m-%d %H:%M")
-        self.report: dict = {}
+      function applyTheme(theme) {
+        if (theme === 'dark') {
+          body.classList.add('dark-theme');
+        } else {
+          body.classList.remove('dark-theme');
+        }
+      }
 
-    def load_data(self) -> None:
-        """Загружаем JSON с результатами обработки миссии."""
-        file_path = os.path.join(DATA_DIR, f"{self.mission_name}.json")
-        if not os.path.exists(file_path):
-            raise FileNotFoundError(f"Нет данных для отчёта: {file_path}")
-        with open(file_path, "r", encoding="utf-8") as f:
-            self.report = json.load(f)
+      // Загрузка темы из localStorage
+      const saved = localStorage.getItem(STORAGE_KEY) || 'light';
+      applyTheme(saved);
 
-    def _init_pdf(self) -> FPDF:
-        """Настраиваем PDF c Unicode-шрифтами (DejaVuSans)."""
-        pdf = FPDF()
-        pdf.add_page()
+      if (btn) {
+        btn.addEventListener('click', () => {
+          const current = body.classList.contains('dark-theme') ? 'dark' : 'light';
+          const next = current === 'dark' ? 'light' : 'dark';
+          applyTheme(next);
+          localStorage.setItem(STORAGE_KEY, next);
+        });
+      }
 
-        # Unicode-шрифты (обязательно добавить ttf в папку fonts/)
-        pdf.add_font("DejaVu", "", os.path.join(FONT_DIR, "DejaVuSans.ttf"), uni=True)
-        pdf.add_font("DejaVu", "B", os.path.join(FONT_DIR, "DejaVuSans-Bold.ttf"), uni=True)
+      // Прелоадер
+      window.addEventListener('load', () => {
+        const preloader = document.getElementById('preloader');
+        if (preloader) {
+          preloader.style.opacity = '0';
+          setTimeout(() => preloader.style.display = 'none', 500);
+        }
+      });
+    })();
+  </script>
 
-        pdf.set_auto_page_break(auto=True, margin=15)
-        return pdf
+  <!-- Локальная логика WebCoin-кошелька -->
+  <script>
+    (function() {
+      const STORAGE_KEY = 'webcoin_balance';
+      const display = document.getElementById('balance-display');
 
-    def generate_pdf(self) -> str:
-        """Формируем PDF-отчёт и возвращаем путь к файлу."""
-        pdf = self._init_pdf()
+      function syncDisplay(balance) {
+        if (display) {
+          display.textContent = balance + ' WEB';
+        }
+      }
 
-        # Заголовок
-        pdf.set_font("DejaVu", "B", 16)
-        pdf.cell(0, 10, f"📍 Геоотчёт: {self.mission_name}", ln=True)
+      function getBalance() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const value = raw ? parseInt(raw, 10) : 0;
+        return isNaN(value) ? 0 : value;
+      }
 
-        pdf.set_font("DejaVu", "", 11)
-        pdf.cell(0, 8, f"Дата генерации: {self.date}", ln=True)
-        pdf.ln(4)
+      function setBalance(value) {
+        const fixed = value < 0 ? 0 : value;
+        localStorage.setItem(STORAGE_KEY, String(fixed));
+        syncDisplay(fixed);
+      }
 
-        # Содержимое
-        for key, value in self.report.items():
-            if isinstance(value, dict):
-                pdf.set_font("DejaVu", "B", 12)
-                pdf.cell(0, 8, f"▌ {key}", ln=True)
-                pdf.set_font("DejaVu", "", 11)
-                for subkey, subvalue in value.items():
-                    pdf.multi_cell(0, 6, f" • {subkey}: {subvalue}")
-            else:
-                pdf.multi_cell(0, 6, f"{key}: {value}")
-            pdf.ln(1)
+      // Экспортируем в глобальную область для кнопок
+      window.addCoins = function(amount) {
+        const current = getBalance();
+        setBalance(current + (amount || 0));
+      };
 
-        # Сохранение
-        os.makedirs(OUTPUT_DIR, exist_ok=True)
-        output_path = os.path.join(OUTPUT_DIR, f"{self.mission_name}_report.pdf")
-        pdf.output(output_path)
-        return output_path
+      window.resetCoins = function() {
+        setBalance(0);
+      };
 
-if __name__ == "__main__":
-    report = GeoReport("test_mission_01")
-    report.load_data()
-    path = report.generate_pdf()
-    print(f"✅ Отчёт сохранён: {path}")</pre>
+      // Инициализация
+      setBalance(getBalance());
+    })();
+  </script>
 
-    <div class="note">
-      Важно: для корректного отображения русского и английского текстов
-      в PDF используем шрифты <code>DejaVuSans</code> и
-      <code>DejaVuSans-Bold</code> (Unicode).
-    </div>
-  </section>
+  <!-- Логика терминала -->
+  <script>
+    (function() {
+      const term = document.getElementById('terminal');
+      const input = document.getElementById('terminal-input');
 
-  <!-- Пример JSON (RU) -->
-  <section class="card">
-    <h2>📂 Пример входного JSON-файла миссии</h2>
-    <pre>{
-  "Участок": "Полевой массив 3A",
-  "GSD": "3.5 см/пиксель",
-  "Высота полета": "120 м",
-  "Камера": "Sony RX1RM2",
-  "Количество снимков": 198,
-  "Размер области": "12.5 га",
-  "Перекрытие": {
-    "Продольное": "80%",
-    "Поперечное": "70%"
-  },
-  "Результаты": {
-    "Ортофотоплан": "Сформирован",
-    "ЦМР": "Готова",
-    "3D-сцена": "Экспортирована в OBJ"
-  }
-}</pre>
-  </section>
+      function println(text) {
+        if (!term) return;
+        term.textContent += text + '\\n';
+        term.scrollTop = term.scrollHeight;
+      }
 
-  <!-- Структура папок (новая архитектура) -->
-  <section class="card">
-    <h2>📂 Структура папок (Geodesy & 3D Suite)</h2>
-    <p>Выдержка из общей структуры 10 репозиториев — только блок геодезии:</p>
+      function handleCommand(cmd) {
+        const trimmed = cmd.trim();
+        if (!trimmed) return;
 
-    <pre>WebKurierDroneHybrid/
-├── engine/
-│   ├── geodesy_suite/
-│   │   ├── report/
-│   │   │   └── report_generator.py      ← генерация PDF-отчётов
-│   │   ├── processing/
-│   │   │   ├── odm_pipeline.py          ← фотограмметрия (ODM/Pix4D/Meshroom)
-│   │   │   ├── dsm_dtm_builder.py       ← построение DSM/DTM
-│   │   │   └── ndvi_ndre_analyzer.py    ← NDVI/NDRE, классификация
-│   │   ├── ui/
-│   │   │   ├── geodesy_api.py           ← API для WebKurierCore/WebKurierSite
-│   │   │   └── telegram_bot_hooks.py    ← команды /цены, /отчёт, /миссия
-│   │   └── config/
-│   │       └── geodesy_config.json      ← настройки GSD, перекрытия, камер
-│   │
-│   ├── logs/
-│   │   ├── reports/                     ← входные JSON-данные миссий
-│   │   ├── generated/                   ← готовые PDF, GeoTIFF, модели
-│   │   └── telemetry/                   ← телеметрия полётов
-│   │
-│   └── prompts/
-│       ├── geodesy.prompt.json          ← промпты геодезиста
-│       └── report.prompt.json           ← шаблоны текстов отчётов
-│
-├── data/
-│   ├── pricing/
-│   │   └── drone_prices.csv             ← прайс на 1 км² (эта таблица)
-│   └── cameras.json                     ← камеры, GSD, параметры
-└── docs/
-    └── index.html                       ← <== этот файл (RU + EN документация)</pre>
+        println('> ' + trimmed);
 
-    <div class="note">
-      WebKurierCore и WebKurierSite обращаются к этому модулю через API,
-      но весь расчёт геодезии и 3D-моделей живёт в репозитории
-      <code>WebKurierDroneHybrid</code>.
-    </div>
-  </section>
+        const [base, ...args] = trimmed.split(/\s+/);
 
-  <!-- Разделитель RU/EN -->
-  <section style="margin-top: 40px; text-align: center; color: var(--muted);">
-    — — — — — — — — — — — — — — — — — — — — — — — —<br/>
-    Ниже — полная английская версия того же документа (для README/доков).
-  </section>
+        switch (base.toLowerCase()) {
+          case 'help':
+            println('Доступные команды:');
+            println('  help        — показать это сообщение');
+            println('  ping        — проверка соединения');
+            println('  balance     — показать баланс WebCoin');
+            println('  /add N      — добавить N WEB');
+            println('');
+            break;
 
-  <!-- ========================================================= -->
-  <!-- 🇬🇧 ENGLISH VERSION                                       -->
-  <!-- ========================================================= -->
-  <section class="card" style="margin-top: 32px;">
-    <div class="pill">WebKurierDroneHybrid · Geodesy & 3D Suite</div>
-    <h1>Geodesy Packages & PDF Report Generator</h1>
-    <p class="tagline">
-      This document describes 1 km² mapping packages, a Python-based PDF report
-      generator and the folder layout for the new 10-repo WebKurier architecture
-      (Hybrid, Core, DroneHybrid, Chain, Security, PhoneCore, iOS, Android, Site, reserved).
-    </p>
-  </section>
+          case 'ping':
+            println('pong');
+            println('');
+            break;
 
-  <section class="card">
-    <h2>📊 Drone Mapping Packages (1 km²)</h2>
-    <p>Standard service levels for <code>WebKurierDroneHybrid</code>:</p>
+          case 'balance':
+            if (typeof localStorage !== 'undefined') {
+              const raw = localStorage.getItem('webcoin_balance');
+              const val = raw ? parseInt(raw, 10) : 0;
+              println('Текущий баланс: ' + (isNaN(val) ? 0 : val) + ' WEB');
+            } else {
+              println('Хранилище недоступно.');
+            }
+            println('');
+            break;
 
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Package</th>
-          <th>Description</th>
-          <th>Price</th>
-          <th>Delivery</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1</td>
-          <td><b>Base Map</b></td>
-          <td>Orthophoto (GeoTIFF/JPG), alignment, basic photogrammetry, PDF site map.</td>
-          <td class="price">390 €</td>
-          <td>1–2 days</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td><b>3D Terrain</b></td>
-          <td>DSM/DTM, point cloud, 3D model (OBJ/PLY/LAS), elevation analysis.</td>
-          <td class="price">790 €</td>
-          <td>2–3 days</td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td><b>GeoAnalysis</b></td>
-          <td>NDVI/NDRE, land-use classification, object contours, extended PDF report.</td>
-          <td class="price">1290 €</td>
-          <td>3–5 days</td>
-        </tr>
-      </tbody>
-    </table>
+          case '/add':
+            if (args.length === 0) {
+              println('Использование: /add N   (пример: /add 10)');
+            } else {
+              const n = parseInt(args[0], 10);
+              if (isNaN(n)) {
+                println('Ошибка: N должно быть числом.');
+              } else if (typeof window.addCoins === 'function') {
+                window.addCoins(n);
+                println('Добавлено: ' + n + ' WEB');
+              } else {
+                println('Функция addCoins недоступна.');
+              }
+            }
+            println('');
+            break;
 
-    <div class="note">
-      Price list is stored in<br/>
-      <code>WebKurierDroneHybrid/data/pricing/drone_prices.csv</code><br/>
-      and can be consumed by WebKurierSite and the Telegram geodesy bot.
-    </div>
-  </section>
+          default:
+            println('Неизвестная команда: ' + base);
+            println("Наберите 'help' для списка команд.");
+            println('');
+        }
+      }
 
-  <section class="card">
-    <h2>🐍 Python PDF Report Generator</h2>
-    <p>
-      Script location in <code>WebKurierDroneHybrid</code>:<br/>
-      <code>engine/geodesy_suite/report/report_generator.py</code>
-    </p>
-    <p>
-      The code is identical to the Russian block above (Unicode-enabled FPDF
-      with <code>DejaVuSans</code> / <code>DejaVuSans-Bold</code>), so it is
-      not duplicated here to keep the file compact.
-    </p>
-  </section>
+      if (term) {
+        println('WebKurierCore Terminal');
+        println('Введите "help" для списка команд.');
+        println('');
+      }
 
-  <section class="card">
-    <h2>📂 Example Mission JSON</h2>
-    <pre>{
-  "Area": "Field 3A",
-  "GSD": "3.5 cm/px",
-  "Flight altitude": "120 m",
-  "Camera": "Sony RX1RM2",
-  "Image count": 198,
-  "Area size": "12.5 ha",
-  "Overlap": {
-    "Forward": "80%",
-    "Side": "70%"
-  },
-  "Results": {
-    "Orthophoto": "Generated",
-    "DTM": "Ready",
-    "3D scene": "Exported as OBJ"
-  }
-}</pre>
-  </section>
+      if (input) {
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const value = input.value;
+            input.value = '';
+            handleCommand(value);
+          }
+        });
+      }
+    })();
+  </script>
 
-  <section class="card">
-    <h2>📂 Folder Layout (Geodesy Block)</h2>
-    <p>
-      Same structure as above, presented in English for documentation / README usage.
-    </p>
-    <pre>WebKurierDroneHybrid/
-├── engine/
-│   ├── geodesy_suite/
-│   │   ├── report/                # PDF report generator
-│   │   ├── processing/            # ODM / DSM / NDVI pipeline
-│   │   ├── ui/                    # API + bot hooks
-│   │   └── config/                # Geodesy configuration
-│   ├── logs/
-│   └── prompts/
-├── data/
-│   └── pricing/drone_prices.csv   # 1 km² pricing table
-└── docs/index.html                # this bilingual page</pre>
-  </section>
-
-</main>
-
-<!-- Подключение логики меню агентов -->
-<script src="engine/ui/agents-menu.js"></script>
+  <!-- Меню агентов (динамическая загрузка agents_map.json) -->
+  <script src="engine/ui/agents-menu.js"></script>
 
 </body>
 </html>
