@@ -1,0 +1,8 @@
+{
+  "id": "dev-team-panel",
+  "title": { "ru": "Панель Dev Team", "en": "Dev Team Panel" },
+  "icon": "🛠",
+  "route": "engine/agents/dev-team/dev-team-core.html",
+  "tags": ["team", "build"],
+  "enabled": true
+}
