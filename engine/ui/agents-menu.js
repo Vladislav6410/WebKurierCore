@@ -1,167 +1,276 @@
-// engine/ui/agents-menu.js
+{
+  "version": "1.0",
+  "updated_at": "2025-11-23",
 
-(function () {
-  const CONFIG_PATH = "engine/config/agents_map.json";
+  "groups": [
 
-  function getLang() {
-    try {
-      const url = new URL(window.location.href);
-      const lang = url.searchParams.get("lang");
-      if (lang === "en" || lang === "ru") return lang;
-    } catch (e) {
-      // ignore
+    {
+      "id": "geo_drone",
+      "title": { "ru": "Дроны и геодезия", "en": "Drones & Geodesy" },
+      "icon": "🛰",
+      "access": "pro",
+
+      "agents": [
+        {
+          "id": "geodesy",
+          "title": { "ru": "Геодезист", "en": "Geodesy Agent" },
+          "icon": "📐",
+          "route": "engine/agents/geodesy/geodesy-core.html",
+          "tags": ["mapping", "reports", "gsd"],
+          "enabled": true
+        },
+        {
+          "id": "drone",
+          "title": { "ru": "Дрон-оператор", "en": "Drone Operator" },
+          "icon": "🚁",
+          "route": "engine/agents/drone/drone-core.html",
+          "tags": ["missions", "telemetry"],
+          "enabled": true
+        },
+        {
+          "id": "autopilot",
+          "title": { "ru": "Автопилот", "en": "Autopilot Agent" },
+          "icon": "🤖",
+          "route": "engine/agents/autopilot/autopilot-core.html",
+          "tags": ["px4", "mavlink", "routes"],
+          "enabled": true
+        },
+        {
+          "id": "pilot",
+          "title": { "ru": "Пилот", "en": "Pilot Agent" },
+          "icon": "🧑‍✈️",
+          "route": "engine/agents/pilot/pilot-core.html",
+          "tags": ["manual", "training"],
+          "enabled": true
+        },
+        {
+          "id": "geoviz3d",
+          "title": { "ru": "GeoViz3D", "en": "GeoViz3D" },
+          "icon": "🌍",
+          "route": "engine/agents/geoviz3d/geoviz3d-core.html",
+          "tags": ["3d", "visualization"],
+          "enabled": true
+        },
+        {
+          "id": "pv-planner",
+          "title": { "ru": "PV Planner", "en": "PV Planner" },
+          "icon": "🔆",
+          "route": "engine/agents/pv-planner/pv-planner-core.html",
+          "tags": ["solar", "energy"],
+          "enabled": true
+        },
+        {
+          "id": "geo-report",
+          "title": { "ru": "GeoReports", "en": "Geo Reports" },
+          "icon": "📄",
+          "route": "engine/agents/geo-report/geo-report-core.html",
+          "tags": ["pdf", "reports"],
+          "enabled": true
+        }
+      ]
+    },
+
+    {
+      "id": "language",
+      "title": { "ru": "Языки и связь", "en": "Languages & Communication" },
+      "icon": "🌐",
+      "access": "base",
+
+      "agents": [
+        {
+          "id": "translator",
+          "title": { "ru": "Переводчик", "en": "Translator" },
+          "icon": "🗣",
+          "route": "engine/agents/translator/translator-core.html",
+          "tags": ["text", "voice", "files"],
+          "enabled": true
+        },
+        {
+          "id": "voice",
+          "title": { "ru": "Голосовой агент", "en": "Voice Agent" },
+          "icon": "🎤",
+          "route": "engine/agents/voice/voice-core.html",
+          "tags": ["tts", "stt"],
+          "enabled": true
+        },
+        {
+          "id": "lessons",
+          "title": { "ru": "Уроки A1–C1", "en": "Lessons A1–C1" },
+          "icon": "📚",
+          "route": "engine/agents/lessons/lessons-core.html",
+          "tags": ["courses", "german"],
+          "enabled": true
+        }
+      ]
+    },
+
+    {
+      "id": "finance",
+      "title": { "ru": "Финансы", "en": "Finance" },
+      "icon": "💶",
+      "access": "pro",
+
+      "agents": [
+        {
+          "id": "wallet",
+          "title": { "ru": "WebCoin Кошелёк", "en": "WebCoin Wallet" },
+          "icon": "🪙",
+          "route": "engine/agents/wallet/wallet-core.html",
+          "tags": ["webcoin", "rewards"],
+          "enabled": true
+        },
+        {
+          "id": "accountant",
+          "title": { "ru": "Бухгалтер", "en": "Accountant" },
+          "icon": "📊",
+          "route": "engine/agents/accountant/accountant-core.html",
+          "tags": ["tax", "reports"],
+          "enabled": true
+        },
+        {
+          "id": "tax-return",
+          "title": { "ru": "Налоговая декларация", "en": "Tax Return" },
+          "icon": "🧾",
+          "route": "engine/agents/tax-return/tax-return-core.html",
+          "tags": ["germany", "poland"],
+          "enabled": true
+        }
+      ]
+    },
+
+    {
+      "id": "business",
+      "title": { "ru": "Бизнес", "en": "Business" },
+      "icon": "🏢",
+      "access": "pro",
+
+      "agents": [
+        {
+          "id": "hr",
+          "title": { "ru": "HR Агент", "en": "HR Agent" },
+          "icon": "🧑‍💼",
+          "route": "engine/agents/hr/hr-core.html",
+          "tags": ["hiring"],
+          "enabled": true
+        },
+        {
+          "id": "marketing",
+          "title": { "ru": "Маркетолог", "en": "Marketing" },
+          "icon": "📢",
+          "route": "engine/agents/marketing/marketing-core.html",
+          "tags": ["ads", "campaigns"],
+          "enabled": true
+        },
+        {
+          "id": "romantic",
+          "title": { "ru": "Романтик", "en": "Romantic" },
+          "icon": "💌",
+          "route": "engine/agents/romantic/romantic-core.html",
+          "tags": ["texts"],
+          "enabled": false
+        }
+      ]
+    },
+
+    {
+      "id": "security_system",
+      "title": { "ru": "Безопасность", "en": "Security" },
+      "icon": "🛡",
+      "access": "admin",
+
+      "agents": [
+        {
+          "id": "security",
+          "title": { "ru": "SecurityAgent", "en": "Security Agent" },
+          "icon": "🛡️",
+          "route": "engine/agents/security/security-core.html",
+          "tags": ["scan", "antivirus"],
+          "enabled": true
+        },
+        {
+          "id": "legal",
+          "title": { "ru": "Юрист", "en": "Legal Agent" },
+          "icon": "⚖️",
+          "route": "engine/agents/legal/legal-core.html",
+          "tags": ["docs"],
+          "enabled": true
+        },
+        {
+          "id": "memory",
+          "title": { "ru": "MemoryAgent", "en": "Memory Agent" },
+          "icon": "🧬",
+          "route": "engine/agents/memory/memory-core.html",
+          "tags": ["storage"],
+          "enabled": true
+        },
+        {
+          "id": "admin-terminal",
+          "title": { "ru": "Админ-консоль", "en": "Admin Terminal" },
+          "icon": "⌨️",
+          "route": "admin/terminal.html",
+          "tags": ["root"],
+          "enabled": true
+        }
+      ]
+    },
+
+    {
+      "id": "dev_team",
+      "title": { "ru": "Команда разработки", "en": "Dev & Build Team" },
+      "icon": "🛠",
+      "access": "pro",
+
+      "agents": [
+        {
+          "id": "master",
+          "title": { "ru": "MasterAgent", "en": "Master Agent" },
+          "icon": "🧭",
+          "route": "engine/agents/master/master-core.html",
+          "tags": ["manager", "orchestrator"],
+          "enabled": true
+        },
+        {
+          "id": "engineer",
+          "title": { "ru": "Инженер", "en": "Engineer Agent" },
+          "icon": "🧠",
+          "route": "engine/agents/engineer/engineer-core.html",
+          "tags": ["structure", "files", "config"],
+          "enabled": true
+        },
+        {
+          "id": "programmer",
+          "title": { "ru": "Программист", "en": "Programmer" },
+          "icon": "💻",
+          "route": "engine/agents/programmer/programmer-core.html",
+          "tags": ["code", "fix", "modules"],
+          "enabled": true
+        },
+        {
+          "id": "designer",
+          "title": { "ru": "Верстальщик", "en": "Designer" },
+          "icon": "🎨",
+          "route": "engine/agents/designer/designer-core.html",
+          "tags": ["html", "css", "ui"],
+          "enabled": true
+        },
+        {
+          "id": "tools",
+          "title": { "ru": "Tools Panel", "en": "Tools Panel" },
+          "icon": "🧰",
+          "route": "engine/agents/tools/tools-core.html",
+          "tags": ["templates", "zip-export"],
+          "enabled": true
+        },
+        {
+          "id": "editor",
+          "title": { "ru": "Редактор", "en": "Editor" },
+          "icon": "✍️",
+          "route": "engine/agents/editor/editor-core.html",
+          "tags": ["docs", "readme"],
+          "enabled": true
+        }
+      ]
     }
-    return "ru";
-  }
 
-  function getAccessLabel(access, lang) {
-    const map = {
-      ru: {
-        base: "Базовый доступ",
-        pro: "Pro доступ",
-        admin: "Только админ"
-      },
-      en: {
-        base: "Base access",
-        pro: "Pro access",
-        admin: "Admin only"
-      }
-    };
-    const dict = map[lang] || map["ru"];
-    return dict[access] || access;
-  }
-
-  function translateTitle(titleObj, lang) {
-    if (!titleObj) return "";
-    if (titleObj[lang]) return titleObj[lang];
-    return titleObj["ru"] || titleObj["en"] || "";
-  }
-
-  function buildAgentsMenu(config) {
-    const lang = getLang();
-    const menuRoot = document.getElementById("agents-menu");
-    const titleEl = document.getElementById("agents-title");
-
-    if (!menuRoot) {
-      console.warn("agents-menu.js: #agents-menu not found on this page.");
-      return;
-    }
-
-    // Обновим заголовок при желании
-    if (titleEl) {
-      titleEl.textContent =
-        lang === "en" ? "WebKurier Agents" : "Агенты WebKurier";
-    }
-
-    menuRoot.innerHTML = "";
-
-    if (!config || !Array.isArray(config.groups)) {
-      menuRoot.textContent =
-        lang === "en"
-          ? "No agent groups defined."
-          : "Группы агентов не найдены.";
-      return;
-    }
-
-    config.groups.forEach((group) => {
-      const card = document.createElement("div");
-      card.className = "agent-group-card";
-
-      // Header
-      const header = document.createElement("div");
-      header.className = "agent-group-header";
-
-      const titleWrap = document.createElement("div");
-      const iconSpan = document.createElement("span");
-      iconSpan.className = "agent-group-icon";
-      iconSpan.textContent = group.icon || "•";
-
-      const titleSpan = document.createElement("span");
-      titleSpan.className = "agent-group-title";
-      titleSpan.textContent = translateTitle(group.title, lang) || group.id;
-
-      titleWrap.appendChild(iconSpan);
-      titleWrap.appendChild(titleSpan);
-
-      const accessSpan = document.createElement("span");
-      accessSpan.className = "agent-access-badge";
-      accessSpan.textContent = getAccessLabel(group.access || "base", lang);
-
-      header.appendChild(titleWrap);
-      header.appendChild(accessSpan);
-      card.appendChild(header);
-
-      // Agents
-      const agentsWrap = document.createElement("div");
-      agentsWrap.className = "agent-group-agents";
-
-      if (Array.isArray(group.agents)) {
-        group.agents.forEach((agent) => {
-          const chip = document.createElement("div");
-          chip.className = "agent-chip";
-
-          if (!agent.enabled) {
-            chip.classList.add("disabled");
-          }
-
-          chip.innerHTML =
-            (agent.icon ? agent.icon + " " : "") +
-            (translateTitle(agent.title, lang) || agent.id);
-
-          if (agent.enabled && agent.route) {
-            chip.addEventListener("click", () => {
-              try {
-                const url = new URL(window.location.href);
-                const langParam = url.searchParams.get("lang");
-                let target = agent.route;
-                if (langParam) {
-                  // сохраняем ?lang=...
-                  const sep = target.includes("?") ? "&" : "?";
-                  target = target + sep + "lang=" + encodeURIComponent(langParam);
-                }
-                window.location.href = target;
-              } catch (e) {
-                // запасной вариант
-                window.location.href = agent.route;
-              }
-            });
-          }
-
-          agentsWrap.appendChild(chip);
-        });
-      }
-
-      card.appendChild(agentsWrap);
-      menuRoot.appendChild(card);
-    });
-  }
-
-  async function loadConfigAndBuild() {
-    const menuRoot = document.getElementById("agents-menu");
-    const lang = getLang();
-
-    if (!menuRoot) return;
-
-    menuRoot.textContent =
-      lang === "en" ? "Loading agents..." : "Загрузка агентов...";
-
-    try {
-      const res = await fetch(CONFIG_PATH, {
-        cache: "no-store"
-      });
-      if (!res.ok) {
-        throw new Error("HTTP " + res.status);
-      }
-      const json = await res.json();
-      buildAgentsMenu(json);
-    } catch (err) {
-      console.error("agents-menu.js: failed to load config:", err);
-      menuRoot.textContent =
-        lang === "en"
-          ? "Failed to load agents_map.json."
-          : "Не удалось загрузить agents_map.json.";
-    }
-  }
-
-  document.addEventListener("DOMContentLoaded", loadConfigAndBuild);
-})();
+  ]
+}
