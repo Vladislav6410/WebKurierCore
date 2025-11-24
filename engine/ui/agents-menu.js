@@ -1,276 +1,135 @@
-{
-  "version": "1.0",
-  "updated_at": "2025-11-23",
+// engine/ui/agents-menu.js
+// Строит плитки агентов по конфигу engine/config/agents_map.json
 
-  "groups": [
+(function () {
+  const CONFIG_URL = "engine/config/agents_map.json";
 
-    {
-      "id": "geo_drone",
-      "title": { "ru": "Дроны и геодезия", "en": "Drones & Geodesy" },
-      "icon": "🛰",
-      "access": "pro",
+  const container = document.getElementById("agents-menu");
+  const titleEl = document.getElementById("agents-title");
+  if (!container) {
+    console.warn("[agents-menu] #agents-menu not found");
+    return;
+  }
 
-      "agents": [
-        {
-          "id": "geodesy",
-          "title": { "ru": "Геодезист", "en": "Geodesy Agent" },
-          "icon": "📐",
-          "route": "engine/agents/geodesy/geodesy-core.html",
-          "tags": ["mapping", "reports", "gsd"],
-          "enabled": true
-        },
-        {
-          "id": "drone",
-          "title": { "ru": "Дрон-оператор", "en": "Drone Operator" },
-          "icon": "🚁",
-          "route": "engine/agents/drone/drone-core.html",
-          "tags": ["missions", "telemetry"],
-          "enabled": true
-        },
-        {
-          "id": "autopilot",
-          "title": { "ru": "Автопилот", "en": "Autopilot Agent" },
-          "icon": "🤖",
-          "route": "engine/agents/autopilot/autopilot-core.html",
-          "tags": ["px4", "mavlink", "routes"],
-          "enabled": true
-        },
-        {
-          "id": "pilot",
-          "title": { "ru": "Пилот", "en": "Pilot Agent" },
-          "icon": "🧑‍✈️",
-          "route": "engine/agents/pilot/pilot-core.html",
-          "tags": ["manual", "training"],
-          "enabled": true
-        },
-        {
-          "id": "geoviz3d",
-          "title": { "ru": "GeoViz3D", "en": "GeoViz3D" },
-          "icon": "🌍",
-          "route": "engine/agents/geoviz3d/geoviz3d-core.html",
-          "tags": ["3d", "visualization"],
-          "enabled": true
-        },
-        {
-          "id": "pv-planner",
-          "title": { "ru": "PV Planner", "en": "PV Planner" },
-          "icon": "🔆",
-          "route": "engine/agents/pv-planner/pv-planner-core.html",
-          "tags": ["solar", "energy"],
-          "enabled": true
-        },
-        {
-          "id": "geo-report",
-          "title": { "ru": "GeoReports", "en": "Geo Reports" },
-          "icon": "📄",
-          "route": "engine/agents/geo-report/geo-report-core.html",
-          "tags": ["pdf", "reports"],
-          "enabled": true
-        }
-      ]
-    },
+  // Определяем язык интерфейса
+  const htmlLang = (document.documentElement.lang || "ru").toLowerCase();
+  const LANG = htmlLang.startsWith("ru") ? "ru" : "en";
 
-    {
-      "id": "language",
-      "title": { "ru": "Языки и связь", "en": "Languages & Communication" },
-      "icon": "🌐",
-      "access": "base",
+  // Подписи для бейджа доступа
+  const ACCESS_LABELS = {
+    base: { ru: "Базовый доступ", en: "Base access" },
+    pro: { ru: "Pro доступ", en: "Pro access" },
+    admin: { ru: "Админ", en: "Admin" }
+  };
 
-      "agents": [
-        {
-          "id": "translator",
-          "title": { "ru": "Переводчик", "en": "Translator" },
-          "icon": "🗣",
-          "route": "engine/agents/translator/translator-core.html",
-          "tags": ["text", "voice", "files"],
-          "enabled": true
-        },
-        {
-          "id": "voice",
-          "title": { "ru": "Голосовой агент", "en": "Voice Agent" },
-          "icon": "🎤",
-          "route": "engine/agents/voice/voice-core.html",
-          "tags": ["tts", "stt"],
-          "enabled": true
-        },
-        {
-          "id": "lessons",
-          "title": { "ru": "Уроки A1–C1", "en": "Lessons A1–C1" },
-          "icon": "📚",
-          "route": "engine/agents/lessons/lessons-core.html",
-          "tags": ["courses", "german"],
-          "enabled": true
-        }
-      ]
-    },
+  // Обновим заголовок секции, если есть
+  if (titleEl) {
+    titleEl.textContent =
+      LANG === "ru" ? "Агенты WebKurier" : "WebKurier Agents";
+  }
 
-    {
-      "id": "finance",
-      "title": { "ru": "Финансы", "en": "Finance" },
-      "icon": "💶",
-      "access": "pro",
+  async function loadConfig() {
+    try {
+      const res = await fetch(CONFIG_URL, { cache: "no-cache" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+      renderAgents(data);
+    } catch (err) {
+      console.error("[agents-menu] config load error:", err);
+      container.innerHTML =
+        LANG === "ru"
+          ? "Ошибка загрузки списка агентов."
+          : "Failed to load agents configuration.";
+    }
+  }
 
-      "agents": [
-        {
-          "id": "wallet",
-          "title": { "ru": "WebCoin Кошелёк", "en": "WebCoin Wallet" },
-          "icon": "🪙",
-          "route": "engine/agents/wallet/wallet-core.html",
-          "tags": ["webcoin", "rewards"],
-          "enabled": true
-        },
-        {
-          "id": "accountant",
-          "title": { "ru": "Бухгалтер", "en": "Accountant" },
-          "icon": "📊",
-          "route": "engine/agents/accountant/accountant-core.html",
-          "tags": ["tax", "reports"],
-          "enabled": true
-        },
-        {
-          "id": "tax-return",
-          "title": { "ru": "Налоговая декларация", "en": "Tax Return" },
-          "icon": "🧾",
-          "route": "engine/agents/tax-return/tax-return-core.html",
-          "tags": ["germany", "poland"],
-          "enabled": true
-        }
-      ]
-    },
+  function renderAgents(cfg) {
+    container.innerHTML = "";
 
-    {
-      "id": "business",
-      "title": { "ru": "Бизнес", "en": "Business" },
-      "icon": "🏢",
-      "access": "pro",
-
-      "agents": [
-        {
-          "id": "hr",
-          "title": { "ru": "HR Агент", "en": "HR Agent" },
-          "icon": "🧑‍💼",
-          "route": "engine/agents/hr/hr-core.html",
-          "tags": ["hiring"],
-          "enabled": true
-        },
-        {
-          "id": "marketing",
-          "title": { "ru": "Маркетолог", "en": "Marketing" },
-          "icon": "📢",
-          "route": "engine/agents/marketing/marketing-core.html",
-          "tags": ["ads", "campaigns"],
-          "enabled": true
-        },
-        {
-          "id": "romantic",
-          "title": { "ru": "Романтик", "en": "Romantic" },
-          "icon": "💌",
-          "route": "engine/agents/romantic/romantic-core.html",
-          "tags": ["texts"],
-          "enabled": false
-        }
-      ]
-    },
-
-    {
-      "id": "security_system",
-      "title": { "ru": "Безопасность", "en": "Security" },
-      "icon": "🛡",
-      "access": "admin",
-
-      "agents": [
-        {
-          "id": "security",
-          "title": { "ru": "SecurityAgent", "en": "Security Agent" },
-          "icon": "🛡️",
-          "route": "engine/agents/security/security-core.html",
-          "tags": ["scan", "antivirus"],
-          "enabled": true
-        },
-        {
-          "id": "legal",
-          "title": { "ru": "Юрист", "en": "Legal Agent" },
-          "icon": "⚖️",
-          "route": "engine/agents/legal/legal-core.html",
-          "tags": ["docs"],
-          "enabled": true
-        },
-        {
-          "id": "memory",
-          "title": { "ru": "MemoryAgent", "en": "Memory Agent" },
-          "icon": "🧬",
-          "route": "engine/agents/memory/memory-core.html",
-          "tags": ["storage"],
-          "enabled": true
-        },
-        {
-          "id": "admin-terminal",
-          "title": { "ru": "Админ-консоль", "en": "Admin Terminal" },
-          "icon": "⌨️",
-          "route": "admin/terminal.html",
-          "tags": ["root"],
-          "enabled": true
-        }
-      ]
-    },
-
-    {
-      "id": "dev_team",
-      "title": { "ru": "Команда разработки", "en": "Dev & Build Team" },
-      "icon": "🛠",
-      "access": "pro",
-
-      "agents": [
-        {
-          "id": "master",
-          "title": { "ru": "MasterAgent", "en": "Master Agent" },
-          "icon": "🧭",
-          "route": "engine/agents/master/master-core.html",
-          "tags": ["manager", "orchestrator"],
-          "enabled": true
-        },
-        {
-          "id": "engineer",
-          "title": { "ru": "Инженер", "en": "Engineer Agent" },
-          "icon": "🧠",
-          "route": "engine/agents/engineer/engineer-core.html",
-          "tags": ["structure", "files", "config"],
-          "enabled": true
-        },
-        {
-          "id": "programmer",
-          "title": { "ru": "Программист", "en": "Programmer" },
-          "icon": "💻",
-          "route": "engine/agents/programmer/programmer-core.html",
-          "tags": ["code", "fix", "modules"],
-          "enabled": true
-        },
-        {
-          "id": "designer",
-          "title": { "ru": "Верстальщик", "en": "Designer" },
-          "icon": "🎨",
-          "route": "engine/agents/designer/designer-core.html",
-          "tags": ["html", "css", "ui"],
-          "enabled": true
-        },
-        {
-          "id": "tools",
-          "title": { "ru": "Tools Panel", "en": "Tools Panel" },
-          "icon": "🧰",
-          "route": "engine/agents/tools/tools-core.html",
-          "tags": ["templates", "zip-export"],
-          "enabled": true
-        },
-        {
-          "id": "editor",
-          "title": { "ru": "Редактор", "en": "Editor" },
-          "icon": "✍️",
-          "route": "engine/agents/editor/editor-core.html",
-          "tags": ["docs", "readme"],
-          "enabled": true
-        }
-      ]
+    if (!cfg || !Array.isArray(cfg.groups)) {
+      container.textContent =
+        LANG === "ru"
+          ? "Неверный формат конфигурации агентов."
+          : "Invalid agents configuration format.";
+      return;
     }
 
-  ]
-}
+    cfg.groups.forEach((group) => {
+      if (!group || !Array.isArray(group.agents)) return;
+
+      const card = document.createElement("div");
+      card.className = "agent-group-card";
+
+      // Заголовок группы
+      const header = document.createElement("div");
+      header.className = "agent-group-header";
+
+      const titleWrap = document.createElement("div");
+      const iconSpan = document.createElement("span");
+      iconSpan.className = "agent-group-icon";
+      iconSpan.textContent = group.icon || "•";
+
+      const titleSpan = document.createElement("span");
+      titleSpan.className = "agent-group-title";
+      const groupTitle = group.title && (group.title[LANG] || group.title["en"]);
+      titleSpan.textContent = groupTitle || group.id || "Group";
+
+      titleWrap.appendChild(iconSpan);
+      titleWrap.appendChild(titleSpan);
+
+      const badge = document.createElement("span");
+      badge.className = "agent-access-badge";
+
+      const access = group.access || "base";
+      const accessLabel =
+        ACCESS_LABELS[access] && (ACCESS_LABELS[access][LANG] || ACCESS_LABELS[access]["en"]);
+      badge.textContent = accessLabel || access;
+
+      header.appendChild(titleWrap);
+      header.appendChild(badge);
+
+      card.appendChild(header);
+
+      // Список агентов
+      const agentsWrap = document.createElement("div");
+      agentsWrap.className = "agent-group-agents";
+
+      group.agents.forEach((agent) => {
+        if (!agent || !agent.id) return;
+
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "agent-chip";
+
+        if (agent.icon) {
+          chip.textContent = agent.icon + " ";
+        } else {
+          chip.textContent = "";
+        }
+
+        const title =
+          agent.title && (agent.title[LANG] || agent.title["en"] || agent.title["ru"]);
+        chip.textContent += title || agent.id;
+
+        const enabled = agent.enabled !== false; // по умолчанию true
+        const route = agent.route || "#";
+
+        if (!enabled || route === "#") {
+          chip.classList.add("disabled");
+        } else {
+          chip.addEventListener("click", () => {
+            // навигация к HTML-ядру агента
+            window.location.href = route;
+          });
+        }
+
+        agentsWrap.appendChild(chip);
+      });
+
+      card.appendChild(agentsWrap);
+      container.appendChild(card);
+    });
+  }
+
+  loadConfig();
+})();
