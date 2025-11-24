@@ -1,299 +1,159 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" /><footer>
-  <p>
-    Подробности по геодезии и 3D-набору см. на странице:<br />
-    <a href="docs/geodesy.html">Geodesy &amp; 3D Suite (WebKurierDroneHybrid)</a>
-  </p>
-
-  <p style="margin-top:8px;">
-    <strong>Для администратора:</strong>
-    <a href="admin/terminal.html">Админ-консоль (терминал WebKurierCore)</a>
-  </p>
-
-  <p>© WebKurier, произведено в Германии.</p>
-</footer>
-  <title>WebKurierCore · Терминал, WebCoin и агенты</title>
+  <meta charset="UTF-8" />
+  <title>WebKurierCore · Портал агентов</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
     :root {
       --bg-light: #f4f4f4;
-      --bg-dark: #121212;
+      --bg-dark: #020617;
       --text-light: #1a1a1a;
-      --text-dark: #f4f4f4;
+      --text-dark: #e5e7eb;
       --link-light: #007acc;
-      --link-dark: #66ccff;
-      --accent-light: #007acc;
-      --accent-dark: #00bfff;
-      --btn-bg-light: #ffffff;
-      --btn-bg-dark: #1e1e1e;
-      --btn-border: #ccc;
-      --coin-bg: #3a3a3a;
+      --link-dark: #60a5fa;
+      --accent-light: #3b82f6;
+      --accent-dark: #2563eb;
+      --card-bg: #020617;
+      --card-border: #1f2937;
+      --btn-border: #374151;
     }
 
-    /* ---------------------- BODY / THEME ---------------------- */
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
       padding: 0;
-      font-family: 'Courier New', Courier, monospace;
-      background-color: var(--bg-light);
-      color: var(--text-light);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #111827 0, #020617 55%);
+      color: var(--text-dark);
       transition: background-color 0.3s, color 0.3s;
     }
 
-    body.dark-theme {
-      background-color: var(--bg-dark);
-      color: var(--text-dark);
-    }
-
-    main {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 20px 16px 40px;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    h1, h2, h3 {
-      text-align: center;
-      margin-top: 20px;
-      margin-bottom: 8px;
-    }
-
-    p.subtitle {
-      margin-top: 6px;
-      font-size: 0.95rem;
-      opacity: 0.8;
+    body.light-theme {
+      background: var(--bg-light);
+      color: var(--text-light);
     }
 
     a {
-      color: var(--link-light);
+      color: var(--link-dark);
       text-decoration: none;
     }
-    body.dark-theme a {
-      color: var(--link-dark);
+    body.light-theme a {
+      color: var(--link-light);
     }
 
-    /* ---------------------- BUTTONS ---------------------- */
-
-    button, .btn {
-      padding: 10px 20px;
-      margin: 10px;
-      font-size: 16px;
-      cursor: pointer;
-      border: 1px solid var(--btn-border);
-      background-color: var(--btn-bg-light);
-      color: var(--text-light);
-      transition: background-color 0.3s, color 0.3s;
-      border-radius: 5px;
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
     }
 
-    body.dark-theme button,
-    body.dark-theme .btn {
-      background-color: var(--btn-bg-dark);
-      color: var(--text-dark);
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
     }
 
-    /* ---------------------- CARDS / LAYOUT ---------------------- */
+    .title {
+      font-size: 2rem;
+      font-weight: 700;
+    }
 
-    .row {
+    .subtitle {
+      color: #9ca3af;
+      font-size: 0.95rem;
+      max-width: 720px;
+    }
+
+    .top-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-      align-items: flex-start;
+      gap: 10px;
       margin-top: 10px;
     }
 
-    .card {
-      border-radius: 10px;
-      border: 1px solid var(--btn-border);
-      padding: 16px 18px;
-      box-sizing: border-box;
-      background-color: rgba(255,255,255,0.8);
-    }
-
-    body.dark-theme .card {
-      background-color: rgba(0,0,0,0.4);
-    }
-
-    .card-half {
-      flex: 1 1 280px;
-      max-width: 460px;
-    }
-
-    /* ---------------------- WALLET ---------------------- */
-
-    .wallet {
-      margin-top: 10px;
-      padding: 16px;
-      border: 1px solid var(--btn-border);
-      border-radius: 8px;
-      background-color: rgba(255,255,255,0.05);
-      display: inline-block;
-    }
-    .wallet h2 {
-      margin-bottom: 10px;
-      text-align: left;
-    }
-    .wallet .balance-label {
+    .btn {
+      padding: 9px 14px;
       font-size: 0.9rem;
-      opacity: 0.8;
-      margin-bottom: 4px;
-    }
-    .wallet .balance {
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-    .wallet button {
-      font-weight: bold;
-      font-size: 14px;
-      margin: 4px 4px 0 0;
-    }
-
-    #balance-display {
-      font-size: 18px;
-      margin-top: 10px;
-      background-color: var(--coin-bg);
-      color: #fff;
-      padding: 8px 10px;
-      border-radius: 8px;
-      display: inline-block;
-    }
-
-    /* ---------------------- TERMINAL ---------------------- */
-
-    .terminal {
-      background-color: #000;
-      color: #00ff00;
-      font-family: 'Courier New', monospace;
-      padding: 16px;
-      margin-top: 10px;
-      min-height: 260px;
-      overflow-y: auto;
-      border-radius: 10px;
-      border: 1px solid #444;
-      white-space: pre-wrap;
-      text-align: left;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    }
-
-    #terminal-input {
-      display: block;
-      margin: 12px auto 0;
-      width: 100%;
-      font-size: 14px;
-      padding: 8px 10px;
-      border-radius: 6px;
-      border: 1px solid #aaa;
-      background-color: #fff;
-      color: #000;
-      font-family: 'Courier New', monospace;
-      box-sizing: border-box;
-    }
-
-    body.dark-theme #terminal-input {
-      background-color: #1a1a1a;
-      color: #f4f4f4;
-      border: 1px solid #555;
-    }
-
-    /* ---------------------- THEME TOGGLE ---------------------- */
-
-    .toggle-theme {
-      position: fixed;
-      top: 15px;
-      right: 15px;
-      z-index: 1000;
-      padding: 8px 16px;
-      border-radius: 5px;
-      background-color: var(--accent-light);
-      color: #fff;
-      border: none;
+      border-radius: 999px;
+      border: 1px solid var(--btn-border);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-dark);
       cursor: pointer;
-    }
-    body.dark-theme .toggle-theme {
-      background-color: var(--accent-dark);
-    }
-
-    /* ---------------------- PRELOADER ---------------------- */
-
-    #preloader {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      background: var(--bg-light);
-      z-index: 9999;
-      top: 0;
-      left: 0;
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      transition: opacity 0.5s;
-    }
-    body.dark-theme #preloader {
-      background: var(--bg-dark);
+      gap: 6px;
     }
 
-    .loader {
-      width: 40px;
-      height: 40px;
-      border: 5px solid #ccc;
-      border-top-color: #333;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    .btn:hover {
+      border-color: var(--accent-dark);
     }
 
-    /* ---------------------- AGENTS MENU ---------------------- */
-
-    #agents-section {
-      margin-top: 30px;
+    body.light-theme .btn {
+      background: #ffffff;
+      color: #111827;
     }
+
+    .section-title {
+      margin-top: 26px;
+      margin-bottom: 10px;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    /* ======= AGENTS MENU ======= */
 
     .agents-menu {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 16px;
       margin-top: 12px;
     }
 
     .agent-group-card {
-      border: 1px solid #444;
-      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
       padding: 12px 14px;
-      background: #111;
-      color: #f4f4f4;
+      background: linear-gradient(145deg, #020617, #020617 55%, #0b1120);
+      box-shadow: 0 14px 32px rgba(0,0,0,0.55);
     }
 
-    body.dark-theme .agent-group-card {
-      background: #111;
+    body.light-theme .agent-group-card {
+      background: #ffffff;
+      box-shadow: 0 8px 20px rgba(15,23,42,0.10);
     }
 
     .agent-group-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+    }
+
+    .agent-group-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .agent-group-title {
       font-weight: 600;
-      font-size: 1.05rem;
+      font-size: 1.02rem;
     }
 
     .agent-group-icon {
       font-size: 1.4rem;
-      margin-right: 6px;
+    }
+
+    .agent-access-badge {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      opacity: 0.7;
     }
 
     .agent-group-agents {
@@ -304,14 +164,29 @@
     }
 
     .agent-chip {
-      padding: 4px 8px;
+      padding: 4px 9px;
       border-radius: 999px;
       font-size: 0.8rem;
-      border: 1px solid #555;
+      border: 1px solid #4b5563;
       cursor: pointer;
       white-space: nowrap;
-      background: #000;
-      color: #f4f4f4;
+      background: rgba(15,23,42,0.9);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .agent-chip span.agent-icon {
+      font-size: 1rem;
+    }
+
+    .agent-chip:hover {
+      border-color: var(--accent-dark);
+    }
+
+    body.light-theme .agent-chip {
+      background: #f9fafb;
+      border-color: #d1d5db;
     }
 
     .agent-chip.disabled {
@@ -319,286 +194,161 @@
       cursor: default;
     }
 
-    .agent-access-badge {
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      opacity: 0.7;
-    }
+    /* Тогглер темы */
 
-    /* ---------------------- FOOTER / LINKS ---------------------- */
-
-    footer {
-      margin-top: 40px;
-      text-align: center;
+    .toggle-theme {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 1000;
+      padding: 7px 13px;
+      border-radius: 999px;
+      background-color: var(--accent-dark);
+      color: #fff;
+      border: none;
+      cursor: pointer;
       font-size: 0.85rem;
-      opacity: 0.7;
+    }
+    body.light-theme .toggle-theme {
+      background-color: var(--accent-light);
     }
 
-    footer a {
-      text-decoration: underline;
+    /* Прелоадер (простая версия) */
+
+    #preloader {
+      position: fixed;
+      inset: 0;
+      background: #020617;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      transition: opacity 0.4s;
     }
 
-    /* ---------------------- MOBILE ---------------------- */
+    body.light-theme #preloader {
+      background: #f4f4f4;
+    }
 
-    @media (max-width: 600px) {
-      button, .btn {
-        width: 90%;
-        font-size: 14px;
+    .loader {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 4px solid #4b5563;
+      border-top-color: #facc15;
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 640px) {
+      header {
+        padding-top: 18px;
       }
-      #terminal-input {
-        font-size: 14px;
-      }
-      .row {
-        flex-direction: column;
+      .title {
+        font-size: 1.6rem;
       }
     }
   </style>
 </head>
+
 <body>
 
-  <!-- Прелоадер -->
-  <div id="preloader">
-    <div class="loader"></div>
-  </div>
+<button class="toggle-theme" id="themeToggle">Темная тема</button>
+<div id="preloader"><div class="loader"></div></div>
 
-  <!-- Переключатель темы -->
-  <button class="toggle-theme" id="toggle-theme-btn">🌓 Theme</button>
+<div class="page">
+  <header>
+    <div class="title">WebKurierCore · Портал агентов</div>
+    <p class="subtitle">
+      Центральный вход в экосистему WebKurier. Здесь выбираются агенты, Dev-команда и админ-панель.
+      Инфраструктурой управляет WebKurierHybrid, пользователи заходят через WebKurierCore.
+    </p>
 
-  <main>
-    <header>
-      <h1>WebKurierCore · Терминал и агенты</h1>
-      <p class="subtitle">
-        Единое ядро: WebCoin-кошелёк, терминал инженера и доступ к агентам WebKurier.
-      </p>
-    </header>
-
-    <!-- Основной ряд: кошелёк + терминал -->
-    <div class="row">
-      <!-- WebCoin-кошелёк -->
-      <section class="card card-half">
-        <h2>WebCoin Wallet</h2>
-        <p style="font-size:0.9rem; opacity:0.8;">
-          Локальный тестовый баланс. Подключается к WebKurierChain и Telegram/WebApp.
-        </p>
-
-        <div class="wallet">
-          <div class="balance-label">Текущий баланс:</div>
-          <div id="balance-display">0 WEB</div>
-
-          <div style="margin-top:10px;">
-            <button onclick="addCoins(10)">+10 WEB</button>
-            <button onclick="addCoins(50)">+50 WEB</button>
-            <button onclick="resetCoins()">🔁 Сброс</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- Терминал -->
-      <section class="card card-half">
-        <h2>Терминал инженера</h2>
-        <p style="font-size:0.9rem; opacity:0.8;">
-          Команды: <code>help</code>, <code>ping</code>, <code>balance</code>, <code>/add &lt;число&gt;</code>.
-        </p>
-
-        <div id="terminal" class="terminal"></div>
-        <input
-          id="terminal-input"
-          type="text"
-          placeholder="Введите команду и нажмите Enter..."
-        />
-      </section>
+    <div class="top-actions">
+      <a class="btn" href="engine/agents/dev-team/dev-team-core.html">
+        🛠 Dev &amp; Build Team
+      </a>
+      <a class="btn" href="admin/terminal.html">
+        ⌨️ Admin Terminal
+      </a>
+      <a class="btn" href="admin/logs.html">
+        📜 Admin Logs
+      </a>
+      <a class="btn" href="admin/status.html">
+        📊 System Status
+      </a>
     </div>
+  </header>
 
-    <!-- Меню агентов -->
-    <section id="agents-section">
-      <h2 id="agents-title">Агенты WebKurier</h2>
-      <p style="text-align:center; font-size:0.9rem; opacity:0.8;">
-        Ниже отображаются группы агентов. Набор и доступ зависят от подписки пользователя.
-      </p>
-      <div id="agents-menu" class="agents-menu"></div>
-    </section>
+  <section>
+    <h2 class="section-title">Агенты и модули</h2>
+    <p class="subtitle" style="margin-bottom:6px;">
+      Список групп и агентов подгружается из <code>engine/config/agents_map.json</code>.
+      Нажмите на чип агента, чтобы открыть его HTML-ядро.
+    </p>
 
-    <!-- Ссылки на дополнительные страницы / документацию -->
-    <footer>
-      <p>
-        Подробности по геодезии и 3D-набору см. на странице:<br />
-        <a href="docs/geodesy.html">Geodesy &amp; 3D Suite (WebKurierDroneHybrid)</a>
-      </p>
-      <p>© WebKurier, произведено в Германии.</p>
-    </footer>
-  </main>
+    <div id="agents-menu" class="agents-menu">
+      <!-- сюда рендерится меню агентов из agents-menu.js -->
+    </div>
+  </section>
 
-  <!-- Логика темы и прелоадера -->
-  <script>
-    (function() {
-      const STORAGE_KEY = 'webkurier_theme';
-      const body = document.body;
-      const btn = document.getElementById('toggle-theme-btn');
+  <section>
+    <h2 class="section-title">Навигация по репозиториям</h2>
+    <p class="subtitle">
+      Уровень 0–2: WebKurierHybrid (оркестратор), WebKurierCore (ядро), DroneHybrid, Chain,
+      Security, PhoneCore. Уровень 3–4: мобильные приложения и публичный сайт WebKurierSite.
+      Подробная схема — в <code>docs/ARCHITECTURE.md</code> и <code>docs/REPOS_MAP.md</code>.
+    </p>
+  </section>
+</div>
 
-      function applyTheme(theme) {
-        if (theme === 'dark') {
-          body.classList.add('dark-theme');
-        } else {
-          body.classList.remove('dark-theme');
-        }
-      }
+<script src="engine/ui/agents-menu.js"></script>
+<script>
+  // Тема
+  const THEME_KEY = 'wk-theme';
 
-      // Загрузка темы из localStorage
-      const saved = localStorage.getItem(STORAGE_KEY) || 'light';
-      applyTheme(saved);
+  function applyTheme(theme) {
+    if (theme === 'light') {
+      document.body.classList.add('light-theme');
+      document.getElementById('themeToggle').textContent = 'Светлая тема';
+    } else {
+      document.body.classList.remove('light-theme');
+      document.getElementById('themeToggle').textContent = 'Тёмная тема';
+    }
+  }
 
-      if (btn) {
-        btn.addEventListener('click', () => {
-          const current = body.classList.contains('dark-theme') ? 'dark' : 'light';
-          const next = current === 'dark' ? 'light' : 'dark';
-          applyTheme(next);
-          localStorage.setItem(STORAGE_KEY, next);
-        });
-      }
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const current = localStorage.getItem(THEME_KEY) || 'dark';
+    const next = current === 'dark' ? 'light' : 'dark';
+    localStorage.setItem(THEME_KEY, next);
+    applyTheme(next);
+  });
 
-      // Прелоадер
-      window.addEventListener('load', () => {
-        const preloader = document.getElementById('preloader');
-        if (preloader) {
-          preloader.style.opacity = '0';
-          setTimeout(() => preloader.style.display = 'none', 500);
-        }
+  document.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem(THEME_KEY) || 'dark';
+    applyTheme(saved);
+
+    // убираем прелоадер
+    const pre = document.getElementById('preloader');
+    setTimeout(() => {
+      pre.style.opacity = '0';
+      setTimeout(() => pre.style.display = 'none', 400);
+    }, 200);
+
+    // инициализация меню агентов
+    if (window.AgentsMenu && typeof window.AgentsMenu.init === 'function') {
+      window.AgentsMenu.init({
+        containerId: 'agents-menu',
+        lang: 'ru',
+        configPath: 'engine/config/agents_map.json'
       });
-    })();
-  </script>
-
-  <!-- Локальная логика WebCoin-кошелька -->
-  <script>
-    (function() {
-      const STORAGE_KEY = 'webcoin_balance';
-      const display = document.getElementById('balance-display');
-
-      function syncDisplay(balance) {
-        if (display) {
-          display.textContent = balance + ' WEB';
-        }
-      }
-
-      function getBalance() {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        const value = raw ? parseInt(raw, 10) : 0;
-        return isNaN(value) ? 0 : value;
-      }
-
-      function setBalance(value) {
-        const fixed = value < 0 ? 0 : value;
-        localStorage.setItem(STORAGE_KEY, String(fixed));
-        syncDisplay(fixed);
-      }
-
-      // Экспортируем в глобальную область для кнопок
-      window.addCoins = function(amount) {
-        const current = getBalance();
-        setBalance(current + (amount || 0));
-      };
-
-      window.resetCoins = function() {
-        setBalance(0);
-      };
-
-      // Инициализация
-      setBalance(getBalance());
-    })();
-  </script>
-
-  <!-- Логика терминала -->
-  <script>
-    (function() {
-      const term = document.getElementById('terminal');
-      const input = document.getElementById('terminal-input');
-
-      function println(text) {
-        if (!term) return;
-        term.textContent += text + '\\n';
-        term.scrollTop = term.scrollHeight;
-      }
-
-      function handleCommand(cmd) {
-        const trimmed = cmd.trim();
-        if (!trimmed) return;
-
-        println('> ' + trimmed);
-
-        const [base, ...args] = trimmed.split(/\s+/);
-
-        switch (base.toLowerCase()) {
-          case 'help':
-            println('Доступные команды:');
-            println('  help        — показать это сообщение');
-            println('  ping        — проверка соединения');
-            println('  balance     — показать баланс WebCoin');
-            println('  /add N      — добавить N WEB');
-            println('');
-            break;
-
-          case 'ping':
-            println('pong');
-            println('');
-            break;
-
-          case 'balance':
-            if (typeof localStorage !== 'undefined') {
-              const raw = localStorage.getItem('webcoin_balance');
-              const val = raw ? parseInt(raw, 10) : 0;
-              println('Текущий баланс: ' + (isNaN(val) ? 0 : val) + ' WEB');
-            } else {
-              println('Хранилище недоступно.');
-            }
-            println('');
-            break;
-
-          case '/add':
-            if (args.length === 0) {
-              println('Использование: /add N   (пример: /add 10)');
-            } else {
-              const n = parseInt(args[0], 10);
-              if (isNaN(n)) {
-                println('Ошибка: N должно быть числом.');
-              } else if (typeof window.addCoins === 'function') {
-                window.addCoins(n);
-                println('Добавлено: ' + n + ' WEB');
-              } else {
-                println('Функция addCoins недоступна.');
-              }
-            }
-            println('');
-            break;
-
-          default:
-            println('Неизвестная команда: ' + base);
-            println("Наберите 'help' для списка команд.");
-            println('');
-        }
-      }
-
-      if (term) {
-        println('WebKurierCore Terminal');
-        println('Введите "help" для списка команд.');
-        println('');
-      }
-
-      if (input) {
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            const value = input.value;
-            input.value = '';
-            handleCommand(value);
-          }
-        });
-      }
-    })();
-  </script>
-
-  <!-- Меню агентов (динамическая загрузка agents_map.json) -->
-  <script src="engine/ui/agents-menu.js"></script>
+    }
+  });
+</script>
 
 </body>
 </html>
-
 
