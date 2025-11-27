@@ -1,0 +1,12 @@
+{
+  "mode": ["free", "lite", "enhanced", "premium"],
+  "secondself_enabled_default": true,
+  "trial_minutes": 5,
+  "monthly_price": {
+    "lite": 4.9,
+    "enhanced": 9.9,
+    "premium": 19.9
+  },
+  "description_en": "SecondSelf enhanced access tier configuration",
+  "description_ru": "Конфигурация уровней доступа SecondSelf (второе Я) для переводчика и 3D PV"
+}
