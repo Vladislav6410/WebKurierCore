@@ -1,0 +1,11 @@
+{
+  "commands": [
+    { "cmd": "/auth login", "handler": "engine/agents/access/auth_agent.js", "desc_en": "login session", "desc_ru": "вход сессии" },
+    { "cmd": "/pv roof", "handler": "engine/agents/solar-advisor/solar_advisor_agent.js", "desc_en": "analyze roof surfaces and plan solar panels", "desc_ru": "анализ крыши и раскладка панелей" },
+    { "cmd": "/pv field", "handler": "engine/agents/solar-advisor/solar_advisor_agent.js", "desc_en": "plan field solar farm rows, spacing, azimuth, tilt", "desc_ru": "план солнечной фермы в поле, ряды и шаг" },
+    { "cmd": "/cafe order pizza", "handler": "engine/agents/cafe/pizza_order_agent.js", "desc_en": "order pizza with time and delivery mode", "desc_ru": "заказ пиццы со временем и режимом" },
+    { "cmd": "/secondself call", "handler": "engine/ai-core/secondself-direct-api/secondself_ws.js", "desc_en": "start premium voice/video session", "desc_ru": "запуск премиальной голос/видео сессии" },
+    { "cmd": "/drone mission", "handler": "WebKurierDroneHybrid/engine/interfaces/core_link.py", "desc_en": "send mission to drone", "desc_ru": "отправить миссию дрону" },
+    { "cmd": "/wallet status", "handler": "WebKurierChain/engine/agents/accountant/payments_log.js", "desc_en": "wallet/balance state", "desc_ru": "статус кошелька/баланса" }
+  ]
+}
