@@ -1,0 +1,50 @@
+[
+  {
+    "id": "es_hello",
+    "command": "/spanish Hello everyone",
+    "expectedLang": "es",
+    "description": "Базовый пример приветствия на испанском"
+  },
+  {
+    "id": "ar_motivation",
+    "command": "/arabic Semangat menjalani hari, semoga produktif!",
+    "expectedLang": "ar",
+    "description": "Мотивационное сообщение на арабский (пример из описания Abang)"
+  },
+  {
+    "id": "ja_start",
+    "command": "/japanese ¡Vamos a empezar!",
+    "expectedLang": "ja",
+    "description": "Комбинация испанского текста и перевода на японский"
+  },
+  {
+    "id": "ru_morning",
+    "command": "/russian Buenos dias",
+    "expectedLang": "ru",
+    "description": "Испанское приветствие, перевод на русский"
+  },
+  {
+    "id": "fr_smalltalk",
+    "command": "/french Wie geht's?",
+    "expectedLang": "fr",
+    "description": "Немецкое выражение, перевод на французский"
+  },
+  {
+    "id": "list_languages",
+    "command": "/translate",
+    "expectedLang": "info",
+    "description": "Список доступных языковых команд Abang-режима"
+  },
+  {
+    "id": "config_on",
+    "command": "/config showOriginal on",
+    "expectedLang": "cfg",
+    "description": "Включить показ оригинала"
+  },
+  {
+    "id": "config_off",
+    "command": "/config showOriginal off",
+    "expectedLang": "cfg",
+    "description": "Выключить показ оригинала"
+  }
+]
