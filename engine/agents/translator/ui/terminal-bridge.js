@@ -15,13 +15,6 @@ import {
 /**
  * Определяет, должна ли строка обрабатываться переводчиком
  * в режиме Abang.
- *
- * Логика:
- *  - /spanish ... /russian ... и т.п.          -> да
- *  - /translate            (без аргументов)    -> да (вывод списка)
- *  - /translate en text    (с аргументами)     -> НЕТ, пусть идёт в обычный /translate
- *  - /config showOriginal on|off               -> да (конфиг переводчика)
- *  - /config              (без аргументов)     -> НЕТ, пусть идёт в общий /config (CONFIG)
  */
 export function isTranslatorCommand(line) {
   if (!line || typeof line !== "string") return false;
@@ -54,18 +47,18 @@ export function isTranslatorCommand(line) {
  *
  * Возвращает объект:
  *  {
- *    original:   string,   // исходный текст
- *    translated: string,   // перевод или служебное сообщение
- *    langCode:   string,   // целевой язык или 'info'/'cfg'
- *    provider:   string,   // имя провайдера (можно заполнять позже)
- *    showOriginal: boolean // показывать ли оригинал
+ *    original:     string,
+ *    translated:   string,
+ *    langCode:     string,
+ *    provider:     string,   // имя провайдера ("LibreTranslate", "GPT", ...)
+ *    showOriginal: boolean
  *  }
  */
 export async function handleTranslatorCommand(line, { userId = "local-user" } = {}) {
   const parsed = parseCommand(line);
   const { command, args, text } = parsed;
 
-  // 1) /translate  -> список доступных языков (Abang-style)
+  // 1) /translate  -> список доступных языков
   if (command === "translate" && !text) {
     const langs = listLanguagesDetailed();
     return {
@@ -107,8 +100,6 @@ export async function handleTranslatorCommand(line, { userId = "local-user" } = 
       };
     }
 
-    // можно добавить другие ключи конфига здесь
-
     return {
       original: "",
       translated: "Доступные настройки: showOriginal on|off",
@@ -136,24 +127,27 @@ export async function handleTranslatorCommand(line, { userId = "local-user" } = 
 
     // Динамический импорт translator-agent.js
     const AgentModule = await import("../translator-agent.js");
-    // Ожидаем, что там есть функция translate(text, lang)
     const translateFn = AgentModule.translate || AgentModule.default?.translate;
     if (typeof translateFn !== "function") {
       throw new Error("translator-agent.js: функция translate не найдена");
     }
 
-    const translated = await translateFn(textToTranslate, targetLang);
+    const translated = await translateFn(textToTranslate, targetLang, userId);
+
+    let providerName = "auto";
+    if (typeof AgentModule.getLastProviderName === "function") {
+      providerName = AgentModule.getLastProviderName() || "auto";
+    }
 
     return {
       original: textToTranslate,
       translated,
       langCode: targetLang,
-      provider: "auto", // можно заменить на реальное имя провайдера
+      provider: providerName,
       showOriginal: cfg.showOriginal !== false
     };
   }
 
-  // На всякий случай — если что-то дошло сюда
   return {
     original: "",
     translated: "Команда переводчика не распознана.",
@@ -162,3 +156,4 @@ export async function handleTranslatorCommand(line, { userId = "local-user" } = 
     showOriginal: false
   };
 }
+
