@@ -12,20 +12,45 @@ import {
   getLanguages as libreGetLanguages
 } from "./libretranslate.js";
 
-// Заготовки под будущие провайдеры
-// (пока просто заглушки с ошибкой, чтобы явно видеть, что не реализовано)
+//
+// ===== GPT-провайдер через наш API /api/translator/gpt =====
+//
+
 async function gptTranslate(text, targetLang, sourceLang = "auto") {
-  throw new Error("GPT provider is not implemented yet");
-}
-async function gptDetect(text) {
-  throw new Error("GPT provider is not implemented yet");
-}
-async function gptGetLanguages() {
-  return [];
+  const resp = await fetch("/api/translator/gpt", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ text, targetLang, sourceLang })
+  });
+
+  if (!resp.ok) {
+    const msg = await resp.text().catch(() => resp.statusText);
+    throw new Error(`GPT translate failed: ${resp.status} ${msg}`);
+  }
+
+  const data = await resp.json();
+  // ожидаем формат { translation, detectedSourceLang }
+  return data.translation || "";
 }
 
+async function gptDetect(text) {
+  // Позже можно сделать отдельный эндпоинт /api/translator/gpt-detect
+  throw new Error("GPT detect is not implemented yet");
+}
+
+async function gptGetLanguages() {
+  // Минимальный набор — потом расширим
+  return ["en", "de", "ru", "es", "fr", "pl", "uk"];
+}
+
+//
+// ===== Local-провайдер (заглушка под будущее) =====
+//
+
 async function localTranslate(text, targetLang, sourceLang = "auto") {
-  // тут позже можно подключить словарь / SQLite / локальную БД
+  // сюда позже можно подключить словарь/SQLite
   throw new Error("Local provider is not implemented yet");
 }
 async function localDetect(text) {
@@ -35,7 +60,10 @@ async function localGetLanguages() {
   return [];
 }
 
-// Карта провайдеров
+//
+// ===== Карта провайдеров =====
+//
+
 const PROVIDERS = {
   libre: {
     key: "libre",
@@ -64,8 +92,11 @@ const PROVIDERS = {
 let lastProviderName = "LibreTranslate";
 let lastProviderKey = "libre";
 
+//
+// ===== Выбор провайдера по конфигу пользователя =====
+//
+
 /**
- * Выбор провайдера в зависимости от конфига пользователя.
  * cfg.provider: "auto" | "libre" | "gpt" | "local"
  * "auto" сейчас всегда маппится на "libre".
  */
@@ -86,6 +117,10 @@ function resolveProvider(userId = "local-user") {
   return provider;
 }
 
+//
+// ===== Публичные функции агента =====
+//
+
 /**
  * Основная функция перевода.
  *
@@ -99,8 +134,7 @@ export async function translate(text, targetLang, userId = "local-user") {
   const sourceLang = "auto";
 
   const result = await provider.translate(text, targetLang, sourceLang);
-  // предполагаем, что провайдер возвращает строку;
-  // если вернёт объект – здесь можно сделать: return result.text;
+  // если провайдер вернёт объект, можно сделать: return result.text;
   return result;
 }
 
