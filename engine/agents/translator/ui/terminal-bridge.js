@@ -14,29 +14,27 @@ import {
 
 /**
  * Определяет, должна ли строка обрабатываться переводчиком
- * в режиме Abang.
+ * в стиле Abang (slash-команды /spanish, /config, /translate).
  */
 export function isTranslatorCommand(line) {
   if (!line || typeof line !== "string") return false;
   const trimmed = line.trim();
   if (!trimmed.startsWith("/")) return false;
 
-  const parts = trimmed.slice(1).split(/\s+/);
-  const cmd = (parts[0] || "").toLowerCase();
-  const rest = parts.slice(1);
+  const { command, args } = parseCommand(trimmed);
 
   // Языковые команды: /spanish, /russian и т.д.
-  if (isKnownLangCommand(cmd)) return true;
+  if (isKnownLangCommand(command)) return true;
 
   // /translate без аргументов — показать список языков
-  if (cmd === "translate" && rest.length === 0) return true;
+  if (command === "translate" && (!args || args.length === 0)) {
+    return true;
+  }
 
   // /config showOriginal on|off или /config provider ...
-  if (cmd === "config") {
-    const key = (rest[0] || "").toLowerCase();
-    if (
-      ["showoriginal", "translator", "translate", "provider"].includes(key)
-    ) {
+  if (command === "config") {
+    const key = (args[0] || "").toLowerCase();
+    if (["showoriginal", "translator", "translate", "provider"].includes(key)) {
       return true;
     }
   }
@@ -52,7 +50,7 @@ export function isTranslatorCommand(line) {
  *    original:     string,
  *    translated:   string,
  *    langCode:     string,
- *    provider:     string,   // имя провайдера ("LibreTranslate", "GPT", ...)
+ *    provider:     string,   // имя провайдера ("LibreTranslate", "GPT", "LocalDictionary", "none")
  *    showOriginal: boolean
  *  }
  */
@@ -60,10 +58,11 @@ export async function handleTranslatorCommand(
   line,
   { userId = "local-user" } = {}
 ) {
-  const parsed = parseCommand(line);
-  const { command, args, text } = parsed;
+  const { command, args, text } = parseCommand(line);
 
+  //
   // 1) /translate  -> список доступных языков
+  //
   if (command === "translate" && !text) {
     const langs = listLanguagesDetailed();
     return {
@@ -77,13 +76,17 @@ export async function handleTranslatorCommand(
     };
   }
 
+  //
   // 2) /config ...  -> конфиг переводчика
+  //
   if (command === "config") {
     const key = (args[0] || "").toLowerCase();
     const value = (args[1] || "").toLowerCase();
     const cfg = loadTranslatorConfig(userId);
 
+    //
     // 2.1. /config showOriginal on|off
+    //
     if (key === "showoriginal") {
       if (["on", "true", "1"].includes(value)) {
         cfg.showOriginal = true;
@@ -98,19 +101,21 @@ export async function handleTranslatorCommand(
           showOriginal: false
         };
       }
+
       saveTranslatorConfig(userId, cfg);
+
       return {
         original: "",
-        translated: `⚙️ showOriginal = ${
-          cfg.showOriginal ? "on" : "off"
-        }`,
+        translated: `⚙️ showOriginal = ${cfg.showOriginal ? "on" : "off"}`,
         langCode: "cfg",
         provider: "none",
         showOriginal: false
       };
     }
 
-    // 2.2. /config provider libre|gpt|local|auto
+    //
+    // 2.2. /config provider auto|libre|gpt|local
+    //
     if (key === "provider") {
       const available = getAvailableProviders(); // ["auto", "libre", "gpt", "local"]
       const v = value || "auto";
@@ -119,8 +124,7 @@ export async function handleTranslatorCommand(
         return {
           original: "",
           translated:
-            "Использование: /config provider " +
-            available.join("|"),
+            "Использование: /config provider " + available.join("|"),
           langCode: "cfg",
           provider: "none",
           showOriginal: false
@@ -139,7 +143,9 @@ export async function handleTranslatorCommand(
       };
     }
 
-    // 2.3. Прочие ключи (резюме)
+    //
+    // 2.3. Резюме по настройкам
+    //
     return {
       original: "",
       translated:
@@ -152,7 +158,9 @@ export async function handleTranslatorCommand(
     };
   }
 
-  // 3) Языковые команды: /spanish text, /russian text и т.п.
+  //
+  // 3) Языковые команды: /spanish text, /russian text, ...
+  //
   if (isKnownLangCommand(command)) {
     const targetLang = getLanguageCode(command);
     const cfg = loadTranslatorConfig(userId);
@@ -174,16 +182,10 @@ export async function handleTranslatorCommand(
     const translateFn =
       AgentModule.translate || AgentModule.default?.translate;
     if (typeof translateFn !== "function") {
-      throw new Error(
-        "translator-agent.js: функция translate не найдена"
-      );
+      throw new Error("translator-agent.js: функция translate не найдена");
     }
 
-    const translated = await translateFn(
-      textToTranslate,
-      targetLang,
-      userId
-    );
+    const translated = await translateFn(textToTranslate, targetLang, userId);
 
     let providerName = "auto";
     if (typeof AgentModule.getLastProviderName === "function") {
@@ -199,6 +201,9 @@ export async function handleTranslatorCommand(
     };
   }
 
+  //
+  // 4) На всякий случай fallback (не должен срабатывать при правильной isTranslatorCommand)
+  //
   return {
     original: "",
     translated: "Команда переводчика не распознана.",
