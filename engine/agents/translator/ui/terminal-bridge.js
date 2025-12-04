@@ -4,12 +4,12 @@ import { parseCommand } from "../command-parser.js";
 import {
   getLanguageCode,
   isKnownLangCommand,
-  listLanguageCommands,
   listLanguagesDetailed
 } from "../command-registry.js";
 import {
   loadTranslatorConfig,
-  saveTranslatorConfig
+  saveTranslatorConfig,
+  getAvailableProviders
 } from "../translator-config.js";
 
 /**
@@ -31,10 +31,12 @@ export function isTranslatorCommand(line) {
   // /translate без аргументов — показать список языков
   if (cmd === "translate" && rest.length === 0) return true;
 
-  // /config showOriginal on/off — конфиг переводчика
+  // /config showOriginal on|off или /config provider ...
   if (cmd === "config") {
     const key = (rest[0] || "").toLowerCase();
-    if (["showoriginal", "translator", "translate"].includes(key)) {
+    if (
+      ["showoriginal", "translator", "translate", "provider"].includes(key)
+    ) {
       return true;
     }
   }
@@ -54,7 +56,10 @@ export function isTranslatorCommand(line) {
  *    showOriginal: boolean
  *  }
  */
-export async function handleTranslatorCommand(line, { userId = "local-user" } = {}) {
+export async function handleTranslatorCommand(
+  line,
+  { userId = "local-user" } = {}
+) {
   const parsed = parseCommand(line);
   const { command, args, text } = parsed;
 
@@ -63,19 +68,22 @@ export async function handleTranslatorCommand(line, { userId = "local-user" } = 
     const langs = listLanguagesDetailed();
     return {
       original: "",
-      translated: "🌍 Available languages:\n" + langs.map(l => "- " + l).join("\n"),
+      translated:
+        "🌍 Available languages:\n" +
+        langs.map((l) => "- " + l).join("\n"),
       langCode: "info",
       provider: "none",
       showOriginal: false
     };
   }
 
-  // 2) /config showOriginal on|off  -> конфиг переводчика
+  // 2) /config ...  -> конфиг переводчика
   if (command === "config") {
     const key = (args[0] || "").toLowerCase();
     const value = (args[1] || "").toLowerCase();
     const cfg = loadTranslatorConfig(userId);
 
+    // 2.1. /config showOriginal on|off
     if (key === "showoriginal") {
       if (["on", "true", "1"].includes(value)) {
         cfg.showOriginal = true;
@@ -93,16 +101,51 @@ export async function handleTranslatorCommand(line, { userId = "local-user" } = 
       saveTranslatorConfig(userId, cfg);
       return {
         original: "",
-        translated: `⚙️ showOriginal = ${cfg.showOriginal ? "on" : "off"}`,
+        translated: `⚙️ showOriginal = ${
+          cfg.showOriginal ? "on" : "off"
+        }`,
         langCode: "cfg",
         provider: "none",
         showOriginal: false
       };
     }
 
+    // 2.2. /config provider libre|gpt|local|auto
+    if (key === "provider") {
+      const available = getAvailableProviders(); // ["auto", "libre", "gpt", "local"]
+      const v = value || "auto";
+
+      if (!available.includes(v)) {
+        return {
+          original: "",
+          translated:
+            "Использование: /config provider " +
+            available.join("|"),
+          langCode: "cfg",
+          provider: "none",
+          showOriginal: false
+        };
+      }
+
+      cfg.provider = v;
+      saveTranslatorConfig(userId, cfg);
+
+      return {
+        original: "",
+        translated: `⚙️ provider = ${cfg.provider}`,
+        langCode: "cfg",
+        provider: "none",
+        showOriginal: false
+      };
+    }
+
+    // 2.3. Прочие ключи (резюме)
     return {
       original: "",
-      translated: "Доступные настройки: showOriginal on|off",
+      translated:
+        "Доступные настройки:\n" +
+        "- /config showOriginal on|off\n" +
+        "- /config provider auto|libre|gpt|local",
       langCode: "cfg",
       provider: "none",
       showOriginal: false
@@ -118,7 +161,8 @@ export async function handleTranslatorCommand(line, { userId = "local-user" } = 
     if (!textToTranslate) {
       return {
         original: "",
-        translated: "Введите текст после команды, например: /spanish Hello everyone",
+        translated:
+          "Введите текст после команды, например: /spanish Hello everyone",
         langCode: targetLang,
         provider: "none",
         showOriginal: false
@@ -127,12 +171,19 @@ export async function handleTranslatorCommand(line, { userId = "local-user" } = 
 
     // Динамический импорт translator-agent.js
     const AgentModule = await import("../translator-agent.js");
-    const translateFn = AgentModule.translate || AgentModule.default?.translate;
+    const translateFn =
+      AgentModule.translate || AgentModule.default?.translate;
     if (typeof translateFn !== "function") {
-      throw new Error("translator-agent.js: функция translate не найдена");
+      throw new Error(
+        "translator-agent.js: функция translate не найдена"
+      );
     }
 
-    const translated = await translateFn(textToTranslate, targetLang, userId);
+    const translated = await translateFn(
+      textToTranslate,
+      targetLang,
+      userId
+    );
 
     let providerName = "auto";
     if (typeof AgentModule.getLastProviderName === "function") {
@@ -156,4 +207,5 @@ export async function handleTranslatorCommand(line, { userId = "local-user" } = 
     showOriginal: false
   };
 }
+
 
