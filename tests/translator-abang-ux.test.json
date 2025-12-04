@@ -1,0 +1,22 @@
+[
+  {
+    "command": "/spanish Hello everyone",
+    "expectedLang": "es"
+  },
+  {
+    "command": "/arabic Semangat menjalani hari, semoga produktif!",
+    "expectedLang": "ar"
+  },
+  {
+    "command": "/japanese ¡Vamos a empezar!",
+    "expectedLang": "ja"
+  },
+  {
+    "command": "/russian Buenos dias",
+    "expectedLang": "ru"
+  },
+  {
+    "command": "/french Wie geht's?",
+    "expectedLang": "fr"
+  }
+]
