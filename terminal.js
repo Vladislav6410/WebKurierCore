@@ -1,4 +1,9 @@
+// terminal.js
+
 import CONFIG from "./engine/config.js";
+import { handleTranslatorCommand, isTranslatorCommand } from "./engine/agents/translator/ui/terminal-bridge.js";
+
+const currentUserId = (CONFIG && CONFIG.user && CONFIG.user.id) || "local-user";
 
 // --- Базовые команды ---
 const commands = {
@@ -58,6 +63,7 @@ if (CONFIG.features?.master) {
 // === TranslatorAgent ===
 if (CONFIG.features?.translator) {
   import("./engine/agents/translator/translator-agent.js").then((TranslatorAgent) => {
+    // Классический режим: /translate [lang] [text]
     commands["/translate"] = {
       description: "Перевести текст: /translate [язык] [текст]",
       exec: async ([lang, ...text]) => {
@@ -79,6 +85,9 @@ if (CONFIG.features?.translator) {
         return `🔎 Язык: ${lang}`;
       }
     };
+
+    // (опционально) сюда можно добавить явные алиасы /spanish, /russian и т.п.,
+    // если захочешь дублировать Abang-режим через таблицу команд, а не через bridge.
   });
 }
 
@@ -274,6 +283,29 @@ async function handleCommand(event) {
 
     printToTerminal("> " + cmd);
 
+    // 1. Abang-режим переводчика: /spanish text, /arabic text, /japanese text, /russian text,
+    //    а также /translate и /config в стиле UX Abang.
+    if (cmd.startsWith("/")) {
+      try {
+        if (isTranslatorCommand(cmd)) {
+          const result = await handleTranslatorCommand(cmd, { userId: currentUserId });
+          if (result) {
+            if (result.showOriginal && result.original) {
+              printToTerminal(`[${result.langCode}] ${result.translated}`);
+              printToTerminal(`(orig) ${result.original}`);
+            } else {
+              printToTerminal(`[${result.langCode}] ${result.translated}`);
+            }
+          }
+          return; // не передаём эту строку в общий commands[]
+        }
+      } catch (err) {
+        printToTerminal("⚠️ Ошибка переводчика: " + err, true);
+        return;
+      }
+    }
+
+    // 2. Общие команды терминала через registry commands{}
     const [command, ...args] = cmd.split(" ");
     const action = commands[command];
 
@@ -307,3 +339,4 @@ function printToTerminal(message, isError = false) {
   output.appendChild(line);
   output.scrollTop = output.scrollHeight;
 }
+
