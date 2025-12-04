@@ -1,0 +1,4 @@
+[
+  { "id": "hello_everyone", "source": "Hello everyone", "target": "Hola a todos" },
+  { "id": "good_morning",   "source": "Good morning",   "target": "Buenos días" }
+]
