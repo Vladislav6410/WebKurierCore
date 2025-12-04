@@ -290,11 +290,16 @@ async function handleCommand(event) {
         if (isTranslatorCommand(cmd)) {
           const result = await handleTranslatorCommand(cmd, { userId: currentUserId });
           if (result) {
+            const header =
+              result.provider && result.provider !== "none"
+                ? `[${result.langCode} • ${result.provider}]`
+                : `[${result.langCode}]`;
+
             if (result.showOriginal && result.original) {
-              printToTerminal(`[${result.langCode}] ${result.translated}`);
+              printToTerminal(`${header} ${result.translated}`);
               printToTerminal(`(orig) ${result.original}`);
             } else {
-              printToTerminal(`[${result.langCode}] ${result.translated}`);
+              printToTerminal(`${header} ${result.translated}`);
             }
           }
           return; // не передаём эту строку в общий commands[]
@@ -339,4 +344,5 @@ function printToTerminal(message, isError = false) {
   output.appendChild(line);
   output.scrollTop = output.scrollHeight;
 }
+
 
