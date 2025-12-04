@@ -1,8 +1,6 @@
 // engine/agents/translator/translator-agent.js
 
-import {
-  loadTranslatorConfig
-} from "./translator-config.js";
+import { loadTranslatorConfig } from "./translator-config.js";
 
 // Предполагаем, что в libretranslate.js есть функции:
 //   translate(text, targetLang, sourceLang?)
@@ -15,7 +13,7 @@ import {
 } from "./libretranslate.js";
 
 // Заготовки под будущие провайдеры
-// (сейчас они могут кидать ошибку, пока не подключён GPT / локальный словарь)
+// (пока просто заглушки с ошибкой, чтобы явно видеть, что не реализовано)
 async function gptTranslate(text, targetLang, sourceLang = "auto") {
   throw new Error("GPT provider is not implemented yet");
 }
@@ -27,7 +25,7 @@ async function gptGetLanguages() {
 }
 
 async function localTranslate(text, targetLang, sourceLang = "auto") {
-  // тут позже можно подключить словарь / SQLite
+  // тут позже можно подключить словарь / SQLite / локальную БД
   throw new Error("Local provider is not implemented yet");
 }
 async function localDetect(text) {
@@ -66,11 +64,16 @@ const PROVIDERS = {
 let lastProviderName = "LibreTranslate";
 let lastProviderKey = "libre";
 
+/**
+ * Выбор провайдера в зависимости от конфига пользователя.
+ * cfg.provider: "auto" | "libre" | "gpt" | "local"
+ * "auto" сейчас всегда маппится на "libre".
+ */
 function resolveProvider(userId = "local-user") {
   const cfg = loadTranslatorConfig(userId);
   const providerKey = (cfg.provider || "auto").toLowerCase();
 
-  // auto -> пока всегда libre, можно потом усложнить
+  // auto -> пока всегда libre, дальше можно сделать логику выбора
   let keyToUse = providerKey === "auto" ? "libre" : providerKey;
 
   if (!Object.prototype.hasOwnProperty.call(PROVIDERS, keyToUse)) {
@@ -86,9 +89,9 @@ function resolveProvider(userId = "local-user") {
 /**
  * Основная функция перевода.
  *
- * @param {string} text       - исходный текст
- * @param {string} targetLang - целевой ISO-код (es, ru, de, ...)
- * @param {string} userId     - идентификатор пользователя (для конфига)
+ * @param {string} text       исходный текст
+ * @param {string} targetLang целевой ISO-код (es, ru, de, ...)
+ * @param {string} userId     идентификатор пользователя (для конфига)
  * @returns {Promise<string>} перевод
  */
 export async function translate(text, targetLang, userId = "local-user") {
@@ -97,7 +100,7 @@ export async function translate(text, targetLang, userId = "local-user") {
 
   const result = await provider.translate(text, targetLang, sourceLang);
   // предполагаем, что провайдер возвращает строку;
-  // если он вернет объект, здесь можно сделать result.text.
+  // если вернёт объект – здесь можно сделать: return result.text;
   return result;
 }
 
