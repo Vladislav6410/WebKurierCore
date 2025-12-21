@@ -106,8 +106,6 @@
       font-weight: 600;
     }
 
-    /* ======= AGENTS MENU ======= */
-
     .agents-menu {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -194,8 +192,6 @@
       cursor: default;
     }
 
-    /* Тогглер темы */
-
     .toggle-theme {
       position: fixed;
       top: 12px;
@@ -212,8 +208,6 @@
     body.light-theme .toggle-theme {
       background-color: var(--accent-light);
     }
-
-    /* Прелоадер (простая версия) */
 
     #preloader {
       position: fixed;
@@ -307,9 +301,7 @@
 
 <script src="engine/ui/agents-menu.js"></script>
 <script>
-  // Тема
   const THEME_KEY = 'wk-theme';
-
   function applyTheme(theme) {
     if (theme === 'light') {
       document.body.classList.add('light-theme');
@@ -319,26 +311,21 @@
       document.getElementById('themeToggle').textContent = 'Тёмная тема';
     }
   }
-
   document.getElementById('themeToggle').addEventListener('click', () => {
     const current = localStorage.getItem(THEME_KEY) || 'dark';
     const next = current === 'dark' ? 'light' : 'dark';
     localStorage.setItem(THEME_KEY, next);
     applyTheme(next);
   });
-
   document.addEventListener('DOMContentLoaded', () => {
     const saved = localStorage.getItem(THEME_KEY) || 'dark';
     applyTheme(saved);
-
-    // убираем прелоадер
     const pre = document.getElementById('preloader');
     setTimeout(() => {
       pre.style.opacity = '0';
       setTimeout(() => pre.style.display = 'none', 400);
     }, 200);
 
-    // инициализация меню агентов
     if (window.AgentsMenu && typeof window.AgentsMenu.init === 'function') {
       window.AgentsMenu.init({
         containerId: 'agents-menu',
@@ -349,6 +336,9 @@
   });
 </script>
 
+<!-- вставленный скрипт -->
+<script src="engine/agents/accountant/web/fop-cabinet-bridge.js"></script>
 </body>
 </html>
+
 
