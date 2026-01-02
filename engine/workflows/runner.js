@@ -5,34 +5,74 @@ function nowISO() {
   return new Date().toISOString();
 }
 
-function runId() {
+function newRunId() {
   return crypto.randomUUID();
 }
 
-export async function runWorkflow({ workflow, registry, store, input, emitAudit }) {
-  const id = runId();
+/**
+ * runWorkflow
+ *
+ * Поддержка resume:
+ * - если передан resumeFromRunId, то продолжает существующий run
+ * - если resumeFromRunId не передан, создаёт новый run
+ *
+ * Правила:
+ * - input санитизируется на границе (один раз)
+ * - если шаг вернул {status:"pending"} -> run.status="waiting" и выходим
+ * - при resume: уже выполненные шаги пропускаются (stepResults[stepId] существует и не pending)
+ */
+export async function runWorkflow({
+  workflow,
+  registry,
+  store,
+  input,
+  emitAudit,
+  resumeFromRunId = null
+}) {
+  const id = resumeFromRunId || newRunId();
 
   // ✅ sanitize input once, at the boundary
   const safeInput = sanitizeInputPayload(input, workflow.policies || {});
 
-  const run = store.createRun({
-    id,
-    workflowId: workflow.id,
-    status: "running", // running | waiting | finished | failed
-    startedAt: nowISO(),
-    finishedAt: null,
-    input: safeInput,
-    stepResults: {},
-    currentStep: null,
-    error: null
-  });
+  // create or resume run
+  let run = store.getRun(id);
 
-  await emitAudit?.({
-    type: "run.started",
-    runId: id,
-    workflowId: workflow.id,
-    ts: nowISO()
-  });
+  if (!run) {
+    run = store.createRun({
+      id,
+      workflowId: workflow.id,
+      status: "running", // running | waiting | finished | failed
+      startedAt: nowISO(),
+      finishedAt: null,
+      input: safeInput,
+      stepResults: {},
+      currentStep: null,
+      error: null
+    });
+
+    await emitAudit?.({
+      type: "run.started",
+      runId: id,
+      workflowId: workflow.id,
+      ts: nowISO()
+    });
+  } else {
+    // resume existing run (keep existing input if present)
+    const resumedInput = run.input ?? safeInput;
+    store.updateRun(id, {
+      status: "running",
+      finishedAt: null,
+      error: null,
+      input: resumedInput
+    });
+
+    await emitAudit?.({
+      type: "run.resumed",
+      runId: id,
+      workflowId: workflow.id,
+      ts: nowISO()
+    });
+  }
 
   // adjacency map
   const nextMap = new Map();
@@ -45,6 +85,7 @@ export async function runWorkflow({ workflow, registry, store, input, emitAudit 
   if (startEdges.length === 0) {
     const err = new Error("No start edge (from: 'start')");
     store.updateRun(id, { status: "failed", finishedAt: nowISO(), error: err.message });
+
     await emitAudit?.({
       type: "run.failed",
       runId: id,
@@ -52,9 +93,11 @@ export async function runWorkflow({ workflow, registry, store, input, emitAudit 
       ts: nowISO(),
       error: err.message
     });
+
     throw err;
   }
 
+  // start queue
   let queue = startEdges.map(e => e.to);
 
   try {
@@ -62,6 +105,30 @@ export async function runWorkflow({ workflow, registry, store, input, emitAudit 
       const stepId = queue.shift();
       const stepDef = workflow.steps.find(s => s.id === stepId);
       if (!stepDef) throw new Error(`Step not found: ${stepId}`);
+
+      // ✅ skip if already done (and not pending)
+      const existing = store.getRun(id)?.stepResults?.[stepId];
+      if (existing && existing.status !== "pending") {
+        await emitAudit?.({
+          type: "step.skipped",
+          runId: id,
+          stepId,
+          ts: nowISO()
+        });
+
+        // даже если пропустили — всё равно идём по edges
+        const edges = nextMap.get(stepId) || [];
+        for (const e of edges) {
+          if (!e.condition) {
+            queue.push(e.to);
+          } else {
+            const condFn = new Function("input", "results", `return (${e.condition});`);
+            const pass = !!condFn(store.getRun(id).input, store.getRun(id).stepResults);
+            if (pass) queue.push(e.to);
+          }
+        }
+        continue;
+      }
 
       store.updateRun(id, { currentStep: stepId });
 
@@ -77,13 +144,13 @@ export async function runWorkflow({ workflow, registry, store, input, emitAudit 
       const ctx = {
         runId: id,
         workflow,
-        input: safeInput,
+        input: store.getRun(id).input, // ✅ current stored input
         results: store.getRun(id).stepResults
       };
 
       const result = await impl.execute(stepDef.config, ctx);
 
-      // ✅ If step requests human approval -> STOP workflow
+      // ✅ pending approval -> STOP workflow
       if (result?.status === "pending") {
         const stepResults = { ...store.getRun(id).stepResults, [stepId]: result };
 
@@ -101,7 +168,6 @@ export async function runWorkflow({ workflow, registry, store, input, emitAudit 
           ts: nowISO()
         });
 
-        // Do not continue edges, do not mark step finished.
         return store.getRun(id);
       }
 
@@ -124,7 +190,7 @@ export async function runWorkflow({ workflow, registry, store, input, emitAudit 
           queue.push(e.to);
         } else {
           const condFn = new Function("input", "results", `return (${e.condition});`);
-          const pass = !!condFn(safeInput, stepResults);
+          const pass = !!condFn(store.getRun(id).input, stepResults);
           if (pass) queue.push(e.to);
         }
       }
