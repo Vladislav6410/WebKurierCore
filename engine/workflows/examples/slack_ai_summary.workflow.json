@@ -1,0 +1,16 @@
+{
+  "id": "wf_slack_ai_summary",
+  "name": "Slack -> AI Summary -> Human Approve",
+  "trigger": { "type": "webhook", "config": { "path": "/api/hooks/slack-summary" } },
+  "policies": { "security_validate_urls": true, "security_sanitize_payload": true, "chain_audit_enabled": true },
+  "steps": [
+    { "id": "t1", "type": "data.transform", "config": { "expression": "({ text: input.text, channel: input.channel })" } },
+    { "id": "a1", "type": "ai.prompt", "config": { "model": "gpt", "promptTemplate": "Summarize: {{results.t1.text}}" } },
+    { "id": "h1", "type": "human.approval", "config": { "title": "Approve summary", "message": "Approve AI output before posting to Slack" } }
+  ],
+  "edges": [
+    { "from": "start", "to": "t1" },
+    { "from": "t1", "to": "a1" },
+    { "from": "a1", "to": "h1" }
+  ]
+}
