@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { sanitizeInputPayload } from "./securityGate.js"; // ✅ add
 
 function nowISO() {
   return new Date().toISOString();
@@ -10,13 +11,16 @@ function runId() {
 export async function runWorkflow({ workflow, registry, store, input, emitAudit }) {
   const id = runId();
 
+  // ✅ sanitize input once, at the boundary
+  const safeInput = sanitizeInputPayload(input, workflow.policies || {});
+
   const run = store.createRun({
     id,
     workflowId: workflow.id,
     status: "running",
     startedAt: nowISO(),
     finishedAt: null,
-    input,
+    input: safeInput, // ✅ use sanitized input
     stepResults: {},
     currentStep: null,
     error: null
@@ -24,7 +28,6 @@ export async function runWorkflow({ workflow, registry, store, input, emitAudit 
 
   await emitAudit?.({ type: "run.started", runId: id, workflowId: workflow.id, ts: nowISO() });
 
-  // adjacency
   const nextMap = new Map();
   for (const e of workflow.edges) {
     if (!nextMap.has(e.from)) nextMap.set(e.from, []);
@@ -55,7 +58,7 @@ export async function runWorkflow({ workflow, registry, store, input, emitAudit 
       const ctx = {
         runId: id,
         workflow,
-        input,
+        input: safeInput, // ✅ use sanitized input in ctx
         results: store.getRun(id).stepResults
       };
 
@@ -72,7 +75,7 @@ export async function runWorkflow({ workflow, registry, store, input, emitAudit 
           queue.push(e.to);
         } else {
           const condFn = new Function("input", "results", `return (${e.condition});`);
-          const pass = !!condFn(input, stepResults);
+          const pass = !!condFn(safeInput, stepResults);
           if (pass) queue.push(e.to);
         }
       }
@@ -84,4 +87,7 @@ export async function runWorkflow({ workflow, registry, store, input, emitAudit 
     return store.getRun(id);
   } catch (err) {
     store.updateRun(id, { status: "failed", finishedAt: nowISO(), currentStep: null, error: String(err?.message || err) });
-    await emitAudit?.({ type: "run.failed", runId: id, workflowId: workflow.id, ts: nowISO(), error: String(err?.message ||
+    await emitAudit?.({ type: "run.failed", runId: id, workflowId: workflow.id, ts: nowISO(), error: String(err?.message || err) });
+    throw err;
+  }
+}
