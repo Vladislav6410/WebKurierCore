@@ -6,29 +6,39 @@ import { runWorkflow } from "../engine/workflows/runner.js";
 import { loadWorkflowFromFile } from "../engine/workflows/load.js";
 import { createAuditEmitter } from "../engine/workflows/audit.js";
 
-// ✅ фиксируем абсолютный путь, чтобы не ломалось от cwd
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const DEFAULT_WORKFLOW_FILE = path.join(__dirname, "..", "engine", "workflows", "examples", "slack_ai_summary.workflow.json");
+
+// ✅ абсолютный путь (на сервере cwd может отличаться)
+const DEFAULT_WORKFLOW_FILE = path.join(
+  __dirname,
+  "..",
+  "engine",
+  "workflows",
+  "examples",
+  "slack_ai_summary.workflow.json"
+);
 
 /**
  * registerApprovalRoutes(app, runtime)
- * runtime = createWorkflowRuntime({ dbPath: "data/workflows.sqlite" })
+ * runtime MUST be shared (one instance) to find runs in store.
  */
 export function registerApprovalRoutes(app, runtime) {
   const emitAudit = createAuditEmitter({});
 
-  // ✅ canonical API
+  // List
   app.get("/api/approvals", (req, res) => {
     res.json(listApprovals());
   });
 
+  // Get by id
   app.get("/api/approvals/:id", (req, res) => {
     const a = getApproval(req.params.id);
     if (!a) return res.status(404).json({ error: "Not found" });
     res.json(a);
   });
 
+  // Approve + Resume
   app.post("/api/approvals/:id/approve", async (req, res) => {
     try {
       const approvalId = req.params.id;
@@ -39,11 +49,11 @@ export function registerApprovalRoutes(app, runtime) {
       // 2) load workflow
       const { workflow } = loadWorkflowFromFile(DEFAULT_WORKFLOW_FILE);
 
-      // 3) find run in SAME runtime store
+      // 3) load run from SAME store
       const run = runtime.store.getRun(a.runId);
       if (!run) {
         return res.status(409).json({
-          error: "Run not found in store. Check that server uses ONE shared runtime and SQLite path is stable.",
+          error: "Run not found. Ensure server uses ONE shared runtime and SQLite store.",
           approval: a
         });
       }
@@ -64,6 +74,7 @@ export function registerApprovalRoutes(app, runtime) {
     }
   });
 
+  // Reject
   app.post("/api/approvals/:id/reject", async (req, res) => {
     try {
       const approvalId = req.params.id;
@@ -84,9 +95,8 @@ export function registerApprovalRoutes(app, runtime) {
     }
   });
 
-  // ✅ OPTIONAL compatibility (если хочешь поддержать “старые” примеры)
+  // optional compatibility
   app.get("/approvals/pending", (req, res) => {
-    const items = listApprovals().filter(x => x.status === "pending");
-    res.json(items);
+    res.json(listApprovals().filter(x => x.status === "pending"));
   });
 }
