@@ -1,0 +1,12 @@
+{
+  "id": "wf_transform_only",
+  "name": "Transform Only (Smoke Test)",
+  "trigger": { "type": "manual", "config": {} },
+  "policies": { "security_validate_urls": false, "security_sanitize_payload": true, "chain_audit_enabled": false },
+  "steps": [
+    { "id": "t1", "type": "data.transform", "config": { "expression": "({ ok: true, got: input })" } }
+  ],
+  "edges": [
+    { "from": "start", "to": "t1" }
+  ]
+}
