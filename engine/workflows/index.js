@@ -10,9 +10,22 @@ import { AiPromptStep } from "./steps/ai.prompt.js";
 import { HttpRequestStep } from "./steps/http.request.js";
 import { HumanApprovalStep } from "./steps/human.approval.js";
 
-export function createWorkflowRuntime() {
+/**
+ * Workflow Runtime (Relay-like)
+ * - registry: triggers + steps
+ * - store: persistent SQLite (data/workflows.sqlite)
+ *
+ * Требование:
+ * - npm i better-sqlite3
+ * - папка data/ должна существовать
+ */
+export function createWorkflowRuntime(options = {}) {
   const registry = createRegistry();
-  const store = createRunStore();
+
+  // ✅ persistent store
+  const store = createRunStore({
+    dbPath: options.dbPath || "data/workflows.sqlite"
+  });
 
   // triggers
   registry.registerTrigger(ManualTrigger.type, ManualTrigger);
