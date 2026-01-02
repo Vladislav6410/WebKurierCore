@@ -1,14 +1,23 @@
+import { renderTemplate } from "../renderTemplate.js";
+
 export const AiPromptStep = {
   type: "ai.prompt",
   async execute(config, ctx) {
-    // Заглушка: реальный вызов модели будет через твой AI layer.
-    // config: { model, promptTemplate }
-    const template = config.promptTemplate || "";
+    const model = config.model || "gpt";
+    const promptTemplate = config.promptTemplate || "";
+
+    const prompt = renderTemplate(promptTemplate, {
+      input: ctx.input,
+      results: ctx.results
+    });
+
+    // MVP: без реального вызова модели
+    // Потом подключим provider и вернём реальный completion
     return {
       ok: true,
-      model: config.model || "gpt",
-      promptTemplate: template,
-      note: "Implement provider call in Core AI layer; store usage for limits"
+      model,
+      prompt,
+      note: "MVP: provider call not connected yet"
     };
   }
 };
