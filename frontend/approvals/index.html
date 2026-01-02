@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Human Approvals</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .card { border: 1px solid #ccc; padding: 12px; margin-bottom: 12px; }
+    button { margin-right: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Pending Approvals</h1>
+  <div id="list"></div>
+
+  <script>
+    async function load() {
+      const res = await fetch("/api/approvals");
+      const items = await res.json();
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+
+      items.filter(i => i.status === "pending").forEach(a => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+          <h3>${a.title}</h3>
+          <p>${a.message}</p>
+          <button onclick="approve('${a.approvalId}')">Approve</button>
+          <button onclick="reject('${a.approvalId}')">Reject</button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    async function approve(id) {
+      await fetch(`/api/approvals/${id}/approve`, { method: "POST" });
+      load();
+    }
+
+    async function reject(id) {
+      await fetch(`/api/approvals/${id}/reject`, { method: "POST" });
+      load();
+    }
+
+    load();
+  </script>
+</body>
+</html>
