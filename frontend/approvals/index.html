@@ -4,33 +4,69 @@
   <meta charset="UTF-8" />
   <title>Human Approvals</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; }
-    .card { border: 1px solid #ccc; padding: 12px; margin-bottom: 12px; }
-    button { margin-right: 8px; }
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #fafafa;
+    }
+    .card {
+      border: 1px solid #ccc;
+      padding: 12px;
+      margin-bottom: 12px;
+      background: #fff;
+      border-radius: 6px;
+    }
+    button {
+      margin-right: 8px;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+    .empty {
+      color: #777;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
   <h1>Pending Approvals</h1>
-  <div id="list"></div>
+  <div id="list">Loading…</div>
 
   <script>
     async function load() {
-      const res = await fetch("/api/approvals");
-      const items = await res.json();
       const list = document.getElementById("list");
-      list.innerHTML = "";
+      list.innerHTML = "Loading…";
 
-      items.filter(i => i.status === "pending").forEach(a => {
-        const div = document.createElement("div");
-        div.className = "card";
-        div.innerHTML = `
-          <h3>${a.title}</h3>
-          <p>${a.message}</p>
-          <button onclick="approve('${a.approvalId}')">Approve</button>
-          <button onclick="reject('${a.approvalId}')">Reject</button>
-        `;
-        list.appendChild(div);
-      });
+      try {
+        const res = await fetch("/api/approvals");
+        if (!res.ok) {
+          list.innerHTML = "Error loading approvals";
+          return;
+        }
+
+        const items = await res.json();
+        const pending = items.filter(i => i.status === "pending");
+
+        if (pending.length === 0) {
+          list.innerHTML = '<div class="empty">No pending approvals</div>';
+          return;
+        }
+
+        list.innerHTML = "";
+
+        pending.forEach(a => {
+          const div = document.createElement("div");
+          div.className = "card";
+          div.innerHTML = `
+            <h3>${a.title || "Approval request"}</h3>
+            <p>${a.message || ""}</p>
+            <button onclick="approve('${a.approvalId}')">Approve</button>
+            <button onclick="reject('${a.approvalId}')">Reject</button>
+          `;
+          list.appendChild(div);
+        });
+      } catch (err) {
+        list.innerHTML = "Failed to load approvals";
+      }
     }
 
     async function approve(id) {
