@@ -1,48 +1,68 @@
 import { runWorkflow } from "../../workflows/runner.js";
 import { createWorkflowRuntime } from "../../workflows/index.js";
 import { loadWorkflowFromFile } from "../../workflows/load.js";
+import { validateWorkflow } from "../../workflows/validate.js";
+import { createAuditEmitter } from "../../workflows/audit.js";
 
-/**
- * Терминальная команда:
- * /workflow run engine/workflows/examples/slack_ai_summary.workflow.json
- * /workflow list
- * /workflow show <runId>
- */
+function parseArgs(rawArgs = []) {
+  // Позволяет:
+  // /workflow run <wf.json> --input <input.json>
+  const args = [...rawArgs];
+  const flags = {};
+  const pos = [];
+
+  while (args.length) {
+    const a = args.shift();
+    if (a === "--input") flags.input = args.shift();
+    else pos.push(a);
+  }
+  return { pos, flags };
+}
+
 export function registerWorkflowCommand(terminal) {
   const runtime = createWorkflowRuntime(); // registry + store
+  const emitAudit = createAuditEmitter({ terminal });
 
-  async function emitAudit(event) {
-    // MVP: просто печатаем. Потом подключим Chain.
-    terminal.print?.(`[audit] ${JSON.stringify(event)}`);
-  }
-
-  terminal.registerCommand?.("workflow", async (args = []) => {
-    const sub = (args[0] || "").toLowerCase();
+  terminal.registerCommand?.("workflow", async (rawArgs = []) => {
+    const { pos, flags } = parseArgs(rawArgs);
+    const sub = (pos[0] || "").toLowerCase();
 
     if (!sub || sub === "help") {
       terminal.print?.(
         [
           "Usage:",
-          "  /workflow run <path-to-workflow.json>",
+          "  /workflow run <path-to-workflow.json> [--input <path-to-input.json>]",
           "  /workflow list",
-          "  /workflow show <runId>"
+          "  /workflow show <runId>",
+          "",
+          "Examples:",
+          "  /workflow run engine/workflows/examples/transform_only.workflow.json",
+          "  /workflow run engine/workflows/examples/slack_ai_summary.workflow.json --input engine/workflows/examples/sample.input.json"
         ].join("\n")
       );
       return;
     }
 
     if (sub === "run") {
-      const filePath = args[1];
-      if (!filePath) {
+      const wfPath = pos[1];
+      if (!wfPath) {
         terminal.print?.("Error: provide path to workflow JSON");
         return;
       }
 
-      const { workflow, resolvedPath } = loadWorkflowFromFile(filePath);
-      terminal.print?.(`Loaded: ${resolvedPath}`);
-      terminal.print?.(`Running workflow: ${workflow.id} — ${workflow.name}`);
+      const { workflow, resolvedPath } = loadWorkflowFromFile(wfPath);
+      validateWorkflow(workflow);
 
-      const input = {}; // MVP: пустой input. Потом сделаем /workflow run <file> --input '{...}'
+      terminal.print?.(`Loaded workflow: ${resolvedPath}`);
+      terminal.print?.(`Running: ${workflow.id} — ${workflow.name}`);
+
+      let input = {};
+      if (flags.input) {
+        const loaded = loadWorkflowFromFile(flags.input); // re-use loader for json
+        input = loaded.workflow; // это JSON объект
+        terminal.print?.(`Loaded input: ${loaded.resolvedPath}`);
+      }
+
       const run = await runWorkflow({
         workflow,
         registry: runtime.registry,
@@ -71,7 +91,7 @@ export function registerWorkflowCommand(terminal) {
     }
 
     if (sub === "show") {
-      const runId = args[1];
+      const runId = pos[1];
       if (!runId) {
         terminal.print?.("Error: provide runId");
         return;
