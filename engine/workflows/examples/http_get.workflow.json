@@ -1,0 +1,22 @@
+{
+  "id": "wf_http_get",
+  "name": "HTTP GET (Security validated)",
+  "trigger": { "type": "manual", "config": {} },
+  "policies": { "security_validate_urls": true, "security_sanitize_payload": true, "chain_audit_enabled": false },
+  "steps": [
+    {
+      "id": "h1",
+      "type": "http.request",
+      "config": {
+        "method": "GET",
+        "url": "https://example.com",
+        "timeoutMs": 8000,
+        "maxBytes": 200000,
+        "parse": "text"
+      }
+    }
+  ],
+  "edges": [
+    { "from": "start", "to": "h1" }
+  ]
+}
