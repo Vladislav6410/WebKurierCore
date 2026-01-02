@@ -1,13 +1,29 @@
+import { createApproval, getApproval } from "../approvals.js";
+
+/**
+ * Шаг создаёт approval и останавливает workflow.
+ * Runner увидит status=pending и выйдет.
+ */
 export const HumanApprovalStep = {
   type: "human.approval",
   async execute(config, ctx) {
-    // MVP: возвращаем pending.
-    // Следующий шаг: связать с UI (кнопки Approve/Reject) и хранить решение в store/chain.
+    const title = config.title || "Approval required";
+    const message = config.message || "Please approve or reject";
+    const timeoutSeconds = config.timeoutSeconds || 86400;
+
+    const approval = createApproval({
+      runId: ctx.runId,
+      stepId: config.stepId || "human.approval",
+      title,
+      message,
+      timeoutSeconds
+    });
+
     return {
       status: "pending",
-      title: config.title || "Approval required",
-      message: config.message || "Approve or reject",
-      timeoutSeconds: config.timeoutSeconds || 86400
+      approvalId: approval.approvalId,
+      title,
+      message
     };
   }
 };
