@@ -1,13 +1,11 @@
 /**
- * /workflow command (MVP)
+ * /workflow command (with registry-fix)
  *
  * Commands:
  * - /workflow help
  * - /workflow run <workflowFile> [--input <jsonFile>]
  * - /workflow list
  * - /workflow show <runId>
- *
- * Uses shared runtime (registry + SQLite store).
  */
 
 import fs from "fs";
@@ -27,13 +25,10 @@ function out(terminal, msg) {
 }
 
 function resolvePath(p) {
-  // поддержка относительных путей от корня репо
-  // если путь уже абсолютный — оставляем
   if (!p) return null;
   if (path.isAbsolute(p)) return p;
 
-  // repo root относительно этого файла:
-  // WebKurierCore/engine/terminal/commands/workflow.js -> ../../..
+  // repo root: WebKurierCore/
   const repoRoot = path.join(__dirname, "..", "..", "..");
   return path.join(repoRoot, p);
 }
@@ -58,12 +53,6 @@ export function registerWorkflowCommand(terminal, runtime) {
           "Workflow commands:",
           "  /workflow run <workflowFile> [--input <jsonFile>]",
           "  /workflow list",
-          "  /workflow show <runId>",
-          "",
-          "Examples:",
-          "  /workflow run engine/workflows/examples/slack_ai_summary.workflow.json",
-          "  /workflow run engine/workflows/examples/slack_ai_summary.workflow.json --input engine/workflows/examples/sample.input.json",
-          "  /workflow list",
           "  /workflow show <runId>"
         ].join("\n")
       );
@@ -71,7 +60,7 @@ export function registerWorkflowCommand(terminal, runtime) {
     }
 
     if (!runtime?.registry || !runtime?.store) {
-      out(terminal, "Runtime not provided. registerWorkflowCommand(terminal, runtime) is required.");
+      out(terminal, "Runtime not available.");
       return;
     }
 
@@ -81,16 +70,18 @@ export function registerWorkflowCommand(terminal, runtime) {
         out(terminal, "No runs.");
         return;
       }
-
       out(
         terminal,
         runs
           .map((r, i) => {
-            const line1 = `${i + 1}) ${r.id} | ${r.status} | wf=${r.workflowId}`;
-            const line2 = `   started=${r.startedAt}${r.finishedAt ? ` | finished=${r.finishedAt}` : ""}`;
-            const line3 = r.currentStep ? `   currentStep=${r.currentStep}` : "";
-            const line4 = r.error ? `   error=${r.error}` : "";
-            return [line1, line2, line3, line4].filter(Boolean).join("\n");
+            return [
+              `${i + 1}) ${r.id} | ${r.status} | wf=${r.workflowId}`,
+              `   started=${r.startedAt}${r.finishedAt ? ` | finished=${r.finishedAt}` : ""}`,
+              r.currentStep ? `   currentStep=${r.currentStep}` : "",
+              r.meta?.workflowFile ? `   workflowFile=${r.meta.workflowFile}` : ""
+            ]
+              .filter(Boolean)
+              .join("\n");
           })
           .join("\n")
       );
@@ -119,24 +110,24 @@ export function registerWorkflowCommand(terminal, runtime) {
         return;
       }
 
-      // parse optional --input
+      // parse --input
       let input = {};
       const inputIdx = args.findIndex(x => x === "--input");
       if (inputIdx !== -1) {
         const inputFile = args[inputIdx + 1];
         if (!inputFile) {
-          out(terminal, "Error: --input требует путь к json файлу");
+          out(terminal, "Error: --input requires json file path");
           return;
         }
         input = readJsonFile(inputFile);
       }
 
-      // load workflow
-      const absWf = resolvePath(workflowFile);
-      const { workflow } = loadWorkflowFromFile(absWf);
+      const absWorkflowFile = resolvePath(workflowFile);
+      const { workflow } = loadWorkflowFromFile(absWorkflowFile);
 
       out(terminal, `Running workflow: ${workflow.name} (${workflow.id})`);
 
+      // 🔁 run workflow
       const run = await runWorkflow({
         workflow,
         registry: runtime.registry,
@@ -145,12 +136,18 @@ export function registerWorkflowCommand(terminal, runtime) {
         emitAudit
       });
 
+      // ✅ registry-fix: store workflowFile in run.meta
+      runtime.store.updateRun(run.id, {
+        meta: {
+          workflowFile: absWorkflowFile
+        }
+      });
+
       out(terminal, `Run created: ${run.id}`);
       out(terminal, `Status: ${run.status}`);
       if (run.status === "waiting") {
         out(terminal, "Waiting for approval. Use: /approvals list");
       }
-
       return;
     }
 
