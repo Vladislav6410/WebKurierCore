@@ -1,44 +1,40 @@
-import path from "path";
-import { fileURLToPath } from "url";
+/**
+ * WebKurierCore Approvals API (registry-fix)
+ *
+ * Endpoints:
+ * - GET  /api/approvals
+ * - GET  /api/approvals/:id
+ * - POST /api/approvals/:id/approve
+ * - POST /api/approvals/:id/reject
+ *
+ * Behavior:
+ * - approve: resolves approval + resumes the ORIGINAL workflow (from run.meta.workflowFile)
+ * - reject: resolves approval + marks run as failed
+ */
 
 import { resolveApproval, getApproval, listApprovals } from "../engine/workflows/approvals.js";
 import { runWorkflow } from "../engine/workflows/runner.js";
 import { loadWorkflowFromFile } from "../engine/workflows/load.js";
 import { createAuditEmitter } from "../engine/workflows/audit.js";
+import { resolveWorkflowFileForRun, createWorkflowRegistry } from "../engine/workflows/workflowRegistry.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// ✅ абсолютный путь (на сервере cwd может отличаться)
-const DEFAULT_WORKFLOW_FILE = path.join(
-  __dirname,
-  "..",
-  "engine",
-  "workflows",
-  "examples",
-  "slack_ai_summary.workflow.json"
-);
-
-/**
- * registerApprovalRoutes(app, runtime)
- * runtime MUST be shared (one instance) to find runs in store.
- */
 export function registerApprovalRoutes(app, runtime) {
   const emitAudit = createAuditEmitter({});
+  const wfRegistry = createWorkflowRegistry(); // fallback для старых runs
 
-  // List
+  // List approvals
   app.get("/api/approvals", (req, res) => {
     res.json(listApprovals());
   });
 
-  // Get by id
+  // Get approval by id
   app.get("/api/approvals/:id", (req, res) => {
     const a = getApproval(req.params.id);
     if (!a) return res.status(404).json({ error: "Not found" });
     res.json(a);
   });
 
-  // Approve + Resume
+  // Approve + Resume ORIGINAL workflow
   app.post("/api/approvals/:id/approve", async (req, res) => {
     try {
       const approvalId = req.params.id;
@@ -46,19 +42,29 @@ export function registerApprovalRoutes(app, runtime) {
       // 1) resolve approval
       const a = resolveApproval(approvalId, "approve", req.body?.comment || "");
 
-      // 2) load workflow
-      const { workflow } = loadWorkflowFromFile(DEFAULT_WORKFLOW_FILE);
-
-      // 3) load run from SAME store
+      // 2) load run from shared runtime store
       const run = runtime.store.getRun(a.runId);
       if (!run) {
         return res.status(409).json({
-          error: "Run not found. Ensure server uses ONE shared runtime and SQLite store.",
+          error: "Run not found. Ensure shared runtime + stable SQLite path.",
           approval: a
         });
       }
 
-      // 4) resume
+      // 3) resolve workflow file from run.meta
+      const workflowFile = resolveWorkflowFileForRun(run, wfRegistry);
+      if (!workflowFile) {
+        return res.status(409).json({
+          error: "workflowFile not found in run.meta. This run cannot be resumed.",
+          approval: a,
+          run
+        });
+      }
+
+      // 4) load workflow definition
+      const { workflow } = loadWorkflowFromFile(workflowFile);
+
+      // 5) resume
       const resumed = await runWorkflow({
         workflow,
         registry: runtime.registry,
@@ -74,7 +80,7 @@ export function registerApprovalRoutes(app, runtime) {
     }
   });
 
-  // Reject
+  // Reject + mark run failed
   app.post("/api/approvals/:id/reject", async (req, res) => {
     try {
       const approvalId = req.params.id;
@@ -95,7 +101,7 @@ export function registerApprovalRoutes(app, runtime) {
     }
   });
 
-  // optional compatibility
+  // Optional compatibility endpoint
   app.get("/approvals/pending", (req, res) => {
     res.json(listApprovals().filter(x => x.status === "pending"));
   });
