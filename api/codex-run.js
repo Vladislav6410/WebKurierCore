@@ -3,9 +3,10 @@
 //
 // Express-compatible router.
 // MVP stage:
-// ✅ RepoAdapter (read/list/glob) is implemented
-// ✅ OpenAI wrapper is implemented (Responses API + tool-calls loop)
-// ⛔ rg + applyPatch will be implemented next
+// ✅ RepoAdapter (read/list/glob) implemented
+// ✅ rg_search implemented (system ripgrep)
+// ✅ OpenAI wrapper implemented (Responses API + tool-calls loop)
+// ⛔ apply_patch will be implemented next
 //
 // IMPORTANT:
 // - Never expose OpenAI keys to browser/client.
@@ -14,6 +15,7 @@
 import express from "express";
 import { createCodexAgent } from "../engine/agents/codex/codex-agent.js";
 import { createRepoAdapter } from "./repo-adapter.js";
+import { createRgAdapter } from "./rg-adapter.js";
 import { createOpenAIWrapper } from "./openai-wrapper.js";
 
 export function registerCodexRunRoute(app, opts = {}) {
@@ -31,10 +33,11 @@ export function registerCodexRunRoute(app, opts = {}) {
         return res.status(400).send("taskText is required");
       }
 
-      // ✅ Repo adapter
+      // ✅ Adapters
       const repo = createRepoAdapter({ repoRoot });
+      const rg = createRgAdapter({ repoRoot });
 
-      // ✅ Tools impl (write tools still pending)
+      // ✅ Tools impl
       const toolsImpl = {
         list_dir: async ({ path, maxDepth = 1 }) => {
           const entries = await repo.listDir(path, { maxDepth });
@@ -51,20 +54,19 @@ export function registerCodexRunRoute(app, opts = {}) {
           return { ok: true, pattern, root, count: paths.length, paths };
         },
 
-        // ⛔ Next: implement rg_search
-        rg_search: async () => {
-          throw new Error("rg_search not implemented yet (next file)");
+        rg_search: async ({ query, root = ".", maxResults = 200 }) => {
+          const matches = await rg.rg(query, { root, maxResults });
+          return { ok: true, query, root, count: matches.length, matches };
         },
 
-        // ⛔ Next: implement apply_patch (plus security-gates + previewPatch)
+        // ⛔ Next: implement apply_patch (plus previewPatch + security gates)
         apply_patch: async () => {
           throw new Error("apply_patch not implemented yet (next files)");
         },
       };
 
-      // ✅ OpenAI wrapper (Responses API)
+      // ✅ OpenAI wrapper
       const openaiClient = createOpenAIWrapper({
-        // maxIterations can be tuned
         maxIterations: 12,
         parallelToolCalls: true,
       });
