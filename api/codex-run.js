@@ -5,8 +5,9 @@
 // MVP stage:
 // ✅ RepoAdapter (read/list/glob) implemented
 // ✅ rg_search implemented (system ripgrep)
+// ✅ apply_patch implemented (safe git apply --check + git apply)
+// ✅ security-gates enforced before apply_patch
 // ✅ OpenAI wrapper implemented (Responses API + tool-calls loop)
-// ⛔ apply_patch will be implemented next
 //
 // IMPORTANT:
 // - Never expose OpenAI keys to browser/client.
@@ -16,12 +17,21 @@ import express from "express";
 import { createCodexAgent } from "../engine/agents/codex/codex-agent.js";
 import { createRepoAdapter } from "./repo-adapter.js";
 import { createRgAdapter } from "./rg-adapter.js";
+import { createPatchAdapter } from "./patch-adapter.js";
 import { createOpenAIWrapper } from "./openai-wrapper.js";
+import { validatePatchRequest } from "../engine/agents/codex/policy/security-gates.js";
 
 export function registerCodexRunRoute(app, opts = {}) {
   const {
     repoRoot = process.cwd(),
     promptFile = "engine/agents/codex/codex-prompt.md",
+    // Optional overrides
+    policyOptions = {
+      allowlist: ["engine/", "api/", "server/", "frontend/"],
+      denylist: ["engine/config/secrets.json", ".env"],
+      maxPatchChars: 200_000,
+      maxFilesTouched: 40,
+    },
   } = opts;
 
   const router = express.Router();
@@ -36,6 +46,7 @@ export function registerCodexRunRoute(app, opts = {}) {
       // ✅ Adapters
       const repo = createRepoAdapter({ repoRoot });
       const rg = createRgAdapter({ repoRoot });
+      const patcher = createPatchAdapter({ repoRoot });
 
       // ✅ Tools impl
       const toolsImpl = {
@@ -59,9 +70,51 @@ export function registerCodexRunRoute(app, opts = {}) {
           return { ok: true, query, root, count: matches.length, matches };
         },
 
-        // ⛔ Next: implement apply_patch (plus previewPatch + security gates)
-        apply_patch: async () => {
-          throw new Error("apply_patch not implemented yet (next files)");
+        apply_patch: async ({ patch_text }) => {
+          if (!patch_text) {
+            return { ok: false, error: "patch_text is required" };
+          }
+
+          // 1) Preview patch (and validate it can apply)
+          const preview = await patcher.previewPatch(patch_text);
+
+          // If git check failed — block early
+          if (!preview.ok) {
+            return {
+              ok: false,
+              blocked: true,
+              reason: "Patch failed git apply --check",
+              preview,
+            };
+          }
+
+          // 2) Security gates (allowlist/denylist/limits)
+          const gate = validatePatchRequest(
+            {
+              filesTouched: preview.filesTouched || [],
+              patchText: patch_text,
+            },
+            policyOptions
+          );
+
+          if (!gate.ok) {
+            return {
+              ok: false,
+              blocked: true,
+              reason: gate.reason,
+              preview,
+            };
+          }
+
+          // 3) Apply patch
+          const applied = await patcher.applyPatch(patch_text);
+
+          return {
+            ok: true,
+            applied: true,
+            filesTouched: applied.filesTouched,
+            summary: applied.summary,
+          };
         },
       };
 
