@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 import { createWorkflowRuntime } from "../engine/workflows/index.js";
 import { registerApprovalRoutes } from "../api/approvals.js";
 import { registerDebugRoutes } from "../api/debug.js";
+import { registerCodexRunRoute } from "../api/codex-run.js";
 
 const app = express();
 
@@ -17,12 +18,22 @@ app.use(express.json({ limit: "1mb" }));
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// ✅ project root (WebKurierCore/)
+const PROJECT_ROOT = path.join(__dirname, "..");
+
 // ✅ один общий runtime на весь сервер (SQLite)
 const runtime = createWorkflowRuntime({ dbPath: "data/workflows.sqlite" });
 
 // --- API routes ---
 registerApprovalRoutes(app, runtime);
 registerDebugRoutes(app, runtime);
+
+// ✅ Codex MVP endpoint: POST /api/codex/run
+// Keys must be server-side only (env via Hybrid).
+registerCodexRunRoute(app, {
+  repoRoot: PROJECT_ROOT,
+  promptFile: "engine/agents/codex/codex-prompt.md",
+});
 
 // --- frontend static ---
 const FRONTEND_DIR = path.join(__dirname, "..", "frontend");
@@ -45,5 +56,6 @@ app.listen(PORT, () => {
   console.log(`Approvals API: http://localhost:${PORT}/api/approvals`);
   console.log(`Debug runs:    http://localhost:${PORT}/api/debug/runs`);
   console.log(`Debug appr:    http://localhost:${PORT}/api/debug/approvals`);
+  console.log(`Codex API:     http://localhost:${PORT}/api/codex/run`);
 });
 
