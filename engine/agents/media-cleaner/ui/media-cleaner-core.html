@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WebKurier • MediaCleaner</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 16px; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .card { border: 1px solid #ddd; border-radius: 10px; padding: 12px; max-width: 980px; }
+    input, select, button, textarea { padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
+    textarea { width: 100%; min-height: 120px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    pre { background: #0b1020; color: #d7e0ff; padding: 12px; border-radius: 10px; overflow: auto; }
+    .muted { color: #666; }
+  </style>
+</head>
+<body>
+  <h2>MediaCleaner Dashboard</h2>
+  <p class="muted">This UI is for Core-side testing and session history. Mobile does on-device scan and sends summaries only.</p>
+
+  <div class="card">
+    <div class="row">
+      <input id="userId" placeholder="userId (required)" />
+      <input id="deviceId" placeholder="deviceId (required)" />
+      <select id="mode">
+        <option value="local_only">local_only</option>
+        <option value="sync_enabled">sync_enabled</option>
+      </select>
+      <button id="btnStart">Start Session</button>
+      <button id="btnList">List Sessions</button>
+    </div>
+    <div style="margin-top:12px">
+      <div class="muted">resultsSummary (JSON)</div>
+      <textarea id="resultsSummary">
+{
+  "duplicates": { "groups": 3, "items": 18 },
+  "blur": { "items": 5 },
+  "screenshots": { "items": 12 },
+  "slimMode": { "estimatedFreedBytes": 734003200 }
+}
+      </textarea>
+      <div class="row" style="margin-top:10px">
+        <input id="sessionId" placeholder="sessionId" style="min-width: 320px;" />
+        <button id="btnSubmit">Submit Results</button>
+        <input id="freedBytes" placeholder="freedBytes (e.g. 1500000000)" />
+        <button id="btnReward">Reward WebCoins</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="muted">Output</div>
+    <pre id="out">{}</pre>
+  </div>
+
+  <script type="module" src="./media-cleaner-ui.js"></script>
+</body>
+</html>
