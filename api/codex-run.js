@@ -3,17 +3,18 @@
 //
 // Express-compatible router.
 // MVP stage:
-// - RepoAdapter (read/list/glob) is real now
-// - rg + applyPatch are still stubs (next steps)
-// - OpenAI wrapper is still a stub (next step)
+// ✅ RepoAdapter (read/list/glob) is implemented
+// ✅ OpenAI wrapper is implemented (Responses API + tool-calls loop)
+// ⛔ rg + applyPatch will be implemented next
 //
 // IMPORTANT:
 // - Never expose OpenAI keys to browser/client.
-// - Secrets must come from environment (injected via WebKurierHybrid CI/CD).
+// - Env OPENAI_API_KEY must be set server-side (via WebKurierHybrid secrets).
 
 import express from "express";
 import { createCodexAgent } from "../engine/agents/codex/codex-agent.js";
 import { createRepoAdapter } from "./repo-adapter.js";
+import { createOpenAIWrapper } from "./openai-wrapper.js";
 
 export function registerCodexRunRoute(app, opts = {}) {
   const {
@@ -30,10 +31,10 @@ export function registerCodexRunRoute(app, opts = {}) {
         return res.status(400).send("taskText is required");
       }
 
-      // ✅ Repo adapter (now implemented: read/list/glob)
+      // ✅ Repo adapter
       const repo = createRepoAdapter({ repoRoot });
 
-      // ✅ Tools impl (wire to repo adapter)
+      // ✅ Tools impl (write tools still pending)
       const toolsImpl = {
         list_dir: async ({ path, maxDepth = 1 }) => {
           const entries = await repo.listDir(path, { maxDepth });
@@ -50,19 +51,23 @@ export function registerCodexRunRoute(app, opts = {}) {
           return { ok: true, pattern, root, count: paths.length, paths };
         },
 
-        // ⛔ next step
+        // ⛔ Next: implement rg_search
         rg_search: async () => {
           throw new Error("rg_search not implemented yet (next file)");
         },
 
-        // ⛔ next step
+        // ⛔ Next: implement apply_patch (plus security-gates + previewPatch)
         apply_patch: async () => {
           throw new Error("apply_patch not implemented yet (next files)");
         },
       };
 
-      // ⛔ OpenAI wrapper (next step)
-      const openaiClient = createOpenAIWrapper();
+      // ✅ OpenAI wrapper (Responses API)
+      const openaiClient = createOpenAIWrapper({
+        // maxIterations can be tuned
+        maxIterations: 12,
+        parallelToolCalls: true,
+      });
 
       const agent = createCodexAgent({
         openaiClient,
@@ -79,6 +84,7 @@ export function registerCodexRunRoute(app, opts = {}) {
       return res.json({
         output_text: out.output_text || "",
         sessionId: sessionId || null,
+        trace: out.trace || null,
       });
     } catch (e) {
       return res.status(500).send(String(e?.message || e));
@@ -86,14 +92,4 @@ export function registerCodexRunRoute(app, opts = {}) {
   });
 
   app.use("/api/codex", router);
-}
-
-/* ------------------ MVP STUB: OpenAI Wrapper ------------------ */
-
-function createOpenAIWrapper() {
-  return {
-    async run() {
-      throw new Error("OpenAI wrapper not implemented (wire Responses API next)");
-    },
-  };
 }
