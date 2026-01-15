@@ -1,10 +1,11 @@
 // api/codex-run.js
 // Backend endpoint: POST /api/codex/run
 //
-// This is an Express-compatible router.
-// It is designed as MVP scaffolding:
-// - OpenAI wrapper is a stub (you wire your OpenAI Responses API call here)
-// - Repo adapter is a stub (you wire read/list/rg/glob/patch apply here)
+// Express-compatible router.
+// MVP stage:
+// - RepoAdapter (read/list/glob) is real now
+// - rg + applyPatch are still stubs (next steps)
+// - OpenAI wrapper is still a stub (next step)
 //
 // IMPORTANT:
 // - Never expose OpenAI keys to browser/client.
@@ -12,6 +13,7 @@
 
 import express from "express";
 import { createCodexAgent } from "../engine/agents/codex/codex-agent.js";
+import { createRepoAdapter } from "./repo-adapter.js";
 
 export function registerCodexRunRoute(app, opts = {}) {
   const {
@@ -28,30 +30,38 @@ export function registerCodexRunRoute(app, opts = {}) {
         return res.status(400).send("taskText is required");
       }
 
-      // ---- Repo adapter (MVP stub) ----
-      // Replace these with real implementations.
+      // ✅ Repo adapter (now implemented: read/list/glob)
       const repo = createRepoAdapter({ repoRoot });
 
-      // ---- Tools impl (wired to repo adapter) ----
+      // ✅ Tools impl (wire to repo adapter)
       const toolsImpl = {
-        list_dir: async ({ path, maxDepth = 1 }) =>
-          repo.listDir(path, { maxDepth }),
+        list_dir: async ({ path, maxDepth = 1 }) => {
+          const entries = await repo.listDir(path, { maxDepth });
+          return { ok: true, path, entries };
+        },
 
-        read_file: async ({ path, maxChars = 120000 }) =>
-          repo.readText(path, { maxChars }),
+        read_file: async ({ path, maxChars = 120000 }) => {
+          const text = await repo.readText(path, { maxChars });
+          return { ok: true, path, length: text.length, text };
+        },
 
-        glob_file_search: async ({ pattern, root = ".", maxResults = 100 }) =>
-          repo.glob(pattern, { root, maxResults }),
+        glob_file_search: async ({ pattern, root = ".", maxResults = 100 }) => {
+          const paths = await repo.glob(pattern, { root, maxResults });
+          return { ok: true, pattern, root, count: paths.length, paths };
+        },
 
-        rg_search: async ({ query, root = ".", maxResults = 200 }) =>
-          repo.rg(query, { root, maxResults }),
+        // ⛔ next step
+        rg_search: async () => {
+          throw new Error("rg_search not implemented yet (next file)");
+        },
 
-        apply_patch: async ({ patch_text }) =>
-          repo.applyPatch(patch_text),
+        // ⛔ next step
+        apply_patch: async () => {
+          throw new Error("apply_patch not implemented yet (next files)");
+        },
       };
 
-      // ---- OpenAI client wrapper (MVP stub) ----
-      // Wire OpenAI Responses API here.
+      // ⛔ OpenAI wrapper (next step)
       const openaiClient = createOpenAIWrapper();
 
       const agent = createCodexAgent({
@@ -63,11 +73,9 @@ export function registerCodexRunRoute(app, opts = {}) {
       const out = await agent.runTask({
         taskText,
         reasoning: "medium",
-        // sessionState reserved for Chain compaction later
         sessionState: sessionId ? { id: sessionId, messages: [] } : null,
       });
 
-      // In MVP, we just echo sessionId back (you can generate one later)
       return res.json({
         output_text: out.output_text || "",
         sessionId: sessionId || null,
@@ -80,36 +88,12 @@ export function registerCodexRunRoute(app, opts = {}) {
   app.use("/api/codex", router);
 }
 
-/* ------------------ MVP STUBS BELOW ------------------ */
-
-function createRepoAdapter({ repoRoot }) {
-  // TODO: Implement with fs + fast-glob + rg + patch apply.
-  // For now, throw explicit errors so you see what to wire next.
-  return {
-    async readText() {
-      throw new Error("RepoAdapter.readText not implemented");
-    },
-    async listDir() {
-      throw new Error("RepoAdapter.listDir not implemented");
-    },
-    async glob() {
-      throw new Error("RepoAdapter.glob not implemented");
-    },
-    async rg() {
-      throw new Error("RepoAdapter.rg not implemented");
-    },
-    async applyPatch() {
-      throw new Error("RepoAdapter.applyPatch not implemented");
-    },
-  };
-}
+/* ------------------ MVP STUB: OpenAI Wrapper ------------------ */
 
 function createOpenAIWrapper() {
-  // TODO: Implement OpenAI Responses API call with tool calling.
-  // Return shape: { output_text, trace? }
   return {
     async run() {
-      throw new Error("OpenAI wrapper not implemented (wire Responses API here)");
+      throw new Error("OpenAI wrapper not implemented (wire Responses API next)");
     },
   };
 }
