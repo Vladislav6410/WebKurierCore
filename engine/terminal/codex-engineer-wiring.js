@@ -1,34 +1,52 @@
 // engine/terminal/codex-engineer-wiring.js
 // Wiring layer: Terminal -> EngineerAgent -> Codex bridge (MVP)
 //
-// This file does NOT modify your existing terminal_agent.js automatically.
-// It provides ONE function you call during terminal bootstrap,
-// right after EngineerAgent is created/available.
+// Node + Browser compatible fetch.
+// - In browser: uses global fetch
+// - In Node: uses global fetch if present, otherwise falls back to undici.
+//
+// Backend:
+//  POST /api/codex/run  { taskText, sessionId }
+// Response:
+//  { output_text, sessionId?, trace? }
 
 import { registerEngineerCodexBridge } from "../agents/engineer/codex-bridge.js";
+
+async function getFetchImpl(explicitFetch) {
+  if (explicitFetch) return explicitFetch;
+
+  if (typeof globalThis !== "undefined" && typeof globalThis.fetch === "function") {
+    return globalThis.fetch.bind(globalThis);
+  }
+
+  // Node fallback: undici
+  // Install: npm i undici
+  try {
+    const { fetch } = await import("undici");
+    if (typeof fetch === "function") return fetch;
+  } catch (e) {
+    // ignore and throw below
+  }
+
+  throw new Error(
+    "No fetch() available. Use Node 18+ (global fetch) or install undici: npm i undici, " +
+      "or pass fetchFn into wireEngineerCodexMode()."
+  );
+}
 
 /**
  * Wire Engineer Codex-mode into the running EngineerAgent.
  *
  * @param {object} params
  * @param {object} params.engineerAgent - instance of EngineerAgent
- * @param {function} params.fetchFn - fetch implementation (browser fetch or node-fetch wrapper)
- *
- * How it calls backend:
- *  POST /api/codex/run  { taskText, sessionId }
- *
- * Expected response:
- *  { output_text, sessionId? }
+ * @param {function} [params.fetchFn] - optional fetch override
  */
-export function wireEngineerCodexMode({ engineerAgent, fetchFn = null }) {
+export async function wireEngineerCodexMode({ engineerAgent, fetchFn = null }) {
   if (!engineerAgent) {
     throw new Error("wireEngineerCodexMode: engineerAgent is required");
   }
 
-  const fetchImpl = fetchFn || (typeof fetch !== "undefined" ? fetch : null);
-  if (!fetchImpl) {
-    throw new Error("wireEngineerCodexMode: fetchFn is required in this environment");
-  }
+  const fetchImpl = await getFetchImpl(fetchFn);
 
   registerEngineerCodexBridge(engineerAgent, {
     codexService: {
@@ -44,7 +62,6 @@ export function wireEngineerCodexMode({ engineerAgent, fetchFn = null }) {
           return { output_text: `Codex error: ${t}` };
         }
 
-        // { output_text, sessionId? }
         return await r.json();
       },
     },
@@ -63,7 +80,7 @@ export function wireEngineerCodexMode({ engineerAgent, fetchFn = null }) {
         "Security:",
         "- deny secrets (.env, keys, engine/config/secrets.json)",
         "- block destructive ops (rm -rf, git reset --hard, etc.)",
-        "- allowlist: engine/**, api/**",
+        "- allowlist: engine/**, api/**, server/**, frontend/**",
       ].join("\n"),
   });
 
