@@ -1,16 +1,13 @@
 // engine/agents/engineer/codex-bridge.js
 // EngineerAgent -> Codex-mode bridge (MVP, universal)
 //
-// Key fix:
-// - Do NOT require engineerAgent.registerCommand().
-// - Patch engineerAgent.execute/handle/run (whichever exists) to intercept "codex ..." subcommands.
-// - For non-codex commands, delegate to the original implementation.
+// Works with Terminal routing:
+//   Terminal "/engineer <argsLine>" -> engineerAgent.execute(argsLine) (or handle/run)
 //
-// Expected terminal flow:
-// TerminalAgent routes "/engineer <argsLine>" -> engineerAgent.execute(argsLine) (or handle/run).
-// Example argsLine:
-//   "codex on"
-//   "codex ask fix README formatting"
+// This bridge patches engineerAgent.execute/handle/run to intercept:
+//   "codex on|off|ask|tools|prompt|compact"
+//
+// All non-codex commands are delegated to the original EngineerAgent method.
 
 export function registerEngineerCodexBridge(engineerAgent, deps) {
   if (!engineerAgent) {
@@ -27,7 +24,7 @@ export function registerEngineerCodexBridge(engineerAgent, deps) {
     sessionId: null,
   };
 
-  // Print helper (prefer engineerAgent.print, fallback to console)
+  // Print helper
   const print =
     typeof engineerAgent.print === "function"
       ? (msg) => engineerAgent.print(msg)
@@ -45,7 +42,7 @@ export function registerEngineerCodexBridge(engineerAgent, deps) {
         "- apply_patch(patch_text)",
         "",
         "Notes:",
-        "- Writes are patch-only (no full rewrites).",
+        "- Writes are patch-only.",
         "- Security gates block secrets/destructive ops.",
       ].join("\n")
     );
@@ -59,7 +56,7 @@ export function registerEngineerCodexBridge(engineerAgent, deps) {
     const raw = String(argsLine || "").trim();
     const parts = raw.split(" ").filter(Boolean);
 
-    // We expect argsLine starting with: "codex ..."
+    // Expect argsLine starting with: "codex ..."
     const scope = (parts[0] || "").toLowerCase();
     if (scope !== "codex") return { handled: false };
 
@@ -148,9 +145,7 @@ export function registerEngineerCodexBridge(engineerAgent, deps) {
 
   // Prevent double-patching
   const patchFlag = "__codex_bridge_patched__";
-  if (engineerAgent[patchFlag]) {
-    return true;
-  }
+  if (engineerAgent[patchFlag]) return true;
   engineerAgent[patchFlag] = true;
 
   const original = engineerAgent[methodName].bind(engineerAgent);
@@ -158,10 +153,9 @@ export function registerEngineerCodexBridge(engineerAgent, deps) {
   engineerAgent[methodName] = async (argsLine) => {
     const { handled } = await handleCodexArgs(argsLine);
     if (handled) return true;
-
-    // Not codex -> delegate to original EngineerAgent behavior
     return original(argsLine);
   };
 
   return true;
 }
+
