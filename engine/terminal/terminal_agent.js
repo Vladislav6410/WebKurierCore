@@ -18,8 +18,7 @@ import { initSecurityBridge } from "../workflows/securityBridge.js";
 
 import { bootstrapEngineerCodex } from "./bootstrap-codex.js";
 
-// TODO: проверь фактический путь EngineerAgent в твоём репо и замени импорт.
-// Пример (замени на реальный):
+// Важно: путь должен соответствовать реальному файлу в engine/agents/engineer/
 import { createEngineerAgent } from "../agents/engineer/engineer-agent.js";
 
 /**
@@ -90,7 +89,7 @@ export class TerminalAgent {
  */
 function mountEngineerAgent(terminal, engineerAgent) {
   terminal.registerCommand("/engineer", async (argsLine) => {
-    // Вариант 1: engineerAgent.execute("/engineer ...")
+    // Вариант 1: engineerAgent.execute(argsLine)
     if (typeof engineerAgent.execute === "function") {
       return engineerAgent.execute(argsLine);
     }
@@ -105,10 +104,9 @@ function mountEngineerAgent(terminal, engineerAgent) {
       return engineerAgent.run(argsLine);
     }
 
-    // Если интерфейс другой — сообщаем явно
     terminal.print(
       "[engineer] Cannot mount EngineerAgent: expected method execute() or handle() or run(). " +
-      "Please adapt mountEngineerAgent() to your EngineerAgent API."
+        "Please adapt mountEngineerAgent() to your EngineerAgent API."
     );
     return null;
   });
@@ -137,8 +135,8 @@ export async function createTerminalAgent() {
   // 🛠 EngineerAgent (и Codex-mode внутри Engineer)
   const engineerAgent = createEngineerAgent({ terminal });
 
-  // ✅ Вшиваем Codex-mode в EngineerAgent
-  bootstrapEngineerCodex({ engineerAgent });
+  // ✅ Вшиваем Codex-mode в EngineerAgent (ВАЖНО: await)
+  await bootstrapEngineerCodex({ engineerAgent });
 
   // ✅ Монтируем EngineerAgent в терминал как /engineer ...
   mountEngineerAgent(terminal, engineerAgent);
