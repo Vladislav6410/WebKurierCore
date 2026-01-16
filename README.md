@@ -16,6 +16,47 @@ This repository is the **central interaction layer** between human users and mac
 
 ---
 
+# 0. Local Development (Codex)
+
+## Prerequisites
+- Node.js 18+
+- Python 3.10+
+
+## Install
+```bash
+npm install
+python -m venv .venv
+source .venv/bin/activate
+pip install -r backend/requirements.txt
+```
+
+## Configure
+Set required environment variables before running the Codex API route:
+```bash
+export OPENAI_API_KEY="your_api_key_here"
+```
+
+## Run (single command)
+```bash
+npm run dev:all
+```
+
+This starts:
+- Node/Express server at http://localhost:3000
+- FastAPI backend at http://localhost:8081
+
+## Verify endpoints
+```bash
+curl http://localhost:3000/health
+curl -X POST http://localhost:3000/api/codex/run \
+  -H 'Content-Type: application/json' \
+  -d '{"taskText":"ping"}'
+```
+
+Expected responses:
+- `GET /health` → `{ "ok": true }`
+- `POST /api/codex/run` → `{ "ok": true, "output_text": "..." }`
+
 # 1. Role in the Ecosystem (Hierarchy Level 1)
 
 ```text
@@ -224,5 +265,4 @@ Vladyslav Hushchyn (VladoExport)
 Germany, EU.
 
 ⸻
-
 

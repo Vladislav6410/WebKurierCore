@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node server/index.js",
+    "dev:all": "bash scripts/dev-all.sh",
     "lint": "eslint .",
     "test": "jest --passWithNoTests",
     "merge:feedback": "node engine/agents/romantic/tools/merge_feedback.js",
@@ -24,4 +25,3 @@
     "jest": "^29.7.0"
   }
 }
-
