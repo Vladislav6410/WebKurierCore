@@ -6,6 +6,8 @@ import { fileURLToPath } from "url";
 import { createWorkflowRuntime } from "../engine/workflows/index.js";
 import { registerApprovalRoutes } from "../api/approvals.js";
 import { registerDebugRoutes } from "../api/debug.js";
+
+// ✅ Codex endpoint
 import { registerCodexRunRoute } from "../api/codex-run.js";
 
 const app = express();
@@ -18,9 +20,6 @@ app.use(express.json({ limit: "1mb" }));
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ✅ project root (WebKurierCore/)
-const PROJECT_ROOT = path.join(__dirname, "..");
-
 // ✅ один общий runtime на весь сервер (SQLite)
 const runtime = createWorkflowRuntime({ dbPath: "data/workflows.sqlite" });
 
@@ -28,10 +27,10 @@ const runtime = createWorkflowRuntime({ dbPath: "data/workflows.sqlite" });
 registerApprovalRoutes(app, runtime);
 registerDebugRoutes(app, runtime);
 
-// ✅ Codex MVP endpoint: POST /api/codex/run
-// Keys must be server-side only (env via Hybrid).
+// ✅ /api/codex/run
+// repoRoot: корень репозитория WebKurierCore (process.cwd() при запуске из корня)
 registerCodexRunRoute(app, {
-  repoRoot: PROJECT_ROOT,
+  repoRoot: process.cwd(),
   promptFile: "engine/agents/codex/codex-prompt.md",
 });
 
