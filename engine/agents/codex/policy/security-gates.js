@@ -1,72 +1,89 @@
 // engine/agents/codex/policy/security-gates.js
-// MVP security gates for CodexAgent file and command operations.
-// Enforced by WebKurierCore BEFORE any patch or command is executed.
+// Security gates for Codex apply_patch (MVP)
+//
+// Enforces:
+// - allowlist directories
+// - denylist exact paths
+// - patch size limits
+// - max files touched
+//
+// NOTE:
+// This gate is called BEFORE apply_patch is executed.
+// It must be deterministic and side-effect free.
 
-export const DEFAULT_ALLOWLIST = [
-  "engine/",
-  "api/",
-];
-
-export const DEFAULT_DENYLIST = [
-  "engine/config/secrets.json",
-  ".env",
-];
-
-const DESTRUCTIVE_PATTERNS = [
-  /rm\s+-rf/i,
-  /git\s+reset\s+--hard/i,
-  /mkfs\./i,
-  /dd\s+if=/i,
-  /:\(\)\s*{\s*:\s*\|\s*:\s*;\s*}\s*;/, // fork bomb
-];
-
-export function isPathAllowed(path, allowlist = DEFAULT_ALLOWLIST, denylist = DEFAULT_DENYLIST) {
-  const norm = String(path || "").replace(/\\/g, "/");
-  if (!norm) return false;
-
-  for (const deny of denylist) {
-    const d = deny.replace(/\\/g, "/");
-    if (norm === d || norm.startsWith(d)) return false;
-  }
-
-  return allowlist.some((a) => norm.startsWith(a));
-}
-
-export function validatePatchRequest({ filesTouched = [], patchText = "" }, opts = {}) {
+export function validatePatchRequest(
+  { filesTouched = [], patchText = "" },
+  options = {}
+) {
   const {
-    allowlist = DEFAULT_ALLOWLIST,
-    denylist = DEFAULT_DENYLIST,
+    allowlist = ["engine/", "api/", "server/", "frontend/"],
+    denylist = ["engine/config/secrets.json", ".env"],
     maxPatchChars = 200_000,
     maxFilesTouched = 40,
-  } = opts;
+  } = options;
 
-  if (typeof patchText !== "string" || patchText.length === 0) {
-    return { ok: false, reason: "Empty patchText" };
+  // --- basic guards ---
+  if (!patchText || typeof patchText !== "string") {
+    return fail("patch_text is missing or invalid");
   }
 
   if (patchText.length > maxPatchChars) {
-    return { ok: false, reason: `Patch too large (${patchText.length} chars)` };
+    return fail(
+      `patch too large (${patchText.length} chars > ${maxPatchChars})`
+    );
+  }
+
+  if (!Array.isArray(filesTouched)) {
+    return fail("filesTouched must be an array");
   }
 
   if (filesTouched.length > maxFilesTouched) {
-    return { ok: false, reason: `Too many files touched (${filesTouched.length})` };
+    return fail(
+      `too many files touched (${filesTouched.length} > ${maxFilesTouched})`
+    );
   }
 
-  for (const p of filesTouched) {
-    if (!isPathAllowed(p, allowlist, denylist)) {
-      return { ok: false, reason: `Path not allowed: ${p}` };
+  // --- denylist ---
+  for (const file of filesTouched) {
+    for (const denied of denylist) {
+      if (file === denied || file.endsWith(`/${denied}`)) {
+        return fail(`denied path: ${file}`);
+      }
     }
   }
 
+  // --- allowlist ---
+  for (const file of filesTouched) {
+    const allowed = allowlist.some((prefix) => file.startsWith(prefix));
+    if (!allowed) {
+      return fail(
+        `path not in allowlist: ${file} (allowed: ${allowlist.join(", ")})`
+      );
+    }
+  }
+
+  // --- heuristic: block obvious destructive intent in patch text ---
+  const forbiddenPatterns = [
+    /\brm\s+-rf\b/i,
+    /\bgit\s+reset\s+--hard\b/i,
+    /\bgit\s+clean\s+-fd\b/i,
+  ];
+
+  for (const re of forbiddenPatterns) {
+    if (re.test(patchText)) {
+      return fail("destructive command detected in patch");
+    }
+  }
+
+  return ok();
+}
+
+/* ----------------- helpers ----------------- */
+
+function ok() {
   return { ok: true };
 }
 
-export function validateCmd(command) {
-  const cmd = String(command || "");
-  for (const re of DESTRUCTIVE_PATTERNS) {
-    if (re.test(cmd)) {
-      return { ok: false, reason: `Destructive command blocked: ${cmd}` };
-    }
-  }
-  return { ok: true };
+function fail(reason) {
+  return { ok: false, reason };
 }
