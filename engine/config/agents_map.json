@@ -1,15 +1,35 @@
 {
   "version": "1.0",
-  "updated_at": "2025-11-23",
-
+  "updated_at": "2026-01-16",
+  "capabilities": {
+    "codex_mode": {
+      "id": "codex_mode",
+      "title": { "ru": "Codex-режим", "en": "Codex-mode" },
+      "kind": "mode",
+      "owner_agent": "engineer",
+      "terminal_commands": [
+        "/engineer codex on",
+        "/engineer codex off",
+        "/engineer codex ask <task>",
+        "/engineer codex tools",
+        "/engineer codex prompt",
+        "/engineer codex compact"
+      ],
+      "server_endpoint": "/api/codex/run",
+      "security": {
+        "gates": "engine/agents/codex/policy/security-gates.js",
+        "allowlist": ["engine/", "api/", "server/", "frontend/"],
+        "denylist": [".env", "engine/config/secrets.json"]
+      },
+      "docs": "engine/agents/codex/README.md"
+    }
+  },
   "groups": [
-
     {
       "id": "geo_drone",
       "title": { "ru": "Дроны и геодезия", "en": "Drones & Geodesy" },
       "icon": "🛰",
       "access": "pro",
-
       "agents": [
         {
           "id": "geodesy",
@@ -69,13 +89,11 @@
         }
       ]
     },
-
     {
       "id": "language",
       "title": { "ru": "Языки и связь", "en": "Languages & Communication" },
       "icon": "🌐",
       "access": "base",
-
       "agents": [
         {
           "id": "translator",
@@ -103,13 +121,11 @@
         }
       ]
     },
-
     {
       "id": "finance",
       "title": { "ru": "Финансы", "en": "Finance" },
       "icon": "💶",
       "access": "pro",
-
       "agents": [
         {
           "id": "wallet",
@@ -137,13 +153,11 @@
         }
       ]
     },
-
     {
       "id": "business",
       "title": { "ru": "Бизнес", "en": "Business" },
       "icon": "🏢",
       "access": "pro",
-
       "agents": [
         {
           "id": "hr",
@@ -171,13 +185,11 @@
         }
       ]
     },
-
     {
       "id": "security_system",
       "title": { "ru": "Безопасность", "en": "Security" },
       "icon": "🛡",
       "access": "admin",
-
       "agents": [
         {
           "id": "security",
@@ -213,13 +225,11 @@
         }
       ]
     },
-
     {
       "id": "dev_team",
       "title": { "ru": "Команда разработки", "en": "Dev & Build Team" },
       "icon": "🛠",
       "access": "pro",
-
       "agents": [
         {
           "id": "master",
@@ -235,6 +245,7 @@
           "icon": "🧠",
           "route": "engine/agents/engineer/engineer-core.html",
           "tags": ["structure", "files", "config"],
+          "capabilities": ["codex_mode"],
           "enabled": true
         },
         {
@@ -271,6 +282,7 @@
         }
       ]
     }
-
   ]
 }
+
+
