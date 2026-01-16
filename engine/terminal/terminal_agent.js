@@ -6,14 +6,21 @@
  * - Регистрирует команды
  * - Подключает workflow runtime (SQLite)
  * - Инициализирует Security bridge
+ * - Подключает EngineerAgent (включая Codex-mode через bootstrapEngineerCodex)
  */
-import { bootstrapEngineerCodex } from "./bootstrap-codex.js";const engineerAgent = createEngineerAgent(...);bootstrapEngineerCodex({ engineerAgent });bootstrapEngineerCodex({ engineerAgent });
+
 import { createWorkflowRuntime } from "../workflows/index.js";
 
 import { registerWorkflowCommand } from "./commands/workflow.js";
 import { registerApprovalsCommands } from "./commands/approvals.commands.js";
 
 import { initSecurityBridge } from "../workflows/securityBridge.js";
+
+import { bootstrapEngineerCodex } from "./bootstrap-codex.js";
+
+// TODO: проверь фактический путь EngineerAgent в твоём репо и замени импорт.
+// Пример (замени на реальный):
+import { createEngineerAgent } from "../agents/engineer/engineer-agent.js";
 
 /**
  * Простейшая реализация terminal API.
@@ -47,9 +54,6 @@ export class TerminalAgent {
 
   /**
    * Выполнение строки команды
-   * Пример:
-   *   /workflow run engine/workflows/examples/transform_only.workflow.json
-   *   /approvals list
    */
   async execute(line) {
     if (!line) return;
@@ -60,7 +64,6 @@ export class TerminalAgent {
       return;
     }
 
-    // берём имя команды полностью: "/workflow", "/approvals"
     const firstSpace = clean.indexOf(" ");
     const name = firstSpace === -1 ? clean : clean.slice(0, firstSpace);
     const argsLine = firstSpace === -1 ? "" : clean.slice(firstSpace + 1);
@@ -81,6 +84,37 @@ export class TerminalAgent {
 }
 
 /**
+ * Привязка EngineerAgent к терминалу:
+ * - /engineer ... → EngineerAgent handler
+ * Важно: конкретный метод EngineerAgent может отличаться — поддерживаем несколько вариантов.
+ */
+function mountEngineerAgent(terminal, engineerAgent) {
+  terminal.registerCommand("/engineer", async (argsLine) => {
+    // Вариант 1: engineerAgent.execute("/engineer ...")
+    if (typeof engineerAgent.execute === "function") {
+      return engineerAgent.execute(argsLine);
+    }
+
+    // Вариант 2: engineerAgent.handle(argsLine)
+    if (typeof engineerAgent.handle === "function") {
+      return engineerAgent.handle(argsLine);
+    }
+
+    // Вариант 3: engineerAgent.run(argsLine)
+    if (typeof engineerAgent.run === "function") {
+      return engineerAgent.run(argsLine);
+    }
+
+    // Если интерфейс другой — сообщаем явно
+    terminal.print(
+      "[engineer] Cannot mount EngineerAgent: expected method execute() or handle() or run(). " +
+      "Please adapt mountEngineerAgent() to your EngineerAgent API."
+    );
+    return null;
+  });
+}
+
+/**
  * Factory — создаёт и инициализирует терминал
  */
 export async function createTerminalAgent() {
@@ -95,15 +129,24 @@ export async function createTerminalAgent() {
   terminal.print("[workflows] runtime ready (sqlite)");
 
   // ✅ /workflow
-  // registerWorkflowCommand должен уметь принимать runtime.
-  // Если у тебя старая версия registerWorkflowCommand(terminal) — обновим на шаге 2/4 (следующий файл).
   registerWorkflowCommand(terminal, runtime);
 
   // ✅ /approvals
   registerApprovalsCommands(terminal, runtime);
 
+  // 🛠 EngineerAgent (и Codex-mode внутри Engineer)
+  const engineerAgent = createEngineerAgent({ terminal });
+
+  // ✅ Вшиваем Codex-mode в EngineerAgent
+  bootstrapEngineerCodex({ engineerAgent });
+
+  // ✅ Монтируем EngineerAgent в терминал как /engineer ...
+  mountEngineerAgent(terminal, engineerAgent);
+
   terminal.print("TerminalAgent ready. Try: /workflow help");
   terminal.print("Also: /approvals help");
+  terminal.print("Engineer: /engineer codex on");
 
   return terminal;
 }
+
