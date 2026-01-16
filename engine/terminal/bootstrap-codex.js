@@ -1,10 +1,10 @@
 // engine/terminal/bootstrap-codex.js
-// Minimal bootstrap helper to wire Engineer Codex-mode without breaking your terminal.
-// You call this ONCE after EngineerAgent instance is created.
+// Minimal bootstrap helper to wire Engineer Codex-mode safely in Node+Browser.
 //
-// Usage (example inside terminal_agent.js after engineerAgent is ready):
-//   import { bootstrapEngineerCodex } from "./bootstrap-codex.js";
-//   bootstrapEngineerCodex({ engineerAgent });
+// IMPORTANT:
+// - wireEngineerCodexMode is async now (Node may need dynamic import of undici).
+// - So bootstrapEngineerCodex must be async and awaited by caller if you want strict startup order.
+// - If caller does NOT await, it will still wire in background (but errors may surface later).
 
 import { wireEngineerCodexMode } from "./codex-engineer-wiring.js";
 
@@ -14,12 +14,12 @@ import { wireEngineerCodexMode } from "./codex-engineer-wiring.js";
  * @param {object} params.engineerAgent - your EngineerAgent instance
  * @param {function} [params.fetchFn] - optional fetch override
  */
-export function bootstrapEngineerCodex({ engineerAgent, fetchFn = null }) {
+export async function bootstrapEngineerCodex({ engineerAgent, fetchFn = null }) {
   if (!engineerAgent) {
     throw new Error("bootstrapEngineerCodex: engineerAgent is required");
   }
 
-  wireEngineerCodexMode({
+  await wireEngineerCodexMode({
     engineerAgent,
     fetchFn: fetchFn || null,
   });
