@@ -7,7 +7,7 @@
  * - Подключает workflow runtime (SQLite)
  * - Инициализирует Security bridge
  */
-import { bootstrapEngineerCodex } from "./bootstrap-codex.js";const engineerAgent = createEngineerAgent(...);
+import { bootstrapEngineerCodex } from "./bootstrap-codex.js";const engineerAgent = createEngineerAgent(...);bootstrapEngineerCodex({ engineerAgent });bootstrapEngineerCodex({ engineerAgent });
 import { createWorkflowRuntime } from "../workflows/index.js";
 
 import { registerWorkflowCommand } from "./commands/workflow.js";
