@@ -1,4 +1,4 @@
-да# Node.js
+# Node.js
 node_modules/
 npm-debug.log*
 yarn-debug.log*
@@ -35,6 +35,10 @@ jest-results/
 .cache/
 dist/
 
+# Python cache
+__pycache__/
+*.pyc
+
 # System / OS
 .DS_Store
 Thumbs.db
@@ -45,6 +49,3 @@ Thumbs.db
 
 # Local test files
 test-output/
-__pycache__/# Environment
-.env
-engine/agents/*/.wa-auth-romantic/
