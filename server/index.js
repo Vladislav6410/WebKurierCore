@@ -10,6 +10,9 @@ import { registerDebugRoutes } from "../api/debug.js";
 // ✅ Codex endpoint
 import { registerCodexRunRoute } from "../api/codex-run.js";
 
+// ✅ Relay webhook test endpoint
+import { registerRelayRoutes } from "../api/relay-routes.js";
+
 const app = express();
 
 // --- middlewares ---
@@ -26,6 +29,9 @@ const runtime = createWorkflowRuntime({ dbPath: "data/workflows.sqlite" });
 // --- API routes ---
 registerApprovalRoutes(app, runtime);
 registerDebugRoutes(app, runtime);
+
+// ✅ Relay routes: /api/relay/*
+registerRelayRoutes(app);
 
 // ✅ /api/codex/run
 // repoRoot: корень репозитория WebKurierCore (process.cwd() при запуске из корня)
@@ -56,4 +62,5 @@ app.listen(PORT, () => {
   console.log(`Debug runs:    http://localhost:${PORT}/api/debug/runs`);
   console.log(`Debug appr:    http://localhost:${PORT}/api/debug/approvals`);
   console.log(`Codex API:     http://localhost:${PORT}/api/codex/run`);
+  console.log(`Relay test:    http://localhost:${PORT}/api/relay/test`);
 });
