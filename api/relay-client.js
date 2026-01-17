@@ -1,12 +1,11 @@
-// WebKurierCore/api/relay-client.js
-import fetch from "node-fetch";
-
 /**
- * Relay Webhook Client
- * Sends JSON payloads to Relay.app workflow webhook.
+ * WebKurierCore Relay Webhook Client (Node.js v18+)
+ * Uses built-in fetch (no node-fetch dependency required).
  */
+
 export async function callRelayWebhook(payload = {}, opts = {}) {
   const url = process.env.RELAY_WEBHOOK_URL || opts.url;
+
   if (!url) {
     return {
       ok: false,
