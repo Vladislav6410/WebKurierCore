@@ -3,7 +3,7 @@
 
 (function () {
   // ✅ Replace with your repo branches page
-  const GITHUB_BRANCHES_URL = "https://github.com/<USERNAME>/<REPO>/branches";
+const GITHUB_BRANCHES_URL = "https://github.com/Vladislav6410/WebKurierCore/branches";
 
   // Guard: if codex-ui.js wasn't loaded, show a clear error
   if (!window.CodexUI || typeof window.CodexUI.initController !== "function") {
