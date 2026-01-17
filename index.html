@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>WebKurierCore · Портал агентов</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root{
+      --bg-light:#f4f4f4;
+      --bg-dark:#020617;
+      --text-light:#1a1a1a;
+      --text-dark:#e5e7eb;
+      --link-light:#007acc;
+      --link-dark:#60a5fa;
+      --accent-light:#3b82f6;
+      --accent-dark:#2563eb;
+
+      --card-bg:#020617;
+      --card-border:#1f2937;
+      --btn-border:#374151;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      padding:0;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:radial-gradient(circle at top,#111827 0,#020617 55%);
+      color:var(--text-dark);
+      transition:background-color .3s,color .3s;
+    }
+
+    body.light-theme{
+      background:var(--bg-light);
+      color:var(--text-light);
+    }
+
+    a{ color:var(--link-dark); text-decoration:none; }
+    body.light-theme a{ color:var(--link-light); }
+
+    .page{
+      max-width:1120px;
+      margin:0 auto;
+      padding:24px 16px 40px;
+    }
+
+    header{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-bottom:24px;
+    }
+
+    .title{
+      font-size:2rem;
+      font-weight:700;
+    }
+
+    .subtitle{
+      color:#9ca3af;
+      font-size:.95rem;
+      max-width:720px;
+    }
+
+    .top-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .btn{
+      padding:9px 14px;
+      font-size:.9rem;
+      border-radius:999px;
+      border:1px solid var(--btn-border);
+      background:rgba(15,23,42,.95);
+      color:var(--text-dark);
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .btn:hover{ border-color:var(--accent-dark); }
+
+    body.light-theme .btn{
+      background:#fff;
+      color:#111827;
+    }
+
+    .section-title{
+      margin-top:26px;
+      margin-bottom:10px;
+      font-size:1.2rem;
+      font-weight:600;
+    }
+
+    .agents-menu{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:16px;
+      margin-top:12px;
+    }
+
+    .agent-group-card{
+      border:1px solid var(--card-border);
+      border-radius:12px;
+      padding:12px 14px;
+      background:linear-gradient(145deg,#020617,#020617 55%,#0b1120);
+      box-shadow:0 14px 32px rgba(0,0,0,.55);
+    }
+
+    body.light-theme .agent-group-card{
+      background:#fff;
+      box-shadow:0 8px 20px rgba(15,23,42,.10);
+    }
+
+    .agent-group-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:6px;
+    }
+
+    .agent-group-left{
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .agent-group-title{
+      font-weight:600;
+      font-size:1.02rem;
+    }
+
+    .agent-group-icon{ font-size:1.4rem; }
+
+    .agent-access-badge{
+      font-size:.72rem;
+      text-transform:uppercase;
+      opacity:.7;
+    }
+
+    .agent-group-agents{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-top:6px;
+    }
+
+    .agent-chip{
+      padding:4px 9px;
+      border-radius:999px;
+      font-size:.8rem;
+      border:1px solid #4b5563;
+      cursor:pointer;
+      white-space:nowrap;
+      background:rgba(15,23,42,.9);
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+    }
+
+    .agent-chip span.agent-icon{ font-size:1rem; }
+
+    .agent-chip:hover{ border-color:var(--accent-dark); }
+
+    body.light-theme .agent-chip{
+      background:#f9fafb;
+      border-color:#d1d5db;
+    }
+
+    .agent-chip.disabled{
+      opacity:.4;
+      cursor:default;
+    }
+
+    .toggle-theme{
+      position:fixed;
+      top:12px;
+      right:12px;
+      z-index:1000;
+      padding:7px 13px;
+      border-radius:999px;
+      background-color:var(--accent-dark);
+      color:#fff;
+      border:none;
+      cursor:pointer;
+      font-size:.85rem;
+    }
+    body.light-theme .toggle-theme{ background-color:var(--accent-light); }
+
+    #preloader{
+      position:fixed;
+      inset:0;
+      background:#020617;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:999;
+      transition:opacity .4s;
+    }
+
+    body.light-theme #preloader{ background:#f4f4f4; }
+
+    .loader{
+      width:38px;
+      height:38px;
+      border-radius:50%;
+      border:4px solid #4b5563;
+      border-top-color:#facc15;
+      animation:spin .9s linear infinite;
+    }
+
+    @keyframes spin{ to{ transform:rotate(360deg); } }
+
+    @media (max-width:640px){
+      header{ padding-top:18px; }
+      .title{ font-size:1.6rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <button class="toggle-theme" id="themeToggle">Тёмная тема</button>
+  <div id="preloader"><div class="loader"></div></div>
+
+  <div class="page">
+    <header>
+      <div class="title">WebKurierCore · Портал агентов</div>
+      <p class="subtitle">
+        Центральный вход в экосистему WebKurier. Здесь выбираются агенты, Dev-команда и админ-панель.
+        Инфраструктурой управляет WebKurierHybrid, пользователи заходят через WebKurierCore.
+      </p>
+
+      <div class="top-actions">
+        <a class="btn" href="engine/agents/dev-team/dev-team-core.html">🛠 Dev &amp; Build Team</a>
+        <a class="btn" href="admin/terminal.html">⌨️ Admin Terminal</a>
+        <a class="btn" href="admin/logs.html">📜 Admin Logs</a>
+        <a class="btn" href="admin/status.html">📊 System Status</a>
+
+        <!-- ✅ Codex Console (добавлено) -->
+        <a class="btn" href="/admin/codex.html">🧠 Codex Console</a>
+      </div>
+    </header>
+
+    <section>
+      <h2 class="section-title">Агенты и модули</h2>
+      <p class="subtitle" style="margin-bottom:6px;">
+        Список групп и агентов подгружается из <code>engine/config/agents_map.json</code>.
+        Нажмите на чип агента, чтобы открыть его HTML-ядро.
+      </p>
+
+      <div id="agents-menu" class="agents-menu">
+        <!-- сюда рендерится меню агентов из agents-menu.js -->
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Навигация по репозиториям</h2>
+      <p class="subtitle">
+        Уровень 0–2: WebKurierHybrid (оркестратор), WebKurierCore (ядро), DroneHybrid, Chain,
+        Security, PhoneCore. Уровень 3–4: мобильные приложения и публичный сайт WebKurierSite.
+        Подробная схема — в <code>docs/ARCHITECTURE.md</code> и <code>docs/REPOS_MAP.md</code>.
+      </p>
+    </section>
+  </div>
+
+  <script src="engine/ui/agents-menu.js"></script>
+  <script>
+    const THEME_KEY = 'wk-theme';
+
+    function applyTheme(theme) {
+      const btn = document.getElementById('themeToggle');
+      if (theme === 'light') {
+        document.body.classList.add('light-theme');
+        btn.textContent = 'Светлая тема';
+      } else {
+        document.body.classList.remove('light-theme');
+        btn.textContent = 'Тёмная тема';
+      }
+    }
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const current = localStorage.getItem(THEME_KEY) || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      localStorage.setItem(THEME_KEY, next);
+      applyTheme(next);
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem(THEME_KEY) || 'dark';
+      applyTheme(saved);
+
+      const pre = document.getElementById('preloader');
+      setTimeout(() => {
+        pre.style.opacity = '0';
+        setTimeout(() => (pre.style.display = 'none'), 400);
+      }, 200);
+
+      if (window.AgentsMenu && typeof window.AgentsMenu.init === 'function') {
+        window.AgentsMenu.init({
+          containerId: 'agents-menu',
+          lang: 'ru',
+          configPath: 'engine/config/agents_map.json'
+        });
+      }
+    });
+  </script>
+
+  <!-- вставленный скрипт -->
+  <script src="engine/agents/accountant/web/fop-cabinet-bridge.js"></script>
+</body>
+</html>
