@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>WebKurierCore · Codex Console</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root{
+      --bg:#020617;
+      --card:#0b1120;
+      --card2:#0f172a;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --border:#243047;
+      --accent:#60a5fa;
+      --ok:#34d399;
+      --bad:#fb7185;
+      --btn:#111827;
+      --btn2:#0b1222;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:radial-gradient(circle at top,#111827 0,#020617 55%);
+      color:var(--text);
+    }
+    .page{
+      max-width:1120px;
+      margin:0 auto;
+      padding:18px 14px 40px;
+    }
+    .header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+    }
+    .title{
+      font-size:1.35rem;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .subtitle{
+      margin-top:6px;
+      color:var(--muted);
+      max-width:760px;
+      line-height:1.35;
+      font-size:.95rem;
+    }
+    .card{
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:linear-gradient(145deg,var(--card),var(--card2));
+      padding:12px;
+      box-shadow:0 16px 40px rgba(0,0,0,.45);
+      margin-top:12px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:12px;
+      margin-top:12px;
+    }
+    @media (max-width:920px){
+      .grid{ grid-template-columns:1fr; }
+    }
+    .row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:rgba(15,23,42,.85);
+      color:var(--text);
+      cursor:pointer;
+      text-decoration:none;
+      user-select:none;
+      font-size:.92rem;
+      line-height:1;
+      white-space:nowrap;
+    }
+    .btn:hover{ border-color:var(--accent); }
+    .btn.secondary{ background:rgba(2,6,23,.65); }
+    .btn.ok{ border-color:rgba(52,211,153,.35); }
+    .btn.bad{ border-color:rgba(251,113,133,.45); }
+    .pill{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      border:1px solid var(--border);
+      border-radius:999px;
+      padding:8px 10px;
+      background:rgba(2,6,23,.35);
+      color:var(--muted);
+      font-size:.85rem;
+    }
+    label{
+      color:var(--muted);
+      font-size:.85rem;
+      display:block;
+      margin-bottom:6px;
+    }
+    select, input, textarea{
+      width:100%;
+      border:1px solid var(--border);
+      background:rgba(2,6,23,.35);
+      color:var(--text);
+      border-radius:12px;
+      padding:10px 10px;
+      outline:none;
+      font-size:.95rem;
+    }
+    textarea{
+      min-height:190px;
+      resize:vertical;
+      line-height:1.35;
+    }
+    .split{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width:620px){
+      .split{ grid-template-columns:1fr; }
+    }
+    .mono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:.9rem;
+    }
+    .statusLine{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:rgba(2,6,23,.35);
+      color:var(--muted);
+      line-height:1.35;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+    .statusOk{ border-color:rgba(52,211,153,.35); color:#bbf7d0; }
+    .statusBad{ border-color:rgba(251,113,133,.45); color:#fecaca; }
+    .smallNote{
+      color:var(--muted);
+      font-size:.82rem;
+      margin-top:8px;
+      line-height:1.35;
+    }
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      border:1px solid var(--border);
+      background:rgba(2,6,23,.45);
+      padding:2px 6px;
+      border-radius:8px;
+      font-size:.82rem;
+      color:var(--text);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <div class="header">
+      <div>
+        <div class="title">WebKurierCore · Codex Console</div>
+        <div class="subtitle">
+          Управление Codex через WebKurierCore: отправка задач, проверка <span class="kbd">/health</span>,
+          быстрые кнопки навигации и готовые “пакеты задач”.
+        </div>
+      </div>
+
+      <a class="btn secondary" href="/" title="Вернуться на портал агентов">← На портал</a>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <span class="pill">API: <span class="mono" id="apiBase">/api/codex/run</span></span>
+        <span class="pill">Session: <span class="mono" id="sessionIdView">—</span></span>
+        <span class="pill">Last HTTP: <span class="mono" id="lastHttp">—</span></span>
+      </div>
+
+      <div class="grid">
+        <!-- LEFT: TASK INPUT -->
+        <div class="card" style="margin-top:12px;">
+          <div class="split">
+            <div>
+              <label>Reasoning</label>
+              <select id="reasoning">
+                <option value="low">low (быстро)</option>
+                <option value="medium" selected>medium (рекомендовано)</option>
+                <option value="high">high (сложные задачи)</option>
+                <option value="xhigh">xhigh (самые сложные)</option>
+              </select>
+            </div>
+            <div>
+              <label>Готовая задача (пакеты)</label>
+              <select id="taskPack">
+                <option value="">— выбрать —</option>
+                <option value="ping">[0] ping / smoke-test</option>
+                <option value="scan_repo">[1] Просканировать структуру и найти точки интеграции Codex</option>
+                <option value="add_codex_buttons">[2] Добавить кнопки Codex в портал (index.html)</option>
+                <option value="chain_audit_check">[3] Проверить Chain-аудит (auditEvent) и логи</option>
+                <option value="security_gate_check">[4] Проверить security-gates allowlist/denylist</option>
+                <option value="ui_console_check">[5] Проверить codex.html + UX улучшения</option>
+                <option value="i18n_check">[6] Проверить i18n/языковые кнопки и совместимость</option>
+                <option value="terminal_hook_plan">[7] План интеграции Codex в Admin Terminal</option>
+                <option value="report_status">[8] Сформировать короткий отчёт: что сделано/что дальше</option>
+                <option value="bugs_find">[9] Найти ошибки/битые ссылки /admin/*</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-top:10px;">
+            <label>Текст задачи (taskText)</label>
+            <textarea id="taskText" class="mono" placeholder="Например: 
+1) Найди где подключён registerCodexRunRoute 
+2) Проверь что POST /api/codex/run работает
+3) Сформируй короткий отчёт"></textarea>
+            <div class="smallNote">
+              Подсказка: для быстрой проверки — выбери пакет <span class="kbd">[0] ping</span> и нажми “▶ Запустить”.
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <button class="btn ok" id="btnRun">▶ Запустить</button>
+            <button class="btn secondary" id="btnUsePack">📦 Вставить пакет</button>
+            <button class="btn secondary" id="btnClear">🧽 Очистить</button>
+            <button class="btn secondary" id="btnCopyCurl">📋 Copy CURL</button>
+          </div>
+        </div>
+
+        <!-- RIGHT: REMOTE CONTROL (TV REMOTE) -->
+        <div class="card" style="margin-top:12px;">
+          <label>Пульт управления (быстрые действия)</label>
+
+          <div class="row">
+            <button class="btn" id="btnHealth">✅ Проверить /health</button>
+            <a class="btn" href="/admin/terminal.html">⌨️ Открыть терминал</a>
+            <a class="btn" href="/admin/logs.html">📜 Открыть логи</a>
+            <a class="btn" href="/admin/status.html">📊 System Status</a>
+          </div>
+
+          <div class="card" style="margin-top:10px;">
+            <label>GitHub быстрые ссылки (без токена, просто открытие)</label>
+            <div class="row">
+              <input id="repoUrl" class="mono" placeholder="Repo URL, напр. https://github.com/Vladislav6410/WebKurierCore" />
+              <button class="btn" id="btnOpenRepo">↗ Открыть Repo</button>
+              <button class="btn" id="btnOpenPRs">↗ PRs</button>
+              <button class="btn" id="btnOpenBranches">↗ Branches</button>
+            </div>
+
+            <div class="split" style="margin-top:10px;">
+              <div>
+                <label>Имя ветки (для удаления)</label>
+                <input id="branchName" class="mono" placeholder="например: codex/webkuriercore-..." />
+              </div>
+              <div>
+                <label>Действие</label>
+                <button class="btn bad" id="btnDeleteBranch">🗑 Открыть удаление ветки</button>
+              </div>
+            </div>
+
+            <div class="smallNote">
+              Важно: удаление ветки требует GitHub (это нормально). Эта кнопка просто ведёт в нужное место, чтобы ты не искал.
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:10px;">
+            <label>Проверка проделанной работы (быстро)</label>
+            <div class="row">
+              <button class="btn" id="btnReport">🧾 Отчёт “что сделано”</button>
+              <button class="btn" id="btnFindBugs">🪲 Найти ошибки/битые ссылки</button>
+              <button class="btn" id="btnAudit">🔐 Проверить Security + Audit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px;">
+        <label>Ответ Codex (output_text)</label>
+        <div id="output" class="statusLine mono">—</div>
+      </div>
+
+      <div class="card" style="margin-top:12px;">
+        <label>Системные сообщения</label>
+        <div id="sys" class="statusLine mono">—</div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/admin/codex.js"></script>
+</body>
+</html>
