@@ -1,0 +1,9 @@
+permissions:
+  contents: read
+  actions: none
+  checks: none
+  deployments: none
+  issues: none
+  packages: none
+  pull-requests: none
+  statuses: none
