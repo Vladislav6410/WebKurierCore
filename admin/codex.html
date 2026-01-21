@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WebKurierCore · Codex Console</title>
+
+  <style>
+    :root{
+      --bg:#020617;
+      --fg:#e5e7eb;
+      --muted:#9ca3af;
+      --line:#243047;
+      --card:#0b1120;
+      --btn:#111827;
+      --btn2:#1f2937;
+      --ok:#16a34a;
+      --bad:#dc2626;
+      --accent:#60a5fa;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:radial-gradient(circle at top,#111827 0,#020617 55%);
+      color:var(--fg);
+    }
+
+    .page{
+      max-width:980px;
+      margin:0 auto;
+      padding:16px 12px 30px;
+    }
+
+    header{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      padding:10px 6px 14px;
+      border-bottom:1px solid var(--line);
+      margin-bottom:14px;
+    }
+
+    h1{ margin:0; font-size:18px; }
+    .sub{ color:var(--muted); font-size:13px; line-height:1.35; }
+
+    .row{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+    .card{
+      background:linear-gradient(145deg,#020617,#020617 55%,#0b1120);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px;
+      box-shadow:0 14px 32px rgba(0,0,0,.45);
+      margin-top:12px;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(15,23,42,.95);
+      color:var(--fg);
+      text-decoration:none;
+      cursor:pointer;
+      font-size:14px;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{ border-color:var(--accent); }
+
+    .pill{
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .pill.ok{ color:#86efac; border-color:#16a34a55; }
+    .pill.bad{ color:#fca5a5; border-color:#dc262655; }
+
+    label{ display:block; margin:0 0 6px; font-size:12px; color:var(--muted); }
+    select, textarea, input{
+      width:100%;
+      background:#0f172a;
+      color:var(--fg);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px;
+      font-size:14px;
+      outline:none;
+    }
+    textarea{ min-height:160px; resize:vertical; }
+
+    pre{
+      margin:0;
+      white-space:pre-wrap;
+      word-break:break-word;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      font-size:12.5px;
+      line-height:1.35;
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
+    }
+    @media (min-width:860px){
+      .grid2{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .hint{ color:var(--muted); font-size:12px; margin-top:8px; }
+    .danger{ border-color:#dc2626aa; }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <header>
+      <h1>🧠 Codex Console</h1>
+      <div class="sub">
+        Пульт управления задачами через <code>/api/codex/run</code>. Режим:
+        <b>Plan</b> (план без изменений) → <b>Run</b> (внести изменения).
+      </div>
+
+      <div class="row">
+        <a class="btn" href="/">⬅️ Назад в портал</a>
+        <a class="btn" href="/admin/terminal.html">⌨️ Terminal</a>
+        <a class="btn" href="/admin/status.html">✅ Status</a>
+        <a class="btn" href="/admin/logs.html">📜 Logs</a>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between;">
+        <div>
+          <div class="sub">Состояние API</div>
+          <div id="apiPill" class="pill">…</div>
+        </div>
+        <div class="row">
+          <button class="btn" id="btnHealth">🔎 /health</button>
+          <button class="btn" id="btnPing">🏓 ping</button>
+        </div>
+      </div>
+      <div class="hint">
+        Если ping не работает: значит <code>POST /api/codex/run</code> ещё не реализован в Node-сервере.
+      </div>
+    </div>
+
+    <div class="card grid2">
+      <div>
+        <label>Preset (готовая кнопка-задача)</label>
+        <select id="preset">
+          <option value="">— выбрать —</option>
+          <option value="plan_run_api">TASK: Реализовать /api/codex/run (stub)</option>
+          <option value="secure_gate">TASK: Security gate (блок опасного)</option>
+          <option value="smoke">TASK: Smoke check (health/status/ping)</option>
+          <option value="agent_tiles">TASK: Плитки из agents_map.json</option>
+          <option value="terminal_router">TASK: Terminal router commands_map.json</option>
+        </select>
+
+        <div class="hint">
+          Нажми preset → текст появится снизу. Потом выбери Plan/Run и “Отправить”.
+        </div>
+      </div>
+
+      <div>
+        <label>Режим</label>
+        <select id="mode">
+          <option value="plan">Plan (без изменений)</option>
+          <option value="run">Run (внести изменения)</option>
+        </select>
+
+        <div class="hint">
+          Рекомендация: всегда сначала <b>Plan</b>, потом <b>Run</b>.
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>Текст задачи</label>
+      <textarea id="taskText" placeholder="Опиши задачу. Например: добавь endpoint POST /api/codex/run и верни ok/output_text..."></textarea>
+
+      <div class="row" style="margin-top:10px;">
+        <button class="btn" id="btnSend">▶️ Отправить</button>
+        <button class="btn" id="btnCopy">📋 Копировать</button>
+        <button class="btn" id="btnSave">💾 В историю</button>
+        <button class="btn danger" id="btnClear">🧹 Очистить</button>
+      </div>
+
+      <div class="hint">
+        “История” хранится локально на телефоне (localStorage). Это удобно, чтобы не терять промпты.
+      </div>
+    </div>
+
+    <div class="card">
+      <label>Ответ / Результат</label>
+      <pre id="output">—</pre>
+    </div>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between;">
+        <div>
+          <label>История задач</label>
+          <div class="hint">Кнопка “Вставить” вернёт задачу обратно в поле.</div>
+        </div>
+        <button class="btn danger" id="btnHistoryClear">🗑 Очистить историю</button>
+      </div>
+      <div id="history"></div>
+    </div>
+
+  </div>
+
+  <!-- ✅ shared logic first (no duplication, no mount) -->
+  <script src="/admin/codex-ui.js"></script>
+
+  <!-- ✅ init (binds buttons + presets + history + chunking) -->
+  <script src="/admin/codex.js"></script>
+</body>
+</html>
