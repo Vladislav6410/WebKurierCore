@@ -1,40 +1,120 @@
-<!-- telemetry-core.html -->
+<!-- engine/agents/telemetry/telemetry-core.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>📡 Агент: Телеметрия</title>
+  <title>📡 Агент: Телеметрия (ESP32)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script type="module" src="telemetry-agent.js"></script>
+
   <style>
     body {
-      font-family: sans-serif;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
       background: #f3f3f3;
-      padding: 20px;
+      padding: 18px;
     }
+
     h1 {
-      margin-bottom: 10px;
+      margin: 0 0 10px;
     }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0;
+    }
+
     button {
-      margin: 5px;
-      padding: 8px 12px;
+      padding: 10px 12px;
+      font-size: 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    button:hover { opacity: 0.95; }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.08);
+    }
+
+    .hint {
+      font-size: 13px;
+      opacity: 0.75;
+      margin-top: 6px;
+    }
+
+    input {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      width: 100%;
+      max-width: 360px;
       font-size: 14px;
     }
+
     #output {
-      margin-top: 20px;
+      margin-top: 12px;
       padding: 12px;
-      background: #fff;
-      border-radius: 6px;
-      box-shadow: 0 0 4px rgba(0,0,0,0.1);
+      background: #111827;
+      color: #e5e7eb;
+      border-radius: 10px;
       white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      min-height: 220px;
     }
   </style>
 </head>
 <body>
-  <h1>📡 Агент телеметрии</h1>
 
-  <button onclick="TelemetryAgent.getStatus()">🔋 Статус систем</button>
-  <button onclick="TelemetryAgent.diagnostics()">🧪 Диагностика</button>
+  <h1>📡 Агент телеметрии (ESP32 Wi-Fi)</h1>
 
-  <div id="output"></div>
+  <div class="card">
+    <div class="row">
+      <input id="espHost" placeholder="http://192.168.1.50" />
+      <button onclick="applyHost()">✅ Применить IP</button>
+    </div>
+
+    <div class="row">
+      <button onclick="TelemetryAgent.getStatus()">🔋 Статус</button>
+      <button onclick="TelemetryAgent.diagnostics()">🧪 Диагностика</button>
+      <button onclick="TelemetryAgent.relayOn()">🔌 Реле ON</button>
+      <button onclick="TelemetryAgent.relayOff()">⛔ Реле OFF</button>
+    </div>
+
+    <div class="row">
+      <button onclick="TelemetryAgent.startAuto()">▶️ Авто</button>
+      <button onclick="TelemetryAgent.stopAuto()">⏸ Стоп</button>
+    </div>
+
+    <div class="hint">
+      Подсказка: IP ESP32 смотри в Serial Monitor после прошивки.  
+      Должно открываться: <b>http://IP/status</b>
+    </div>
+  </div>
+
+  <div id="output">Готово. Введи IP ESP32 и нажми "Статус".</div>
+
+  <script>
+    function applyHost(){
+      const el = document.getElementById("espHost");
+      const v = (el?.value || "").trim();
+      if (!v) {
+        TelemetryAgent._output("❗ Введи адрес, например: http://192.168.1.50");
+        return;
+      }
+      TelemetryAgent.config.esp32Host = v;
+      TelemetryAgent._output("✅ Адрес применён: " + v);
+    }
+
+    // автоподстановка текущего значения из конфига
+    document.getElementById("espHost").value = TelemetryAgent.config.esp32Host;
+  </script>
+
 </body>
 </html>
