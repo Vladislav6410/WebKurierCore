@@ -1,0 +1,61 @@
+{
+  "enabled": true,
+  "mode": "translate_and_assist",
+  "default_lang": "ru",
+
+  "phonecore": {
+    "base_url": "http://localhost:3002",
+    "endpoints": {
+      "translate": "/api/translate",
+      "chat": "/api/chat"
+    },
+    "timeout_ms": 20000
+  },
+
+  "security": {
+    "enabled": false,
+    "base_url": "http://localhost:3003",
+    "endpoints": {
+      "scan_url": "/api/scan/url",
+      "scan_text": "/api/scan/text"
+    },
+    "timeout_ms": 12000
+  },
+
+  "slack": {
+    "signing_secret_env": "SLACK_SIGNING_SECRET",
+    "bot_token_env": "SLACK_BOT_TOKEN",
+    "app_token_env": "SLACK_APP_TOKEN",
+    "request_body_limit": "1mb",
+
+    "allowed_channels": [],
+    "deny_channels": [],
+
+    "respond_in_threads": true,
+    "prepend_badge": true
+  },
+
+  "limits": {
+    "max_text_chars": 8000,
+    "max_files": 0
+  },
+
+  "i18n": {
+    "ru": {
+      "badge": "WebKurier",
+      "err_not_configured": "Slack не настроен: проверь SLACK_BOT_TOKEN и SLACK_SIGNING_SECRET.",
+      "err_forbidden": "Доступ запрещён для этого канала.",
+      "err_too_long": "Сообщение слишком длинное (лимит).",
+      "err_internal": "Ошибка обработки. Попробуй позже.",
+      "hint_usage": "Напиши текст — я переведу/помогу. Команды: /wk-help, /wk-lang <ru|en|de|pl>"
+    },
+    "en": {
+      "badge": "WebKurier",
+      "err_not_configured": "Slack is not configured: check SLACK_BOT_TOKEN and SLACK_SIGNING_SECRET.",
+      "err_forbidden": "This channel is not allowed.",
+      "err_too_long": "Message is too long (limit).",
+      "err_internal": "Processing error. Please try later.",
+      "hint_usage": "Send text — I will translate/help. Commands: /wk-help, /wk-lang <ru|en|de|pl>"
+    }
+  }
+}
