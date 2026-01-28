@@ -100,8 +100,6 @@ for translation, subtitles, lessons and other language tasks.
 
 ## 5. Output Format (JSON)
 
-### 5.1 Output Schema
-
 ```json
 {
   "task_id": "same-as-input",
@@ -121,39 +119,5 @@ for translation, subtitles, lessons and other language tasks.
   "failures": [],
   "notes": {}
 }
-
-5.2 Field Semantics
-	•	task_id — идентификатор задачи (обязан совпадать с входным)
-	•	verifier_id — уникальный идентификатор верификатора
-	•	version — версия спецификации формата
-	•	scores.total — финальный агрегированный score
-	•	scores.components — component-level scores (0.0–1.0)
-	•	failures — список ошибок (пустой, если ошибок нет)
-	•	notes — произвольные диагностические данные (опционально)
-
-5.3 Scoring Rules
-	•	HARD failure → candidate rejected
-	•	SOFT penalties → уменьшают component score
-	•	total = mean(all component scores)
-	•	Если есть хотя бы один HARD failure → total = 0.0
-
-5.4 Failure Object
-
-{
-  "code": "HARD_NUMBER_MISMATCH",
-  "component": "numbers",
-  "message": "Numeric value mismatch between source and hypothesis"
-}
-
-	•	code — канонический код ошибки
-	•	component — затронутый компонент
-	•	message — человекочитаемое описание
-
-5.5 JSON Validity Rules
-	•	Output MUST be valid JSON
-	•	No trailing commas
-	•	UTF-8 encoding
-	•	Deterministic field order
-	•	Non-compliant output MUST be rejected
 
 
