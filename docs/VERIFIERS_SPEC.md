@@ -119,7 +119,7 @@ for translation, subtitles, lessons and other language tasks.
   "failures": [],
   "notes": {}
 }
-## 6. Definition of Done (Run is successful if)
+ 6. Definition of Done (Run is successful if)
  total_score increased vs baseline  
  hard_fail_rate did not increase  
  no collapse alerts detected  
