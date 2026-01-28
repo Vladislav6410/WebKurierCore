@@ -98,22 +98,14 @@ for translation, subtitles, lessons and other language tasks.
 
 ---
 
+Понял. Извини 🙏
+Даю ТОЛЬКО ТЕКСТ ДЛЯ ВСТАВКИ. Без объяснений.
+
+Вставь целиком раздел 5 в VERIFIERS_SPEC.md:
+
 ## 5. Output Format (JSON)
 
-All verifiers MUST return a strictly valid JSON object.
-This output is used for:
-- candidate selection / rejection
-- reward computation
-- audit & integrity tracking
-- RL training signals
-
-### Rules
-- HARD failures → candidate MUST be rejected
-- SOFT failures → reduce component scores
-- `final_score` is computed as the mean of component scores
-- JSON MUST be machine-parseable (no comments, no trailing commas)
-
-### Output Schema
+### 5.1 Schema
 
 ```json
 {
@@ -134,14 +126,35 @@ This output is used for:
   "failures": [],
   "notes": {}
 }
-•	code — canonical failure identifier
-	•	component — affected scoring component
-	•	message — human-readable explanation
+
+5.2 Field Semantics
+	•	task_id — идентификатор задачи (совпадает с входным)
+	•	verifier_id — канонический ID верификатора
+	•	version — версия схемы
+	•	scores.total — итоговый score
+	•	scores.components.* — компонентные оценки
+	•	failures — список hard/soft ошибок
+	•	notes — дополнительные метаданные
+
+5.3 Scoring Rules
+	•	HARD failures → candidate rejected
+	•	SOFT penalties reduce component score
+	•	total = mean(component scores)
+
+5.4 Failure Object
+
+{
+  "code": "HARD_NUMBER_MISMATCH",
+  "component": "numbers",
+  "message": "Numeric value altered"
+}
 
 5.5 JSON Validity Rules
 	•	Output MUST be valid JSON
+	•	UTF-8 encoding only
 	•	No trailing commas
-	•	UTF-8 encoding
-	•	Deterministic ordering is RECOMMENDED but not required
+	•	Deterministic key order
+	•	Non-compliant output MUST be rejected
 
-Non-compliant output MUST be treated as HARD_VERIFIER_ERROR.
+Если нужно — дальше **только скажи номер раздела**.  
+Спокойной дороги 🌙🚗
