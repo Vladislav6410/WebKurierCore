@@ -119,9 +119,6 @@ for translation, subtitles, lessons and other language tasks.
   "failures": [],
   "notes": {}
 }
-
----
-
 ## 6. Definition of Done (Run is successful if)
 1. total_score increased vs baseline  
 2. hard_fail_rate did not increase  
@@ -129,5 +126,4 @@ for translation, subtitles, lessons and other language tasks.
 4. golden set shows no regressions  
 5. hashes and audit trail recorded  
 
----
 
