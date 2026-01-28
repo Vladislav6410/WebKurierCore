@@ -100,7 +100,22 @@ for translation, subtitles, lessons and other language tasks.
 
 ## 5. Output Format (JSON)
 
-   json
+All verifiers MUST return a strictly valid JSON object.
+This output is used for:
+- candidate selection / rejection
+- reward computation
+- audit & integrity tracking
+- RL training signals
+
+### Rules
+- HARD failures → candidate MUST be rejected
+- SOFT failures → reduce component scores
+- `final_score` is computed as the mean of component scores
+- JSON MUST be machine-parseable (no comments, no trailing commas)
+
+### Output Schema
+
+```json
 {
   "task_id": "same-as-input",
   "verifier_id": "translator_entity_number",
