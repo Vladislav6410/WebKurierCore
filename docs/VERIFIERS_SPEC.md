@@ -100,7 +100,7 @@ for translation, subtitles, lessons and other language tasks.
 
 ## 5. Output Format (JSON)
 
-```json
+   json
 {
   "task_id": "same-as-input",
   "verifier_id": "translator_entity_number",
