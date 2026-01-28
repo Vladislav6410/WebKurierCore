@@ -156,5 +156,6 @@ for translation, subtitles, lessons and other language tasks.
 	•	Deterministic key order
 	•	Non-compliant output MUST be rejected
 
-
+Если нужно — дальше **только скажи номер раздела**.  
+Спокойной дороги 🌙🚗
 
