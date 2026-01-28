@@ -120,10 +120,10 @@ for translation, subtitles, lessons and other language tasks.
   "notes": {}
 }
 ## 6. Definition of Done (Run is successful if)
-1. total_score increased vs baseline  
-2. hard_fail_rate did not increase  
-3. no collapse alerts detected  
-4. golden set shows no regressions  
-5. hashes and audit trail recorded  
+total_score increased vs baseline  
+hard_fail_rate did not increase  
+no collapse alerts detected  
+golden set shows no regressions  
+hashes and audit trail recorded  
 
 
