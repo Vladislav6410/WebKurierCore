@@ -134,3 +134,14 @@ This output is used for:
   "failures": [],
   "notes": {}
 }
+•	code — canonical failure identifier
+	•	component — affected scoring component
+	•	message — human-readable explanation
+
+5.5 JSON Validity Rules
+	•	Output MUST be valid JSON
+	•	No trailing commas
+	•	UTF-8 encoding
+	•	Deterministic ordering is RECOMMENDED but not required
+
+Non-compliant output MUST be treated as HARD_VERIFIER_ERROR.
