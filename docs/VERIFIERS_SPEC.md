@@ -98,19 +98,9 @@ for translation, subtitles, lessons and other language tasks.
 
 ---
 
-Понял. Извини 🙏
-Даю ТОЛЬКО ТЕКСТ ДЛЯ ВСТАВКИ. Без объяснений.
-
-Вставь целиком раздел 5 в VERIFIERS_SPEC.md:
-
-Понял. Извини 🙏
-Даю ТОЛЬКО ТЕКСТ ДЛЯ ВСТАВКИ. Без объяснений.
-
-Вставь целиком раздел 5 в VERIFIERS_SPEC.md:
-
 ## 5. Output Format (JSON)
 
-### 5.1 Schema
+### 5.1 Output Schema
 
 ```json
 {
@@ -133,34 +123,37 @@ for translation, subtitles, lessons and other language tasks.
 }
 
 5.2 Field Semantics
-	•	task_id — идентификатор задачи (совпадает с входным)
-	•	verifier_id — канонический ID верификатора
-	•	version — версия схемы
-	•	scores.total — итоговый score
-	•	scores.components.* — компонентные оценки
-	•	failures — список hard/soft ошибок
-	•	notes — дополнительные метаданные
+	•	task_id — идентификатор задачи (обязан совпадать с входным)
+	•	verifier_id — уникальный идентификатор верификатора
+	•	version — версия спецификации формата
+	•	scores.total — финальный агрегированный score
+	•	scores.components — component-level scores (0.0–1.0)
+	•	failures — список ошибок (пустой, если ошибок нет)
+	•	notes — произвольные диагностические данные (опционально)
 
 5.3 Scoring Rules
-	•	HARD failures → candidate rejected
-	•	SOFT penalties reduce component score
-	•	total = mean(component scores)
+	•	HARD failure → candidate rejected
+	•	SOFT penalties → уменьшают component score
+	•	total = mean(all component scores)
+	•	Если есть хотя бы один HARD failure → total = 0.0
 
 5.4 Failure Object
 
 {
   "code": "HARD_NUMBER_MISMATCH",
   "component": "numbers",
-  "message": "Numeric value altered"
+  "message": "Numeric value mismatch between source and hypothesis"
 }
+
+	•	code — канонический код ошибки
+	•	component — затронутый компонент
+	•	message — человекочитаемое описание
 
 5.5 JSON Validity Rules
 	•	Output MUST be valid JSON
-	•	UTF-8 encoding only
 	•	No trailing commas
-	•	Deterministic key order
+	•	UTF-8 encoding
+	•	Deterministic field order
 	•	Non-compliant output MUST be rejected
 
-Если нужно — дальше **только скажи номер раздела**.  
-Спокойной дороги 🌙🚗
 
