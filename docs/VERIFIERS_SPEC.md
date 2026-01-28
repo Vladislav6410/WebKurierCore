@@ -98,32 +98,14 @@ for translation, subtitles, lessons and other language tasks.
 
 ---
 
-## 5. Output Format (JSON)
+## 6. Definition of Done
 
-```json
-{
-  "task_id": "same-as-input",
-  "verifier_id": "translator_entity_number",
-  "version": "1.0",
-  "scores": {
-    "total": 0.0,
-    "components": {
-      "fidelity": 0.0,
-      "glossary": 0.0,
-      "entities": 0.0,
-      "numbers": 0.0,
-      "style": 0.0,
-      "safety": 0.0
-    }
-  },
-  "failures": [],
-  "notes": {}
-}
-   Definition of Done (Run is successful if)
- total_score increased vs baseline  
- hard_fail_rate did not increase  
- no collapse alerts detected  
- golden set shows no regressions  
- hashes and audit trail recorded  
+A run is considered successful if **all** of the following are true:
+
+- `total_score` increased compared to baseline  
+- `hard_fail_rate` did not increase  
+- No collapse alerts were detected  
+- Golden test set shows no regressions  
+- Hashes and full audit trail are recorded
 
 
