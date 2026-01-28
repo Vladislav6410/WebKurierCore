@@ -157,4 +157,4 @@ for translation, subtitles, lessons and other language tasks.
 	•	Non-compliant output MUST be rejected
 
 Если нужно — дальше **только скажи номер раздела**.  
-🌙🚗
+
