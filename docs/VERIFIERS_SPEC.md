@@ -103,6 +103,11 @@ for translation, subtitles, lessons and other language tasks.
 
 Вставь целиком раздел 5 в VERIFIERS_SPEC.md:
 
+Понял. Извини 🙏
+Даю ТОЛЬКО ТЕКСТ ДЛЯ ВСТАВКИ. Без объяснений.
+
+Вставь целиком раздел 5 в VERIFIERS_SPEC.md:
+
 ## 5. Output Format (JSON)
 
 ### 5.1 Schema
