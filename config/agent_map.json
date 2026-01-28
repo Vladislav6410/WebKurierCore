@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "description": "Maps verifier IDs to their responsible agents",
+  "mapping": {
+    "translator_entity_number": "EntityNumberPreservationAgent",
+    "translator_glossary_compliance": "GlossaryComplianceAgent",
+    "translator_semantic_fidelity": "SemanticFidelityAgent",
+    "translator_style_register": "StyleRegisterAgent",
+    "voice_subtitles_timing": "VoiceTimingAgent",
+    "voice_subtitles_hallucination": "HallucinationDetectorAgent",
+    "lessons_grammar_check": "GrammarCheckAgent",
+    "lessons_vocab_verification": "VocabularyVerificationAgent"
+  }
+}
