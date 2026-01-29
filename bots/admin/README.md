@@ -155,45 +155,5 @@ CORE_API_TIMEOUT=8
 
 ⸻
 
-📁 Папка: WebKurierCore/bots/admin/systemd/
-
-📄 Файл: webkurier-admin-bot.service
-
-Содержимое файла (скопировать):
-
-[Unit]
-Description=WebKurier Admin Bot (Telegram)
-After=network-online.target
-Wants=network-online.target
-
-[Service]
-Type=simple
-
-# ⚠️ Укажи свой путь до репозитория
-WorkingDirectory=/opt/webkurier/WebKurierCore/bots/admin
-
-# ⚠️ Путь к python в venv
-ExecStart=/opt/webkurier/WebKurierCore/bots/admin/.venv/bin/python3 bot.py
-
-# Environment: можно хранить в отдельном файле (рекомендуется)
-EnvironmentFile=/opt/webkurier/WebKurierCore/bots/admin/.env
-
-Restart=always
-RestartSec=3
-
-# Безопасность (умеренно строгая, можно ослабить при проблемах)
-NoNewPrivileges=true
-PrivateTmp=true
-
-# Логи
-StandardOutput=journal
-StandardError=journal
-
-[Install]
-WantedBy=multi-user.target
-
-
-⸻
-
 
 
