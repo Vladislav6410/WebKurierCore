@@ -1,8 +1,13 @@
 """
-WebKurier Admin Bot package.
+WebKurierCore Admin Telegram Bot package.
 
-Private administrative interface for managing:
-- system status
-- agents lifecycle
-- internal services of WebKurierCore
+Path: WebKurierCore/bots/admin/
 """
+
+__all__ = [
+    "bot",
+    "router",
+    "security",
+    "handlers",
+    "services",
+]
