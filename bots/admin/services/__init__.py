@@ -1,6 +1,9 @@
 """
-Services package for WebKurier Admin Bot.
+Services layer for WebKurier Admin Bot.
 
-Contains integrations and service-layer logic,
-such as communication with WebKurierCore Admin API.
+Contains integrations / API clients (Core Admin API, etc).
 """
+
+from .core_api import core_api_call
+
+__all__ = ["core_api_call"]
