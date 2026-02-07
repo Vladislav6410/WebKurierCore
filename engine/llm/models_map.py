@@ -1,10 +1,16 @@
 
-**Содержимое файла (скопировать):**
+📁 Папка: WebKurierCore/engine/llm/
+📄 Файл: models_map.py
 ```python
+"""
+Model Mapping Configuration
+Maps agents and tasks to specific AI models
+"""
+
 MODEL_MAP = {
     "engineer": {
         "default": "qwen3-coder",
-        "fast": "qwen3-coder-flash",
+        "fast": "qwen3-coder-flash", 
         "long": "qwen2.5-turbo",
         "reasoning": "qwq-32b",
     },
@@ -13,7 +19,7 @@ MODEL_MAP = {
         "bulk": "qwen2.5-turbo",
     },
     "legal": {
-        "default": "gpt-5",
+        "default": "gpt-5", 
         "fallback": "claude-3.5",
     },
     "security": {
@@ -27,7 +33,7 @@ MODEL_MAP = {
         "ocr": "qwen3-vl-32b",
     },
     "voice": {
-        "default": "qwen3-omni-flash",
+        "default": "qwen3-omni-flash", 
         "lite": "qwen2.5-omni-7b",
     },
     "master": {
@@ -35,3 +41,4 @@ MODEL_MAP = {
         "fallback": "qwq-32b",
     },
 }
+
