@@ -143,3 +143,4 @@ export function setDualPair(a, b) {
 export function getDirectionForText({ detectedBaseLang, textSample }) {
   return decideDirection(detectedBaseLang, textSample || "");
 }
+
