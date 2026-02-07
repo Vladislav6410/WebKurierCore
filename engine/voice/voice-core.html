@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebKurierPhoneCore — Voice Core</title>
+
+  <style>
+    .wk-voice-box {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+    }
+
+    .wk-h2 {
+      margin: 0 0 12px 0;
+      font-size: 1.05em;
+      color: #333;
+    }
+
+    .wk-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .wk-control {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .wk-status {
+      padding: 6px 0;
+      font-size: 13px;
+      color: #666;
+    }
+
+    button.wk-control {
+      cursor: pointer;
+      background-color: #f5f5f5;
+    }
+
+    button.wk-control:hover {
+      background-color: #e0e0e0;
+    }
+
+    button.wk-control:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="voice-ui">
+    <div class="wk-voice-box">
+      <h2 class="wk-h2">🎙 Voice Recognition Controls</h2>
+
+      <div class="wk-row">
+        <button id="start-stt" class="wk-control">Start STT</button>
+        <button id="stop-stt" class="wk-control">Stop STT</button>
+        <span id="status-indicator" class="wk-status">Ready</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="dual-live-pair-ui"></div>
+
+  <script type="module">
+    import { initTTSBridge } from "./tts-bridge.js";
+    import { createSTT } from "./stt-bridge.js";
+    import { initDualLiveBridge, enableDualLive, setDualPair } from "../translator/ui/dual-live-bridge.js";
+    import { mountLanguagePairPicker, loadSavedPair } from "../translator/ui/language-pair-picker.js";
+
+    // --- UI helpers
+    const elStatus = document.getElementById("status-indicator");
+    const elStart = document.getElementById("start-stt");
+    const elStop = document.getElementById("stop-stt");
+
+    function setStatus(msg) {
+      if (elStatus) elStatus.textContent = msg;
+    }
+
+    function setButtons(listening) {
+      if (elStart) elStart.disabled = !!listening;
+      if (elStop) elStop.disabled = !listening;
+    }
+
+    // 1) TTS listener
+    initTTSBridge();
+
+    // 2) Dual live translator bridge
+    initDualLiveBridge();
+    enableDualLive(true);
+
+    // 2.1) Pair UI + save/load
+    const pairMount = document.getElementById("dual-live-pair-ui");
+    const saved = loadSavedPair();
+    setDualPair(saved.a, saved.b);
+
+    if (pairMount) {
+      mountLanguagePairPicker({
+        mountEl: pairMount,
+        initialPair: saved,
+        onChangePair: (p) => setDualPair(p.a, p.b),
+      });
+    }
+
+    // 3) STT must start only on user gesture (browser policy)
+    const stt = createSTT({ lang: "de-DE", continuous: true, interimResults: true });
+    window.WK_STT = stt;
+
+    setButtons(false);
+
+    elStart?.addEventListener("click", async () => {
+      try {
+        setStatus("Starting STT…");
+        setButtons(true);
+        const res = stt.start?.();
+        if (res && typeof res.then === "function") await res;
+        setStatus("Listening…");
+      } catch (e) {
+        console.error("[VoiceCore] STT start failed:", e);
+        setStatus("STT start failed");
+        setButtons(false);
+      }
+    });
+
+    elStop?.addEventListener("click", async () => {
+      try {
+        stt.stop?.();
+        setStatus("Stopped");
+      } catch (e) {
+        console.error("[VoiceCore] STT stop failed:", e);
+        setStatus("Stop failed");
+      } finally {
+        setButtons(false);
+      }
+    });
+  </script>
+</body>
+</html>
