@@ -35,3 +35,17 @@ wheels/
 .DS_Store
 Thumbs.db
 
+# Logs
+*.log
+logs/
+
+# Temp files
+*.tmp
+*.bak
+*.swp
+
+# Distribution artifacts
+dist/
+build/
+*.egg-info/
+
