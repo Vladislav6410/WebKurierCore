@@ -1,51 +1,37 @@
-# Node.js
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# Environment (секреты)
+# Environment variables
 .env
 .env.local
-.env.development.local
-.env.production.local
+.env.*.local
 
-# WhatsApp Session (Baileys)
-engine/agents/*/.wa-auth-romantic/
-*.session.json
-
-# Dropbox auth
-.dropbox-auth/
-dropbox_token.json
-
-# Logs & temp files
-logs/
-*.log
-*.bak
-*.tmp
-*.swp
-
-# Memory backups (если делаешь бэкапы в scripts)
-engine/agents/*/backups/
-
-# Jest & coverage
-coverage/
-jest-results/
-.cache/
-dist/
-
-# Python cache
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# System / OS
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
 .DS_Store
 Thumbs.db
 
-# VSCode / JetBrains
-.vscode/
-.idea/
-
-# Local test files
-test-output/
