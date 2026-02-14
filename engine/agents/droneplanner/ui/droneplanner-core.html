@@ -1,10 +1,10 @@
 <script>
 const sample = {
-  "type":"Feature",
-  "properties":{},
-  "geometry":{
-    "type":"Polygon",
-    "coordinates":[[
+  type: "Feature",
+  properties: {},
+  geometry: {
+    type: "Polygon",
+    coordinates: [[
       [7.0, 51.0],
       [7.02, 51.0],
       [7.02, 51.01],
@@ -13,6 +13,7 @@ const sample = {
     ]]
   }
 };
+
 document.getElementById("aoi").value = JSON.stringify(sample, null, 2);
 
 function buildBody() {
@@ -33,35 +34,42 @@ async function safeJson(response) {
   catch { return null; }
 }
 
-document.getElementById("plan").onclick = async () => {
-  try {
+function filenameFromHeaders(response, fallbackName) {
+  const cd = response.headers.get("content-disposition") || "";
+  const match = cd.match(/filename="([^"]+)"/i);
+  return match?.[1] || fallbackName;
+}
+
+async function downloadBlobAsFile(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+async function withBusy(btnId, fn) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = true;
+  try { await fn(); }
+  finally { btn.disabled = false; }
+}
+
+async function postJson(endpoint, body) {
+  return fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+}
+
+async function downloadPlan(endpoint, fallbackName, btnId) {
+  await withBusy(btnId, async () => {
     const body = buildBody();
-    const r = await fetch("/api/droneplanner/plan", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-
-    const data = await safeJson(r);
-    if (!r.ok) {
-      alert((data && data.error) ? data.error : `Plan failed (${r.status})`);
-      return;
-    }
-
-    document.getElementById("out").textContent = JSON.stringify(data, null, 2);
-  } catch (e) {
-    alert(`Plan error: ${e?.message || e}`);
-  }
-};
-
-document.getElementById("downloadQgc").onclick = async () => {
-  try {
-    const body = buildBody();
-    const r = await fetch("/api/droneplanner/export/qgc", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
+    const r = await postJson(endpoint, body);
 
     if (!r.ok) {
       const err = await safeJson(r);
@@ -70,24 +78,37 @@ document.getElementById("downloadQgc").onclick = async () => {
     }
 
     const blob = await r.blob();
-    const url = URL.createObjectURL(blob);
+    const filename = filenameFromHeaders(r, fallbackName);
+    await downloadBlobAsFile(blob, filename);
+  });
+}
 
-    // Try to use filename from header
-    const cd = r.headers.get("content-disposition") || "";
-    const match = cd.match(/filename="([^"]+)"/i);
-    const filename = match?.[1] || "WK_Mission.plan";
+async function planMission() {
+  await withBusy("plan", async () => {
+    try {
+      const body = buildBody();
+      const r = await postJson("/api/droneplanner/plan", body);
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  } catch (e) {
-    alert(`Export error: ${e?.message || e}`);
-  }
-};
+      const data = await safeJson(r);
+      if (!r.ok) {
+        alert((data && data.error) ? data.error : `Plan failed (${r.status})`);
+        return;
+      }
+
+      document.getElementById("out").textContent = JSON.stringify(data, null, 2);
+    } catch (e) {
+      alert(`Plan error: ${e?.message || e}`);
+    }
+  });
+}
+
+document.getElementById("plan").onclick = planMission;
+
+document.getElementById("downloadQgc").onclick = () =>
+  downloadPlan("/api/droneplanner/export/qgc", "WK_Mission.plan", "downloadQgc");
+
+document.getElementById("downloadQgcFence").onclick = () =>
+  downloadPlan("/api/droneplanner/export/qgc-geofence", "WK_Mission_GeoFence.plan", "downloadQgcFence");
 </script>
 
 
