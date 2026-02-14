@@ -3,6 +3,7 @@
  * - Express server
  * - mounts DronePlanner API routes
  * - serves DronePlanner UI as static
+ * - allows embedding UI into WebKurierSite via iframe (CSP frame-ancestors)
  *
  * Run:
  *   node server.js
@@ -19,6 +20,29 @@ import droneplannerRoutes from "./engine/api/droneplanner.routes.js";
 
 const app = express();
 app.use(express.json({ limit: "10mb" }));
+
+// --- Allow embedding Core UI into WebKurierSite (iframe) ---
+const SITE_ORIGIN = "https://site.webkurier.eu";
+
+app.use((req, res, next) => {
+  // CSP is the modern, correct way (works in modern browsers)
+  res.setHeader(
+    "Content-Security-Policy",
+    `frame-ancestors 'self' ${SITE_ORIGIN}`
+  );
+
+  // X-Frame-Options is legacy; SAMEORIGIN would block cross-domain iframes.
+  // We keep SAMEORIGIN by default, but for requests coming from the site origin
+  // we try to allow embedding (some browsers ignore ALLOW-FROM, CSP still does the job).
+  const referer = String(req.headers.referer || "");
+  if (referer.startsWith(SITE_ORIGIN)) {
+    res.setHeader("X-Frame-Options", `ALLOW-FROM ${SITE_ORIGIN}`);
+  } else {
+    res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  }
+
+  next();
+});
 
 // --- API ---
 app.use("/api", droneplannerRoutes);
@@ -38,4 +62,5 @@ const port = Number(process.env.PORT || 8080);
 app.listen(port, () => {
   console.log(`✅ WebKurierCore running on http://localhost:${port}`);
   console.log(`✅ DronePlanner UI: http://localhost:${port}/droneplanner/droneplanner-core.html`);
+  console.log(`✅ Iframe allowed for: ${SITE_ORIGIN}`);
 });
