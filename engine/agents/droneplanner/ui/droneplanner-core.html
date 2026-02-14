@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>WebKurier DronePlanner (MVP)</title>
+  <style>
+    body{font-family:system-ui;margin:16px;max-width:900px}
+    textarea{width:100%;height:180px}
+    input{width:120px}
+    pre{background:#f5f5f5;padding:12px;overflow:auto}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    button{padding:10px 14px}
+  </style>
+</head>
+<body>
+  <h2>🚁 DronePlanner MVP</h2>
+
+  <div class="row">
+    <label>GSD (cm): <input id="gsd" type="number" value="3"/></label>
+    <label>Front overlap: <input id="front" type="number" step="0.01" value="0.75"/></label>
+    <label>Side overlap: <input id="side" type="number" step="0.01" value="0.65"/></label>
+    <label>Speed (m/s): <input id="speed" type="number" value="10"/></label>
+    <button id="plan">Plan</button>
+  </div>
+
+  <h3>AOI GeoJSON (Polygon Feature)</h3>
+  <textarea id="aoi"></textarea>
+
+  <h3>Result mission.json</h3>
+  <pre id="out"></pre>
+
+<script>
+const sample = {
+  "type":"Feature",
+  "properties":{},
+  "geometry":{
+    "type":"Polygon",
+    "coordinates":[[
+      [7.0, 51.0],
+      [7.02, 51.0],
+      [7.02, 51.01],
+      [7.0, 51.01],
+      [7.0, 51.0]
+    ]]
+  }
+};
+document.getElementById("aoi").value = JSON.stringify(sample, null, 2);
+
+document.getElementById("plan").onclick = async () => {
+  const body = {
+    aoi: JSON.parse(document.getElementById("aoi").value),
+    gsd_cm: Number(document.getElementById("gsd").value),
+    overlap: { front: Number(document.getElementById("front").value), side: Number(document.getElementById("side").value) },
+    speed_mps: Number(document.getElementById("speed").value),
+    heading_deg: 0
+  };
+
+  const r = await fetch("/api/droneplanner/plan", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+
+  const data = await r.json();
+  document.getElementById("out").textContent = JSON.stringify(data, null, 2);
+};
+</script>
+</body>
+</html>
