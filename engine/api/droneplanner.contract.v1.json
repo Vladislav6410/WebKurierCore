@@ -1,0 +1,23 @@
+{
+  "version": "1.0",
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/api/droneplanner/plan",
+      "body": {
+        "aoi": "GeoJSON Feature Polygon",
+        "gsd_cm": 3,
+        "overlap": { "front": 0.75, "side": 0.65 },
+        "speed_mps": 10,
+        "heading_deg": 0,
+        "camera": {
+          "sensor_width_mm": 13.2,
+          "focal_length_mm": 8.8,
+          "image_w_px": 5472,
+          "image_h_px": 3648
+        }
+      },
+      "returns": "mission.json"
+    }
+  ]
+}
