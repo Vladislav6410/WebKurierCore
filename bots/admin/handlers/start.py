@@ -4,12 +4,18 @@ from aiogram.types import Message
 from aiogram.enums import ParseMode
 
 from ..security import is_admin
+from ..keyboards.companion import companion_keyboard
 
 router = Router()
 
 START_TEXT = (
     "🛠 *WebKurier Admin Panel*\n\n"
-    "Доступные команды:\n"
+    "✨ Companion v1 — быстрые сценарии:\n"
+    "• Проверка структуры проекта\n"
+    "• Линтер\n"
+    "• Тесты\n"
+    "• Логи\n\n"
+    "Основные команды:\n"
     "• /status — статус системы и сервисов\n"
     "• /health — проверка работоспособности\n"
     "• /agents — список активных агентов\n"
@@ -26,4 +32,8 @@ async def admin_start(message: Message):
         await message.answer("⛔ Доступ запрещён.")
         return
 
-    await message.answer(START_TEXT, parse_mode=ParseMode.MARKDOWN)
+    await message.answer(
+        START_TEXT,
+        parse_mode=ParseMode.MARKDOWN,
+        reply_markup=companion_keyboard()  # ✅ добавили кнопки
+    )
