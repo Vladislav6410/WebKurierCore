@@ -1,0 +1,9 @@
+{
+  "name": "build_repo",
+  "repo_path": "/opt/webkurier/WebKurierCore",
+  "repo_mode": "ro",
+  "workspace": "/var/lib/webkurier/wda-workspace",
+  "net": "off",
+  "timeout_ms": 180000,
+  "limits": { "mem_mb": 2048, "pids": 256, "cpu_sec": 90 }
+}
