@@ -1,9 +1,11 @@
 from aiogram import Router
 
-from .handlers import start, help, agents
+from bots.admin.handlers import start, help
+from bots.admin.handlers import companion
 
-router = Router()
-
-router.include_router(start.router)
-router.include_router(help.router)
-router.include_router(agents.router)
+def setup_router() -> Router:
+    r = Router()
+    r.include_router(start.router)
+    r.include_router(help.router)
+    r.include_router(companion.router)  # ✅ добавили
+    return r
