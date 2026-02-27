@@ -1,0 +1,9 @@
+{
+  "name": "diagnostics",
+  "repo_path": "/opt/webkurier/WebKurierCore",
+  "repo_mode": "ro",
+  "workspace": "/var/lib/webkurier/wda-workspace",
+  "net": "off",
+  "timeout_ms": 60000,
+  "limits": { "mem_mb": 512, "pids": 64, "cpu_sec": 20 }
+}
