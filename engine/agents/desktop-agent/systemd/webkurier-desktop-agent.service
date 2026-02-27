@@ -1,0 +1,34 @@
+[Unit]
+Description=WebKurier Desktop Agent
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/webkurier/WebKurierCore/engine/agents/desktop-agent
+EnvironmentFile=/opt/webkurier/WebKurierCore/engine/agents/desktop-agent/.env
+ExecStart=/usr/bin/node src/index.js
+Restart=always
+RestartSec=3
+User=webkurier
+Group=webkurier
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/webkurier/wda-workspace
+MemoryDenyWriteExecute=true
+LockPersonality=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+SystemCallArchitectures=native
+
+# Cgroup limits (important for bwrap workloads)
+MemoryMax=2500M
+CPUQuota=60%
+TasksMax=512
+
+[Install]
+WantedBy=multi-user.target
