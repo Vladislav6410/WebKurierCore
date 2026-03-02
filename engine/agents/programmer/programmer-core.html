@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🧑‍💻 ProgrammerAgent</title>
+
+  <!-- ВАЖНО: грузим "мозг" агента (НЕ из ui/) -->
+  <script type="module" src="./programmer-agent.js"></script>
+
+  <style>
+    :root{
+      --bg:#0b0f14; --panel:#101826; --line:#1f2b3a; --text:#e8eef6; --muted:#9fb0c2;
+      --btn:#162233; --btnDanger:#2a1a1a;
+    }
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text);}
+    header{
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px; border-bottom:1px solid var(--line);
+      position:sticky; top:0; background:rgba(11,15,20,.98); z-index:5;
+    }
+    .pill{border:1px solid var(--line); padding:4px 8px; border-radius:999px; font-size:12px; color:var(--muted);}
+    .spacer{flex:1}
+    button{
+      border:1px solid #24344a; background:var(--btn); color:var(--text);
+      padding:8px 10px; border-radius:12px; cursor:pointer; font-weight:600;
+    }
+    button:active{transform:scale(.99)}
+    button.danger{background:var(--btnDanger);border-color:#5a2b2b;color:#ffd6d6;}
+    .wrap{display:grid; grid-template-columns: 360px 1fr; height: calc(100vh - 54px);}
+    .left{border-right:1px solid var(--line); padding:12px; overflow:auto;}
+    .right{overflow:hidden;}
+    textarea{
+      width:100%; min-height:90px; resize:vertical; outline:none;
+      background:var(--panel); color:var(--text); border:1px solid var(--line);
+      border-radius:12px; padding:10px;
+    }
+    #output{
+      margin-top:10px; background:var(--panel); border:1px solid var(--line);
+      border-radius:12px; padding:10px; white-space:pre-wrap; min-height:120px;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      font-size:12.5px;
+    }
+    iframe{
+      width:100%; height:100%; border:0; background:var(--bg);
+    }
+    .hint{color:var(--muted); font-size:12px; line-height:1.4}
+    .row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+  </style>
+</head>
+
+<body>
+  <header>
+    <strong>🧑‍💻 ProgrammerAgent</strong>
+    <span class="pill">Unified entry</span>
+    <span class="spacer"></span>
+    <span class="pill">WebPanel + WDA Apply</span>
+  </header>
+
+  <div class="wrap">
+    <aside class="left">
+      <div class="hint">
+        Это единый вход. Слева быстрые кнопки и лог, справа полный VibeCoding UI (iframe).<br>
+        Apply работает через <code>/api/programmer/apply_patch</code> (WDA).
+      </div>
+
+      <div class="row">
+        <button id="btnGen">🧠 Generate</button>
+        <button id="btnFix">🛠 Fix</button>
+        <button id="btnApply" class="danger">✅ Apply (WDA)</button>
+      </div>
+
+      <div style="margin-top:10px" class="hint">Задача (опционально):</div>
+      <textarea id="prompt" placeholder="Например: 'Сделай кнопку в tools-panel', 'исправь ошибку в terminal.js'..."></textarea>
+
+      <div id="output">Готов ✅</div>
+    </aside>
+
+    <section class="right">
+      <!-- Полный UI -->
+      <iframe id="wkProgrammerFrame" src="./ui/programmer-core.html"></iframe>
+    </section>
+  </div>
+
+  <script>
+    const out = document.getElementById("output");
+    const promptEl = document.getElementById("prompt");
+
+    // UI printer для programmer-agent.js (он будет писать сюда)
+    window.__WK_PROGRAMMER_PRINT__ = (text) => { out.textContent = text; };
+
+    function ensureAgent() {
+      if (!window.ProgrammerAgent) {
+        out.textContent = "❌ ProgrammerAgent не загрузился. Проверь путь ./programmer-agent.js";
+        return false;
+      }
+      return true;
+    }
+
+    document.getElementById("btnGen").onclick = async () => {
+      if (!ensureAgent()) return;
+      out.textContent = "⏳ Генерация...";
+      try { await window.ProgrammerAgent.generateCode(promptEl.value); }
+      catch (e) { out.textContent = "❌ " + String(e?.message || e); }
+    };
+
+    document.getElementById("btnFix").onclick = async () => {
+      if (!ensureAgent()) return;
+      out.textContent = "⏳ Проверка...";
+      try { await window.ProgrammerAgent.fixBugs(promptEl.value); }
+      catch (e) { out.textContent = "❌ " + String(e?.message || e); }
+    };
+
+    document.getElementById("btnApply").onclick = async () => {
+      if (!ensureAgent()) return;
+      out.textContent = "⏳ Apply через WDA...";
+      try { await window.ProgrammerAgent.applyPatchWDA(); }
+      catch (e) { out.textContent = "❌ " + String(e?.message || e); }
+    };
+  </script>
+</body>
+</html>
