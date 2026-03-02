@@ -13,3 +13,7 @@ async function applyPatch() {
 
 // ✅ добавь в самый конец файла (чтобы кнопка из programmer-agent.js работала)
 window.__WK_PROGRAMMER_APPLY_PATCH__ = applyPatch;
+
+window.__WK_PROGRAMMER_APPLY_PATCH__ = applyPatch;
+
+window.__WK_PROGRAMMER_LAST_DIFF__ = () => lastPatch?.unifiedDiff || "";
