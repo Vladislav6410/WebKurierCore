@@ -1,7 +1,27 @@
 // engine/agents/programmer/programmer-agent.js
+// Универсальный ProgrammerAgent: поддерживает простой UI (#output)
+// и VibeCoding UI (chat addMsg + lastPatch + applyPatch через WDA)
+
+function uiPrint(text) {
+  // 1) новый UI-хук (если есть)
+  if (typeof window.__WK_PROGRAMMER_PRINT__ === "function") {
+    window.__WK_PROGRAMMER_PRINT__(text);
+    return;
+  }
+
+  // 2) старый #output
+  const out = document.getElementById("output");
+  if (out) {
+    out.innerText = text;
+    return;
+  }
+
+  // 3) fallback
+  console.log("[ProgrammerAgent]", text);
+}
 
 export const ProgrammerAgent = {
-  generateCode: () => {
+  generateCode: (prompt = "") => {
     const code = `
 <!-- Пример сгенерированного HTML-кода -->
 <div class="card">
@@ -10,41 +30,65 @@ export const ProgrammerAgent = {
 </div>
     `.trim();
 
-    ProgrammerAgent._output(code);
+    uiPrint("🧠 GenerateCode\n" + (prompt ? `Промпт: ${prompt}\n\n` : "") + code);
   },
 
-  fixBugs: () => {
-    const message = "🛠 Проверка завершена: ошибок не обнаружено (симуляция)";
-    ProgrammerAgent._output(message);
+  fixBugs: (prompt = "") => {
+    const message =
+      "🛠 Проверка завершена: ошибок не обнаружено (симуляция)\n" +
+      (prompt ? `\nПромпт: ${prompt}` : "");
+    uiPrint(message);
   },
 
-  // ✅ новая кнопка: Apply через WDA (реальный apply делает backend)
+  // ✅ Кнопка Apply через WDA:
+  // Реальный apply делает backend (/api/programmer/apply_patch),
+  // а unifiedDiff хранится в UI как lastPatch.unifiedDiff.
   applyPatchWDA: async () => {
-    // UI (programmer-ui.js) должен отдать lastPatch.unifiedDiff
-    // поэтому вызываем хук, который живёт в UI
-    if (typeof window.__WK_PROGRAMMER_APPLY_PATCH__ !== "function") {
-      ProgrammerAgent._output("❌ UI hook __WK_PROGRAMMER_APPLY_PATCH__ не найден. Проверь programmer-ui.js (в конце файла должен быть window.__WK_PROGRAMMER_APPLY_PATCH__ = applyPatch).");
+    // Вариант 1 (лучший): новый UI сам экспортирует функцию applyPatch()
+    // window.__WK_PROGRAMMER_APPLY_PATCH__ = applyPatch
+    if (typeof window.__WK_PROGRAMMER_APPLY_PATCH__ === "function") {
+      uiPrint("⏳ Применяю патч через WDA...");
+      try {
+        await window.__WK_PROGRAMMER_APPLY_PATCH__();
+        uiPrint("✅ Запрос apply отправлен (через UI → WDA).");
+      } catch (e) {
+        uiPrint(`❌ Ошибка apply: ${String(e?.message || e)}`);
+      }
       return;
     }
 
-    ProgrammerAgent._output("⏳ Применяю патч через WDA...");
-    try {
-      await window.__WK_PROGRAMMER_APPLY_PATCH__();
-    } catch (e) {
-      ProgrammerAgent._output(`❌ Ошибка apply: ${String(e?.message || e)}`);
+    // Вариант 2: если UI хранит diff в window.__WK_PROGRAMMER_LAST_DIFF__
+    // (можно добавить позже)
+    if (typeof window.__WK_PROGRAMMER_LAST_DIFF__ === "string" && window.__WK_PROGRAMMER_LAST_DIFF__) {
+      uiPrint("⏳ Применяю патч через WDA (fallback diff-string)...");
+      try {
+        const resp = await fetch("/api/programmer/apply_patch", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            target: "WebKurierCore",
+            unifiedDiff: window.__WK_PROGRAMMER_LAST_DIFF__
+          })
+        });
+        const data = await resp.json().catch(() => ({}));
+        uiPrint(data.ok ? "✅ Применено (через WDA)" : `❌ ${data.error || "ошибка"}`);
+      } catch (e) {
+        uiPrint(`❌ Ошибка apply: ${String(e?.message || e)}`);
+      }
+      return;
     }
+
+    uiPrint(
+      "❌ Не найден UI hook для apply.\n" +
+      "Нужно добавить в programmer-ui.js строку:\n" +
+      "  window.__WK_PROGRAMMER_APPLY_PATCH__ = applyPatch;\n" +
+      "И убедиться что lastPatch.unifiedDiff существует."
+    );
   },
 
-  _output: (text) => {
-    const out = document.getElementById("output");
-    if (out) {
-      out.innerText = text;
-    } else {
-      console.warn("Элемент #output не найден.");
-    }
-  }
+  _output: uiPrint
 };
 
-// чтобы работало с onclick в html:
+// Чтобы работало с onclick в HTML:
 window.ProgrammerAgent = ProgrammerAgent;
 
