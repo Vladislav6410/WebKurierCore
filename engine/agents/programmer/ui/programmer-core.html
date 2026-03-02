@@ -1,1 +1,88 @@
-engine/agents/programmer/ui/programmer-core.html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>💻 Агент: Программист</title>
+
+  <!-- Важно: этот файл должен существовать в ЭТОЙ ЖЕ папке -->
+  <script type="module" src="./programmer-agent.js"></script>
+
+  <style>
+    :root{
+      --bg:#0b0f14; --panel:#101826; --line:#1f2b3a; --text:#e8eef6; --muted:#9fb0c2;
+      --btn:#162233; --btnDanger:#2a1a1a;
+    }
+    body{
+      margin:0;
+      padding:16px;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap{max-width:1100px;margin:0 auto;}
+    h1{margin:0 0 10px 0;font-size:20px}
+    .hint{color:var(--muted);font-size:12px;margin-bottom:10px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0;}
+    button{
+      border:1px solid #24344a;
+      background: var(--btn);
+      color: var(--text);
+      padding:8px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    button.danger{background:var(--btnDanger);border-color:#5a2b2b;color:#ffd6d6;}
+    textarea{
+      width:100%;
+      min-height:90px;
+      background: var(--panel);
+      color: var(--text);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px;
+      resize:vertical;
+      outline:none;
+    }
+    #output{
+      margin-top:14px;
+      background: var(--panel);
+      border:1px solid var(--line);
+      padding:12px;
+      border-radius:12px;
+      white-space: pre-wrap;
+      min-height: 180px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h1>💻 Агент-программист</h1>
+    <div class="hint">
+      Команды из Web-терминала (если подключил bridge): <b>/programmer</b>, <b>/programmer open &lt;file&gt;</b>, <b>/programmer diff</b>, <b>/programmer apply</b>, <b>/programmer run</b>
+    </div>
+
+    <div class="row">
+      <button onclick="window.ProgrammerAgent?.generateCode()">🧠 Сгенерировать HTML</button>
+      <button onclick="window.ProgrammerAgent?.fixBugs()">🛠 Проверить/исправить</button>
+      <button onclick="window.ProgrammerAgent?.applyPatchWDA()">✅ Apply (WDA)</button>
+      <button onclick="document.getElementById('prompt').value=''; window.__WK_PROGRAMMER_PRINT__?.('🧹 Очищено.');" class="danger">🧹 Clear</button>
+    </div>
+
+    <div class="hint">Задача/описание:</div>
+    <textarea id="prompt" placeholder="Например: 'Исправь ошибку в programmer-ui.js, добавь кнопку Apply через WDA…'"></textarea>
+
+    <div id="output">Готов ✅</div>
+  </div>
+
+  <script>
+    // UI вывод (ProgrammerAgent пишет сюда)
+    window.__WK_PROGRAMMER_PRINT__ = (text) => {
+      const out = document.getElementById("output");
+      if (out) out.textContent = String(text ?? "");
+    };
+  </script>
+</body>
+</html>
