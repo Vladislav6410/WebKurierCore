@@ -440,3 +440,45 @@ window.copyCertificateJson = copyCertificateJson;
 window.exportCertificateJson = exportCertificateJson;
 window.verifyCertificate = verifyCertificate;
 window.refreshActionLog = refreshActionLog;
+window.issueCertificate = issueCertificate;
+window.viewCertificate = viewCertificate;
+window.copyCertificateJson = copyCertificateJson;
+window.exportCertificateJson = exportCertificateJson;
+window.verifyCertificate = verifyCertificate;
+window.refreshActionLog = refreshActionLog;
+/* -----------------------------
+UI BUTTON BINDINGS
+----------------------------- */
+
+document.getElementById("issueCertificateBtn")?.addEventListener("click", async () => {
+  await issueCertificate();
+});
+
+document.getElementById("viewCertificateBtn")?.addEventListener("click", async () => {
+  await viewCertificate();
+});
+
+document.getElementById("copyCertificateBtn")?.addEventListener("click", async () => {
+  await copyCertificateJson();
+});
+
+document.getElementById("exportCertificateBtn")?.addEventListener("click", async () => {
+  await exportCertificateJson();
+});
+
+document.getElementById("verifyCertificateBtn")?.addEventListener("click", async () => {
+  await verifyCertificate();
+});
+/* -----------------------------
+AUTO INIT
+----------------------------- */
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+  try {
+    await refreshActionLog();
+  } catch (e) {
+    console.warn("log init error", e);
+  }
+
+});
