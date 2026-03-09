@@ -1,0 +1,44 @@
+<section class="panel compact">
+  <h2>Mission Certificate</h2>
+
+  <div class="grid">
+    <div class="field">
+      <label for="certificateMissionId">Mission ID</label>
+      <input id="certificateMissionId" type="text" value="mission-2026-03-09-001" />
+    </div>
+
+    <div class="field">
+      <label for="certificateDroneId">Drone ID</label>
+      <input id="certificateDroneId" type="text" value="WK-DRONE-001" />
+    </div>
+
+    <div class="field">
+      <label for="certificateOperatorId">Operator ID</label>
+      <input id="certificateOperatorId" type="text" value="operator-001" />
+    </div>
+
+    <div class="field">
+      <label for="certificateStartTime">Start Time (ISO)</label>
+      <input id="certificateStartTime" type="text" value="2026-03-09T08:10:00Z" />
+    </div>
+
+    <div class="field">
+      <label for="certificateEndTime">End Time (ISO)</label>
+      <input id="certificateEndTime" type="text" value="2026-03-09T08:42:00Z" />
+    </div>
+  </div>
+
+  <div class="actions top-actions">
+    <button id="issueCertificateBtn">ISSUE CERTIFICATE</button>
+    <button id="viewCertificateBtn">VIEW CERTIFICATE</button>
+    <button id="copyCertificateBtn">COPY CERTIFICATE JSON</button>
+    <button id="exportCertificateBtn">EXPORT CERTIFICATE JSON</button>
+    <button id="verifyCertificateBtn">VERIFY CERTIFICATE</button>
+  </div>
+
+  <div id="certificateVerifyBox" class="tail-verify-box">
+    <div class="tail-verify-line">certificate verify: —</div>
+  </div>
+
+  <pre id="certificatePreview" class="raw-box">{}</pre>
+</section>
