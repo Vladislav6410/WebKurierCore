@@ -1,0 +1,14 @@
+{
+  "agents": [
+    "translator",
+    "voice",
+    "tools",
+    "engineer",
+    "programmer",
+    "wallet",
+    "pilot",
+    "security",
+    "memory",
+    "master"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "system": "WebKurier",
+  "component": "WebKurierCore",
+  "role": "Primary User Gateway & Cognitive Router",
+  "version": "production-1",
+  "entrypoint": "server.js",
+  "port": 3000,
+
+  "active_agents": [
+    "translator",
+    "voice",
+    "tools",
+    "engineer",
+    "programmer",
+    "wallet",
+    "pilot",
+    "security",
+    "memory",
+    "master"
+  ],
+
+  "domain_hubs": {
+    "vehiclehub": "WebKurierVehicleHub",
+    "phonecore": "WebKurierPhoneCore",
+    "chain": "WebKurierChain",
+    "security": "WebKurierSecurity"
+  },
+
+  "core_routes": [
+    "/health",
+    "/status",
+    "/agents",
+    "/admin",
+    "/api/codex/run"
+  ]
+}
