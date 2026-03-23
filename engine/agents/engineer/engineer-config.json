@@ -1,0 +1,17 @@
+{
+  "agentId": "engineer",
+  "name": "EngineerAgent",
+  "version": "1.0.0",
+  "enabled": true,
+  "model": "gpt-5.4",
+  "temperature": 0.2,
+  "maxOutputTokens": 1800,
+  "allowFilePlanning": true,
+  "allowCodeDrafting": true,
+  "allowShellSuggestions": true,
+  "uiEntry": "/engine/agents/engineer/ui/engineer-core.html",
+  "apiRoute": "/api/agents/engineer",
+  "requiredEnv": [
+    "OPENAI_API_KEY"
+  ]
+}
