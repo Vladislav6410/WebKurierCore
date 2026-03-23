@@ -139,6 +139,20 @@ WebKurierCore/
 └── docs/
     └── *.html                     # Documentation pages
 
+WebKurierCore/
+└── engine/
+    └── agents/
+        └── engineer/
+            ├── engineer-agent.js
+            ├── engineer-config.json
+            ├── prompts/
+            │   └── engineer-system.prompt.txt
+            ├── ui/
+            │   ├── engineer-core.html
+            │   └── engineer-ui.js
+            ├── api/
+            │   └── engineer-api.js
+            └── README.md
 
 ⸻
 
