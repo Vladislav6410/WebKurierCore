@@ -1,18 +1,11 @@
-<<<<<<< HEAD
-cd /srv/webkurier-data/repos/WebKurier/WebKurierCore
-cat > engine/agents/ai_pilot/run_loop.py << 'PY'
-=======
->>>>>>> 86ab79d (add engineer agent)
 import json
-import sys
 import time
 import urllib.request
 import urllib.error
 
-from engine.agents.ai_pilot.agent import AIPilotAgent
+from engine.agents.ai_navigator.navigator_agent import AINavigatorAgent
 
 TELEMETRY_URL = "http://127.0.0.1:8000/api/autopilot/telemetry/live"
-STATUS_URL = "http://127.0.0.1:8000/api/autopilot/status"
 
 
 def fetch_json(url: str, timeout: int = 5) -> dict:
@@ -21,56 +14,44 @@ def fetch_json(url: str, timeout: int = 5) -> dict:
         return json.loads(raw)
 
 
-def print_block(title: str, payload: dict):
-    print("=" * 60)
-    print(title)
-    print("-" * 60)
-    print(json.dumps(payload, ensure_ascii=False, indent=2))
-    print("=" * 60)
-
-
 def main():
-    agent = AIPilotAgent()
+    agent = AINavigatorAgent()
 
-    print("AI Pilot loop started")
+    print("AI Navigator loop started")
     print(f"Telemetry source: {TELEMETRY_URL}")
     print("Press Ctrl+C to stop")
-    print()
 
     while True:
         try:
-            status = fetch_json(STATUS_URL)
             telemetry = fetch_json(TELEMETRY_URL)
             result = agent.analyze(telemetry)
 
-            print_block("SYSTEM STATUS", status)
-            print_block("LIVE TELEMETRY", telemetry)
-            print_block("AI PILOT ANALYSIS", result)
+            print("=" * 60)
+            print("AI NAVIGATOR ANALYSIS")
+            print("-" * 60)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            print("=" * 60)
 
         except urllib.error.URLError as exc:
             print("=" * 60)
-            print("AI PILOT ERROR")
+            print("AI NAVIGATOR ERROR")
             print("-" * 60)
             print(f"Cannot reach DroneHybrid API: {exc}")
             print("=" * 60)
 
         except KeyboardInterrupt:
-            print("\nAI Pilot loop stopped")
-            sys.exit(0)
+            print("\nAI Navigator loop stopped")
+            break
 
         except Exception as exc:
             print("=" * 60)
-            print("AI PILOT ERROR")
+            print("AI NAVIGATOR ERROR")
             print("-" * 60)
             print(str(exc))
             print("=" * 60)
 
-        time.sleep(2)
+        time.sleep(3)
 
 
 if __name__ == "__main__":
     main()
-<<<<<<< HEAD
-PY
-=======
->>>>>>> 86ab79d (add engineer agent)
