@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EngineerAgent</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #0d1321;
+      color: #f4f7fb;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .panel {
+      background: #151f34;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    h1, h2 {
+      margin-top: 0;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: #0f1728;
+      color: #ffffff;
+      padding: 12px;
+      font-size: 15px;
+      resize: vertical;
+    }
+
+    button {
+      background: #2dd36f;
+      color: #062312;
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #0b1120;
+      border-radius: 12px;
+      padding: 14px;
+      overflow: auto;
+    }
+
+    .muted {
+      color: #a9b7d1;
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #22314e;
+      color: #dfe8f8;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <h1>🛠 EngineerAgent</h1>
+      <p class="muted">
+        Technical planning, architecture guidance, code drafting, and integration notes.
+      </p>
+      <div class="row">
+        <span id="healthBadge" class="status">checking...</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Task</h2>
+      <textarea id="promptInput" placeholder="Describe the technical task..."></textarea>
+      <div style="margin-top: 12px;">
+        <button id="runBtn">Run EngineerAgent</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Response</h2>
+      <pre id="outputBox">No output yet.</pre>
+    </div>
+  </div>
+
+  <script src="./engineer-ui.js"></script>
+</body>
+</html>
