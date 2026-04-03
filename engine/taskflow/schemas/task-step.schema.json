@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WebKurier TaskFlow Step",
+  "type": "object",
+  "required": ["title", "domain", "action"],
+  "properties": {
+    "stepId": { "type": "string" },
+    "title": { "type": "string" },
+    "domain": { "type": "string" },
+    "action": { "type": "string" },
+    "input": { "type": "object" },
+    "status": { "type": "string" },
+    "trustLevel": { "type": "string" },
+    "requiresSecrets": { "type": "boolean" }
+  }
+}
