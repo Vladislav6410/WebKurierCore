@@ -1,0 +1,44 @@
+{
+  "flowName": "drone-survey-mission",
+  "ownerAgent": "autopilot",
+  "context": {
+    "missionType": "survey"
+  },
+  "steps": [
+    {
+      "title": "Validate mission request",
+      "domain": "security",
+      "action": "mission.validate",
+      "trustLevel": "trusted",
+      "input": {}
+    },
+    {
+      "title": "Build survey route",
+      "domain": "dronehybrid",
+      "action": "mission.build",
+      "trustLevel": "semi_trusted",
+      "input": {}
+    },
+    {
+      "title": "Upload mission",
+      "domain": "dronehybrid",
+      "action": "mission.upload",
+      "trustLevel": "semi_trusted",
+      "input": {}
+    },
+    {
+      "title": "Start mission",
+      "domain": "dronehybrid",
+      "action": "mission.start",
+      "trustLevel": "semi_trusted",
+      "input": {}
+    },
+    {
+      "title": "Write mission audit",
+      "domain": "chain",
+      "action": "audit.append",
+      "trustLevel": "trusted",
+      "input": {}
+    }
+  ]
+}
