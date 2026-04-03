@@ -1,0 +1,37 @@
+{
+  "flowName": "report-generate-flow",
+  "ownerAgent": "engineer",
+  "context": {
+    "outputFormat": "pdf"
+  },
+  "steps": [
+    {
+      "title": "Validate report request",
+      "domain": "security",
+      "action": "report.validate",
+      "trustLevel": "trusted",
+      "input": {}
+    },
+    {
+      "title": "Collect source data",
+      "domain": "core",
+      "action": "report.collect",
+      "trustLevel": "trusted",
+      "input": {}
+    },
+    {
+      "title": "Generate report",
+      "domain": "core",
+      "action": "report.generate",
+      "trustLevel": "trusted",
+      "input": {}
+    },
+    {
+      "title": "Write report audit",
+      "domain": "chain",
+      "action": "audit.append",
+      "trustLevel": "trusted",
+      "input": {}
+    }
+  ]
+}
