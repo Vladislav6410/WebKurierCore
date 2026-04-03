@@ -1,0 +1,37 @@
+{
+  "flowName": "webcoin-payment-flow",
+  "ownerAgent": "wallet",
+  "context": {
+    "currency": "WebCoin"
+  },
+  "steps": [
+    {
+      "title": "Verify payment request",
+      "domain": "security",
+      "action": "payment.validate",
+      "trustLevel": "trusted",
+      "input": {}
+    },
+    {
+      "title": "Reserve transaction",
+      "domain": "chain",
+      "action": "transaction.reserve",
+      "trustLevel": "trusted",
+      "input": {}
+    },
+    {
+      "title": "Commit wallet operation",
+      "domain": "chain",
+      "action": "wallet.commit",
+      "trustLevel": "trusted",
+      "input": {}
+    },
+    {
+      "title": "Write audit event",
+      "domain": "chain",
+      "action": "audit.append",
+      "trustLevel": "trusted",
+      "input": {}
+    }
+  ]
+}
