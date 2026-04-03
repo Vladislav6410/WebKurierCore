@@ -1,0 +1,37 @@
+{
+  "flowName": "translator-realtime-session",
+  "ownerAgent": "translator",
+  "context": {
+    "mode": "duplex-live-translation"
+  },
+  "steps": [
+    {
+      "title": "Session security check",
+      "domain": "security",
+      "action": "session.validate",
+      "trustLevel": "trusted",
+      "input": {}
+    },
+    {
+      "title": "Start realtime voice pipeline",
+      "domain": "phonecore",
+      "action": "voice.pipeline.start",
+      "trustLevel": "semi_trusted",
+      "input": {}
+    },
+    {
+      "title": "Start translation engine",
+      "domain": "phonecore",
+      "action": "translator.start",
+      "trustLevel": "semi_trusted",
+      "input": {}
+    },
+    {
+      "title": "Write session audit",
+      "domain": "chain",
+      "action": "audit.append",
+      "trustLevel": "trusted",
+      "input": {}
+    }
+  ]
+}
