@@ -1,0 +1,11 @@
+name: Feature
+description: New feature
+
+body:
+  - type: input
+    attributes:
+      label: What to build?
+
+  - type: textarea
+    attributes:
+      label: Description
