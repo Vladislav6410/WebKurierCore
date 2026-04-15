@@ -1,0 +1,11 @@
+name: Bug
+description: Report bug
+
+body:
+  - type: input
+    attributes:
+      label: What happened?
+
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
