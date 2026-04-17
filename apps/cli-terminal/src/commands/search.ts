@@ -29,6 +29,11 @@ type SearchCommandOptions = {
   live?: boolean;
 };
 
+type RootProgramOptions = {
+  debug: boolean;
+  color: boolean;
+};
+
 export function registerSearchCommand(program: Command): void {
   program
     .command('search')
@@ -47,7 +52,7 @@ export function registerSearchCommand(program: Command): void {
     .option('--dry-run', 'Show request config without executing', false)
     .option('--no-live', 'Disable live web access and use cached/default behavior only')
     .action(async (queryParts: string[], options: SearchCommandOptions) => {
-      const rootOptions = program.opts<{ debug: boolean; color: boolean }>();
+      const rootOptions = program.opts<RootProgramOptions>();
 
       try {
         const query = queryParts.join(' ').trim();
@@ -67,8 +72,9 @@ export function registerSearchCommand(program: Command): void {
           Object.assign(config, enhanced);
         }
 
+        const normalizedFormat = normalizeFormat(options.format);
+
         if (options.dryRun) {
-          const normalizedFormat = normalizeFormat(options.format);
           if (normalizedFormat === 'json') {
             console.log(
               JSON.stringify(
@@ -104,7 +110,6 @@ export function registerSearchCommand(program: Command): void {
           },
         });
 
-        const normalizedFormat = normalizeFormat(options.format);
         const showSpinner = normalizedFormat !== 'json';
 
         const spinner = showSpinner
@@ -160,33 +165,45 @@ export function registerSearchCommand(program: Command): void {
 
         if (result.metadata?.mode === SearchMode.DEEP && duration > 120000) {
           console.log(
-            chalk.yellow('⚠️ Deep research took more than 2 minutes — consider caching for production use'),
+            chalk.yellow(
+              '⚠️ Deep research took more than 2 minutes — consider caching for production use',
+            ),
           );
         }
 
         process.exit(EXIT_CODES.SUCCESS);
-      } catch (error: any) {
-        if (error?.code === 'invalid_api_key') {
+      } catch (error: unknown) {
+        const err = error as {
+          code?: string;
+          retryAfter?: number;
+          name?: string;
+          message?: string;
+          errors?: Array<{ path: Array<string | number>; message: string }>;
+        };
+
+        if (err.code === 'invalid_api_key') {
           console.error(chalk.red('❌ Invalid OpenAI API key'));
           process.exit(EXIT_CODES.AUTH_ERROR);
         }
 
-        if (error?.code === 'rate_limit_exceeded') {
+        if (err.code === 'rate_limit_exceeded') {
           console.error(chalk.red('❌ Rate limit exceeded'));
-          const retry = error.retryAfter ?? 60;
+          const retry = err.retryAfter ?? 60;
           console.log(`💡 Retry after ${retry}s or upgrade your OpenAI tier`);
           process.exit(EXIT_CODES.RATE_LIMIT);
         }
 
-        if (error?.name === 'ZodError' && Array.isArray(error.errors)) {
+        if (err.name === 'ZodError' && Array.isArray(err.errors)) {
           console.error(chalk.red('❌ Configuration validation failed:'));
-          for (const item of error.errors) {
+
+          for (const item of err.errors) {
             console.error(`  • ${item.path.join('.')}: ${item.message}`);
           }
+
           process.exit(EXIT_CODES.CONFIG_ERROR);
         }
 
-        console.error(chalk.red('💥 Search failed:'), error?.message ?? 'Unknown error');
+        console.error(chalk.red('💥 Search failed:'), err.message ?? 'Unknown error');
 
         if (rootOptions.debug) {
           console.error(error);
@@ -198,8 +215,14 @@ export function registerSearchCommand(program: Command): void {
 }
 
 function normalizeFormat(format?: string): 'pretty' | 'json' | 'table' | 'md' {
-  if (format === 'markdown') return 'md';
-  if (format === 'json' || format === 'table' || format === 'md') return format;
+  if (format === 'markdown') {
+    return 'md';
+  }
+
+  if (format === 'json' || format === 'table' || format === 'md') {
+    return format;
+  }
+
   return 'pretty';
 }
 
