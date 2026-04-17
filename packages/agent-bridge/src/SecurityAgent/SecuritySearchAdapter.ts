@@ -10,6 +10,7 @@ import type {
 import { UrlSanitizer } from './services/UrlSanitizer';
 import { RiskCalculator } from './services/RiskCalculator';
 import type { CacheManager } from './services/CacheManager';
+import { RedisCacheManager } from './services/RedisCacheManager';
 
 type AdapterDeps = {
   cache?: CacheManager;
@@ -21,7 +22,8 @@ export class SecuritySearchAdapter {
   private readonly webSearchClient: WebSearchClient;
 
   constructor(deps: AdapterDeps = {}) {
-    this.cache = deps.cache;
+    this.cache = deps.cache ?? createDefaultCacheManager();
+
     this.webSearchClient =
       deps.webSearchClient ??
       new WebSearchClient({
@@ -81,6 +83,20 @@ export class SecuritySearchAdapter {
   private buildCacheKey(target: string): string {
     const hash = crypto.createHash('sha256').update(target).digest('hex');
     return `sec:${hash}`;
+  }
+}
+
+function createDefaultCacheManager(): CacheManager | undefined {
+  const redisUrl = process.env.REDIS_URL;
+
+  if (!redisUrl) {
+    return undefined;
+  }
+
+  try {
+    return new RedisCacheManager(redisUrl);
+  } catch {
+    return undefined;
   }
 }
 
