@@ -30,10 +30,14 @@ export class TableFormatter {
       table.push(['Tokens', String(response.metadata.tokensUsed)]);
     }
 
-    if (options.showCitations && Array.isArray(response.citations) && response.citations.length > 0) {
+    if (
+      options.showCitations &&
+      Array.isArray(response.citations) &&
+      response.citations.length > 0
+    ) {
       const citations = response.citations
         .slice(0, 5)
-        .map((c: any, i: number) => `[${i + 1}] ${c.title} — ${c.url}`)
+        .map((cite: any, index: number) => `[${index + 1}] ${cite.title} — ${cite.url}`)
         .join('\n');
 
       table.push(['Sources', citations]);
