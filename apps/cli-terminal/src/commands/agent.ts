@@ -1,7 +1,12 @@
 import chalk from 'chalk';
 import { Command } from 'commander';
 
-import { SecuritySearchAdapter } from '@webkurier/agent-bridge/security';
+import {
+  SecuritySearchAdapter,
+  type SecurityCheckResult,
+  type SecurityFinding,
+  type SecurityRecommendation,
+} from '@webkurier/agent-bridge/security';
 
 import { JsonFormatter } from '../lib/output/JsonFormatter';
 import { MarkdownFormatter } from '../lib/output/MarkdownFormatter';
@@ -67,39 +72,41 @@ async function runSecurityCommand(
     const format = normalizeFormat(options.format);
 
     const result = await adapter.check(target, { mode });
-
-    const responseForFormatters = mapSecurityResultToFormatterResponse(result);
+    const formatterResponse = mapSecurityResultToFormatterResponse(result);
 
     const formatterOptions = {
       showCitations: true,
       showMetadata: true,
       color: true,
       query: target,
-      duration: responseForFormatters.metadata?.durationMs,
+      duration: formatterResponse.metadata?.durationMs,
     };
 
     let output = '';
 
     switch (format) {
       case 'json':
-        output = JsonFormatter.format(responseForFormatters, formatterOptions);
+        output = JsonFormatter.format(formatterResponse, formatterOptions);
         break;
       case 'table':
-        output = TableFormatter.format(responseForFormatters, formatterOptions);
+        output = TableFormatter.format(formatterResponse, formatterOptions);
         break;
       case 'md':
-        output = MarkdownFormatter.format(responseForFormatters, formatterOptions);
+        output = MarkdownFormatter.format(formatterResponse, formatterOptions);
         break;
       default:
-        output = PrettyFormatter.format(responseForFormatters as any, formatterOptions);
+        output = PrettyFormatter.format(formatterResponse as any, formatterOptions);
         break;
     }
 
     console.log(output);
     process.exit(EXIT_CODES.SUCCESS);
   } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Unknown security agent error';
+
     console.error(chalk.red('❌ Security agent execution failed'));
-    console.error(error);
+    console.error(message);
     process.exit(EXIT_CODES.SEARCH_ERROR);
   }
 }
@@ -129,13 +136,13 @@ function normalizeFormat(
   return 'pretty';
 }
 
-function mapSecurityResultToFormatterResponse(result: any) {
-  const findingsText = Array.isArray(result.findings) && result.findings.length
-    ? result.findings.map((item: string) => `• ${item}`).join('\n')
+function mapSecurityResultToFormatterResponse(result: SecurityCheckResult) {
+  const findingsText = result.findings.length
+    ? result.findings.map(formatFindingLine).join('\n')
     : '• No significant findings';
 
-  const recommendationsText = Array.isArray(result.recommendations) && result.recommendations.length
-    ? result.recommendations.map((item: string) => `• ${item}`).join('\n')
+  const recommendationsText = result.recommendations.length
+    ? result.recommendations.map(formatRecommendationLine).join('\n')
     : '• No additional recommendations';
 
   const text = [
@@ -153,11 +160,21 @@ function mapSecurityResultToFormatterResponse(result: any) {
     text,
     citations: result.sources ?? [],
     metadata: {
-      mode: result.metadata?.mode ?? 'fast',
-      model: result.metadata?.model ?? 'security-agent',
-      tokensUsed: result.metadata?.tokensUsed ?? 0,
-      searchQueries: result.metadata?.searchQueries ?? [],
-      durationMs: result.metadata?.durationMs ?? 0,
+      mode: result.metadata.mode,
+      model: result.metadata.model ?? 'security-agent',
+      tokensUsed: result.metadata.tokensUsed ?? 0,
+      searchQueries: result.metadata.searchQueries ?? [],
+      durationMs: result.metadata.durationMs ?? 0,
     },
   };
+}
+
+function formatFindingLine(finding: SecurityFinding): string {
+  return `• [${finding.severity.toUpperCase()}] ${finding.message}`;
+}
+
+function formatRecommendationLine(
+  recommendation: SecurityRecommendation,
+): string {
+  return `• ${recommendation.message}`;
 }
