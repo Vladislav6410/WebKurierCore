@@ -4,7 +4,7 @@ import { SearchMode } from '@webkurier/websearch-core/types/SearchMode';
 
 interface FormatOptions {
   showCitations: boolean;
-  showMeta boolean;
+  showMetadata: boolean;
   color: boolean;
   query?: string;
   duration?: number;
@@ -15,7 +15,6 @@ export class PrettyFormatter {
     const { text, citations, metadata } = response;
     const lines: string[] = [];
 
-    // Header
     if (options.color) {
       lines.push(chalk.bold.cyan('\n🔍 Search Result'));
       lines.push(chalk.gray('─'.repeat(60)));
@@ -24,83 +23,91 @@ export class PrettyFormatter {
       lines.push('─'.repeat(60));
     }
 
-    // Mode badge
     const modeBadge = this.getModeBadge(metadata.mode, options.color);
-    lines.push(`${modeBadge} ${chalk.gray(`model: ${metadata.model}`)}`);
-    
-    if (options.duration) {
-      lines.push(chalk.gray(`⏱️  ${metadata.durationMs}ms`));
-    }
-    lines.push('');
+    const modelLabel = options.color ? chalk.gray(`model: ${metadata.model}`) : `model: ${metadata.model}`;
+    lines.push(`${modeBadge} ${modelLabel}`);
 
-    // Main answer
+    if (typeof options.duration === 'number') {
+      lines.push(options.color ? chalk.gray(`⏱️  ${options.duration}ms`) : `⏱️  ${options.duration}ms`);
+    }
+
+    lines.push('');
     lines.push(text);
     lines.push('');
 
-    // Citations
     if (options.showCitations && citations?.length) {
-      if (options.color) {
-        lines.push(chalk.bold.yellow('\n📚 Sources:'));
-      } else {
-        lines.push('\n📚 Sources:');
-      }
-      
-      citations.slice(0, 5).forEach((cite, i) => {
-        const num = i + 1;
-        const domain = new URL(cite.url).hostname;
-        lines.push(`  ${chalk.gray(`[${num}]`)} ${chalk.blue(cite.title)}`);
-        lines.push(`      ${chalk.gray(cite.url)} ${chalk.dim(`(${domain})`)}`);
+      lines.push(options.color ? chalk.bold.yellow('📚 Sources:') : '📚 Sources:');
+
+      citations.slice(0, 5).forEach((cite, index) => {
+        const num = index + 1;
+        const domain = safeHostname(cite.url);
+
+        const numLabel = options.color ? chalk.gray(`[${num}]`) : `[${num}]`;
+        const title = options.color ? chalk.blue(cite.title) : cite.title;
+        const url = options.color ? chalk.gray(cite.url) : cite.url;
+        const domainLabel = options.color ? chalk.dim(`(${domain})`) : `(${domain})`;
+
+        lines.push(`  ${numLabel} ${title}`);
+        lines.push(`      ${url} ${domainLabel}`);
       });
-      
+
       if (citations.length > 5) {
-        lines.push(`  ${chalk.gray(`... and ${citations.length - 5} more`)}`);
+        const more = `... and ${citations.length - 5} more`;
+        lines.push(`  ${options.color ? chalk.gray(more) : more}`);
+      }
+
+      lines.push('');
+    }
+
+    if (options.showMetadata) {
+      lines.push(options.color ? chalk.gray('📊 Meta') : '📊 Meta');
+      lines.push(`  Mode: ${metadata.mode}`);
+      if (metadata.tokensUsed !== undefined) {
+        lines.push(`  Tokens: ${metadata.tokensUsed}`);
+      }
+      if (metadata.searchQueries?.length) {
+        lines.push(`  Sub-queries: ${metadata.searchQueries.join(', ')}`);
       }
       lines.push('');
     }
 
-    // Metadata (debug/verbose)
-    if (options.showMetadata) {
-      if (options.color) {
-        lines.push(chalk.gray('\n📊 Meta'));
-      } else {
-        lines.push('\n📊 Meta');
-      }
-      lines.push(`  Mode: ${metadata.mode}`);
-      lines.push(`  Tokens: ${metadata.tokensUsed}`);
-      if (metadata.searchQueries?.length) {
-        lines.push(`  Sub-queries: ${metadata.searchQueries.join(', ')}`);
-      }
-    }
-
-    // Footer tip
-    lines.push('');
-    if (options.color) {
-      lines.push(chalk.dim('💡 Tip: Use --format json for scripting | --help for options'));
-    } else {
-      lines.push('💡 Tip: Use --format json for scripting | --help for options');
-    }
+    lines.push(
+      options.color
+        ? chalk.dim('💡 Tip: Use --format json for scripting | --help for options')
+        : '💡 Tip: Use --format json for scripting | --help for options',
+    );
 
     return lines.join('\n');
   }
 
-  static printDryRun(query: string, config: any): void {
-    console.log(chalk.bold.cyan('\n🧪 Dry Run — Request Preview'));
-    console.log(chalk.gray('─'.repeat(60)));
-    console.log(chalk.bold('Query:'), query);
-    console.log(chalk.bold('Mode:'), this.getModeBadge(config.mode, true));
-    
+  static printDryRun(query: string, config: any, color = true): void {
+    const c = color ? chalk : new NoColorChalk();
+
+    console.log(c.bold.cyan('\n🧪 Dry Run — Request Preview'));
+    console.log(c.gray('─'.repeat(60)));
+    console.log(c.bold('Query:'), query);
+    console.log(c.bold('Mode:'), this.getModeBadge(config.mode, color));
+
     if (config.location) {
-      console.log(chalk.bold('Location:'), `${config.location.city ?? ''} ${config.location.country}`.trim());
+      const parts = [config.location.city, config.location.region, config.location.country].filter(Boolean);
+      console.log(c.bold('Location:'), parts.join(', '));
     }
-    
+
+    if (config.location?.timezone) {
+      console.log(c.bold('Timezone:'), config.location.timezone);
+    }
+
     if (config.domainFilters?.allowedDomains?.length) {
-      console.log(chalk.bold('Domains:'), config.domainFilters.allowedDomains.join(', '));
+      console.log(c.bold('Domains:'), config.domainFilters.allowedDomains.join(', '));
     }
-    
-    console.log(chalk.bold('Live Access:'), config.liveAccess !== false ? chalk.green('yes') : chalk.yellow('cached only'));
-    console.log(chalk.bold('Timeout:'), `${config.timeoutMs ?? 30000}ms`);
+
+    console.log(
+      c.bold('Live Access:'),
+      config.liveAccess !== false ? c.green('yes') : c.yellow('cached only'),
+    );
+    console.log(c.bold('Timeout:'), `${config.timeoutMs ?? 30000}ms`);
     console.log('');
-    console.log(chalk.dim('✅ Run without --dry-run to execute'));
+    console.log(c.dim('✅ Run without --dry-run to execute'));
   }
 
   private static getModeBadge(mode: SearchMode, color: boolean): string {
@@ -109,7 +116,38 @@ export class PrettyFormatter {
       agentic: color ? chalk.bgBlue.white(' AGENTIC ') : '[AGENTIC]',
       deep: color ? chalk.bgMagenta.white(' DEEP ') : '[DEEP]',
     };
+
     return badges[mode];
+  }
+}
+
+function safeHostname(url: string): string {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return 'invalid-url';
+  }
+}
+
+class NoColorChalk {
+  bold = Object.assign((value: string) => value, {
+    cyan: (value: string) => value,
+  });
+
+  gray(value: string) {
+    return value;
+  }
+
+  green(value: string) {
+    return value;
+  }
+
+  yellow(value: string) {
+    return value;
+  }
+
+  dim(value: string) {
+    return value;
   }
 }
 
