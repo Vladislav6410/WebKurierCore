@@ -1,4 +1,4 @@
-import { Select, Confirm, Input } from 'enquirer';
+import { Confirm, Input, Select } from 'enquirer';
 import { SearchMode } from '@webkurier/websearch-core/types/SearchMode';
 
 export class PromptEngine {
@@ -14,8 +14,8 @@ export class PromptEngine {
     }
 
     const addLocation = await new Confirm({
-      name: 'location',
-      message: 'Do you want to provide a location?',
+      name: 'addLocation',
+      message: 'Do you want to specify location settings?',
       initial: false,
     }).run();
 
@@ -46,25 +46,28 @@ export class PromptEngine {
       };
     }
 
-    const addDomains = await new Confirm({
-      name: 'domains',
-      message: 'Restrict search by domains?',
+    const addDomainFilters = await new Confirm({
+      name: 'addDomainFilters',
+      message: 'Do you want to restrict search by domains?',
       initial: false,
     }).run();
 
-    if (addDomains) {
-      const domains = await new Input({
+    if (addDomainFilters) {
+      const domainsInput = await new Input({
         name: 'domains',
         message: 'Comma-separated domains',
         initial: next.domainFilters?.allowedDomains?.join(', ') ?? '',
       }).run();
 
-      next.domainFilters = {
-        allowedDomains: domains
-          .split(',')
-          .map((item) => item.trim())
-          .filter(Boolean),
-      };
+      const allowedDomains = domainsInput
+        .split(',')
+        .map((d) => d.trim())
+        .filter(Boolean)
+        .map((d) => d.replace(/^https?:\/\//, '').replace(/\/$/, ''));
+
+      next.domainFilters = allowedDomains.length
+        ? { allowedDomains }
+        : undefined;
     }
 
     return next;
