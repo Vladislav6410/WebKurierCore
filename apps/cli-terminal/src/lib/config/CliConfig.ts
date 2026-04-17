@@ -15,8 +15,8 @@ export interface CliResolvedConfig {
 
 export class CliConfig {
   /**
-   * Merge order:
-   * CLI flags > environment variables > hardcoded defaults
+   * Merge priority:
+   * CLI flags > environment variables > defaults
    */
   static async resolve(options: {
     cliOptions: any;
@@ -27,7 +27,7 @@ export class CliConfig {
     const mode = this.resolveMode(cliOptions.mode);
     const location = this.resolveLocation(cliOptions);
     const domainFilters = cliOptions.domain?.length
-      ? { allowedDomains: cliOptions.domain } as DomainFilters
+      ? ({ allowedDomains: this.normalizeDomains(cliOptions.domain) } as DomainFilters)
       : this.resolveDomainFiltersFromEnv();
 
     const liveAccess = cliOptions.live !== false;
@@ -50,7 +50,7 @@ export class CliConfig {
       return fallback;
     }
 
-    const normalized = input.toLowerCase();
+    const normalized = String(input).toLowerCase();
     const validModes = Object.values(SearchMode);
 
     if (validModes.includes(normalized as SearchMode)) {
@@ -63,7 +63,10 @@ export class CliConfig {
 
   private static resolveLocation(cli: any): UserLocation | undefined {
     const country = cli.country || process.env.DEFAULT_LOCATION_COUNTRY;
-    if (!country) return undefined;
+
+    if (!country) {
+      return undefined;
+    }
 
     return {
       country: String(country).toUpperCase(),
@@ -75,19 +78,30 @@ export class CliConfig {
 
   private static resolveDomainFiltersFromEnv(): DomainFilters | undefined {
     const domains = process.env.SEARCH_ALLOWED_DOMAINS;
-    if (!domains) return undefined;
 
-    const allowedDomains = domains
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean)
-      .map((item) => item.replace(/^https?:\/\//, '').replace(/\/$/, ''));
+    if (!domains) {
+      return undefined;
+    }
+
+    const allowedDomains = this.normalizeDomains(
+      domains
+        .split(',')
+        .map((d) => d.trim())
+        .filter(Boolean),
+    );
 
     if (!allowedDomains.length) {
       return undefined;
     }
 
     return { allowedDomains };
+  }
+
+  private static normalizeDomains(domains: string[]): string[] {
+    return domains
+      .map((d) => d.trim())
+      .filter(Boolean)
+      .map((d) => d.replace(/^https?:\/\//, '').replace(/\/$/, ''));
   }
 
   private static resolveTimeout(input?: string): number {
@@ -100,9 +114,6 @@ export class CliConfig {
     return parsed;
   }
 
-  /**
-   * Heuristic auto-upgrade for more complex queries.
-   */
   private static autoUpgradeMode(mode: SearchMode, query: string): SearchMode {
     if (mode !== SearchMode.FAST) {
       return mode;
