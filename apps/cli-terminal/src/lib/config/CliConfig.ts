@@ -1,5 +1,9 @@
+import chalk from 'chalk';
 import { SearchMode } from '@webkurier/websearch-core/types/SearchMode';
-import { SearchConfig, UserLocation, DomainFilters } from '@webkurier/websearch-core/types/SearchConfig';
+import {
+  DomainFilters,
+  UserLocation,
+} from '@webkurier/websearch-core/types/SearchConfig';
 
 export interface CliResolvedConfig {
   mode: SearchMode;
@@ -11,8 +15,8 @@ export interface CliResolvedConfig {
 
 export class CliConfig {
   /**
-   * Слияние: .env → CLI flags → defaults
-   * Приоритет: CLI flags > env vars > hardcoded defaults
+   * Merge order:
+   * CLI flags > environment variables > hardcoded defaults
    */
   static async resolve(options: {
     cliOptions: any;
@@ -20,24 +24,14 @@ export class CliConfig {
   }): Promise<CliResolvedConfig> {
     const { cliOptions, query } = options;
 
-    // 1. Mode resolution
     const mode = this.resolveMode(cliOptions.mode);
-
-    // 2. Location resolution
     const location = this.resolveLocation(cliOptions);
-
-    // 3. Domain filters resolution
-    const domainFilters = cliOptions.domain?.length 
+    const domainFilters = cliOptions.domain?.length
       ? { allowedDomains: cliOptions.domain } as DomainFilters
       : this.resolveDomainFiltersFromEnv();
 
-    // 4. Live access
-    const liveAccess = cliOptions.liveAccess !== false; // default true
-
-    // 5. Timeout
-    const timeoutMs = parseInt(cliOptions.timeout, 10) || 30000;
-
-    // 6. Auto-upgrade для сложных запросов (эвристика)
+    const liveAccess = cliOptions.live !== false;
+    const timeoutMs = this.resolveTimeout(cliOptions.timeout);
     const finalMode = this.autoUpgradeMode(mode, query);
 
     return {
@@ -49,13 +43,22 @@ export class CliConfig {
     };
   }
 
-  private static resolveMode(input: string): SearchMode {
-    const validModes = Object.values(SearchMode);
-    if (validModes.includes(input as SearchMode)) {
-      return input as SearchMode;
+  private static resolveMode(input?: string): SearchMode {
+    const fallback = SearchMode.FAST;
+
+    if (!input) {
+      return fallback;
     }
-    console.warn(`⚠️  Invalid mode "${input}", defaulting to ${SearchMode.FAST}`);
-    return SearchMode.FAST;
+
+    const normalized = input.toLowerCase();
+    const validModes = Object.values(SearchMode);
+
+    if (validModes.includes(normalized as SearchMode)) {
+      return normalized as SearchMode;
+    }
+
+    console.warn(`⚠️ Invalid mode "${input}", defaulting to ${fallback}`);
+    return fallback;
   }
 
   private static resolveLocation(cli: any): UserLocation | undefined {
@@ -63,7 +66,7 @@ export class CliConfig {
     if (!country) return undefined;
 
     return {
-      country: country.toUpperCase(),
+      country: String(country).toUpperCase(),
       city: cli.city || process.env.DEFAULT_LOCATION_CITY,
       region: cli.region || process.env.DEFAULT_LOCATION_REGION,
       timezone: cli.timezone || process.env.DEFAULT_LOCATION_TIMEZONE,
@@ -73,25 +76,59 @@ export class CliConfig {
   private static resolveDomainFiltersFromEnv(): DomainFilters | undefined {
     const domains = process.env.SEARCH_ALLOWED_DOMAINS;
     if (!domains) return undefined;
-    
-    return {
-      allowedDomains: domains.split(',').map(d => d.trim()).filter(Boolean),
-    };
+
+    const allowedDomains = domains
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .map((item) => item.replace(/^https?:\/\//, '').replace(/\/$/, ''));
+
+    if (!allowedDomains.length) {
+      return undefined;
+    }
+
+    return { allowedDomains };
+  }
+
+  private static resolveTimeout(input?: string): number {
+    const parsed = Number.parseInt(String(input ?? '30000'), 10);
+
+    if (Number.isNaN(parsed) || parsed <= 0) {
+      return 30000;
+    }
+
+    return parsed;
   }
 
   /**
-   * Эвристика: авто-апгрейд режима для сложных запросов
-   * (можно отключить через CLI flag --no-auto-upgrade)
+   * Heuristic auto-upgrade for more complex queries.
    */
   private static autoUpgradeMode(mode: SearchMode, query: string): SearchMode {
-    if (mode !== SearchMode.FAST) return mode; // Не downgrade
+    if (mode !== SearchMode.FAST) {
+      return mode;
+    }
+
+    const normalized = query.toLowerCase();
 
     const complexKeywords = [
-      'compare', 'versus', 'vs', 'analysis', 'research', 
-      'deep dive', 'comprehensive', 'market report', 'technical'
+      'compare',
+      'versus',
+      'vs',
+      'analysis',
+      'research',
+      'deep dive',
+      'comprehensive',
+      'market report',
+      'technical',
+      'сравнить',
+      'анализ',
+      'исследование',
+      'глубокий',
+      'комплексный',
+      'технический',
     ];
 
-    if (complexKeywords.some(k => query.toLowerCase().includes(k))) {
+    if (complexKeywords.some((keyword) => normalized.includes(keyword))) {
       console.log(chalk.dim('🧠 Auto-upgraded to AGENTIC mode for complex query'));
       return SearchMode.AGENTIC;
     }
