@@ -1,37 +1,30 @@
 #!/usr/bin/env node
 
-/**
- * WebKurier CLI — Terminal interface for AI-powered web search
- *
- * Usage:
- *   webkurier search "your query" [options]
- *   webkurier config show
- *   webkurier doctor
- */
-
 import { Command } from 'commander';
 import { registerSearchCommand } from './commands/search';
 import { registerConfigCommand } from './commands/config';
 import { registerDoctorCommand } from './commands/doctor';
+import { registerRepoCommand } from './commands/repo';
+import { registerAgentCommand } from './commands/agent';
 import { loadEnvConfig } from './lib/config/EnvLoader';
 import { EXIT_CODES } from './utils/exitCodes';
 
-// Load environment before command registration
 loadEnvConfig();
 
 const program = new Command();
 
 program
   .name('webkurier')
-  .description('🔍 AI-powered web search CLI for WebKurier ecosystem')
+  .description('🔍 AI-powered CLI for WebKurier ecosystem')
   .version('1.0.0', '-v, --version')
   .option('--debug', 'Enable verbose logging', false)
   .option('--no-color', 'Disable colored output');
 
-// Required registrations
 registerSearchCommand(program);
 registerConfigCommand(program);
 registerDoctorCommand(program);
+registerRepoCommand(program);
+registerAgentCommand(program);
 
 program.on('command:*', () => {
   console.error(`❌ Unknown command: ${program.args.join(' ')}`);
