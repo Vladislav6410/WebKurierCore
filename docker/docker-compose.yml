@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  webkurier-api:
+    build:
+      context: ..
+      dockerfile: apps/api-server/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DEFAULT_LOCATION_COUNTRY=${DEFAULT_LOCATION_COUNTRY:-DE}
+      - DEFAULT_LOCATION_CITY=${DEFAULT_LOCATION_CITY:-Berlin}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - webkurier-net
+
+  # Опционально: Redis для кэширования результатов поиска
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_/data
+    networks:
+      - webkurier-net
+    command: redis-server --appendonly yes
+
+networks:
+  webkurier-net:
+    driver: bridge
+
+volumes:
+  redis_data:
+
