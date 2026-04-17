@@ -16,7 +16,7 @@ import { registerDoctorCommand } from './commands/doctor';
 import { loadEnvConfig } from './lib/config/EnvLoader';
 import { EXIT_CODES } from './utils/exitCodes';
 
-// Load .env before command registration
+// Load environment before command registration
 loadEnvConfig();
 
 const program = new Command();
@@ -28,6 +28,7 @@ program
   .option('--debug', 'Enable verbose logging', false)
   .option('--no-color', 'Disable colored output');
 
+// Required registrations
 registerSearchCommand(program);
 registerConfigCommand(program);
 registerDoctorCommand(program);
