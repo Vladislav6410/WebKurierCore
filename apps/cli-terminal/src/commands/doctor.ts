@@ -43,7 +43,10 @@ export function registerDoctorCommand(program: Command): void {
       for (const check of checks) {
         const icon = check.ok ? chalk.green('✓') : chalk.red('✗');
         console.log(`${icon} ${chalk.bold(check.name)} — ${check.details}`);
-        if (!check.ok) hasErrors = true;
+
+        if (!check.ok) {
+          hasErrors = true;
+        }
       }
 
       console.log('');
