@@ -9,6 +9,10 @@ export {
   InMemoryCacheManager,
 } from './services/CacheManager';
 
+// 🔥 Новые сервисы
+export { RedisCacheManager } from './services/RedisCacheManager';
+export { ReputationAggregator } from './services/ReputationAggregator';
+
 // === Types ===
 export type {
   SecurityCheckConfig,
