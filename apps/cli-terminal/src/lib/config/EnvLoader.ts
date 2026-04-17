@@ -2,8 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 export function loadEnvConfig(): void {
-  const cwd = process.cwd();
-  const envPath = path.resolve(cwd, '.env');
+  const envPath = path.resolve(process.cwd(), '.env');
 
   if (!fs.existsSync(envPath)) {
     return;
@@ -18,13 +17,13 @@ export function loadEnvConfig(): void {
       continue;
     }
 
-    const eqIndex = line.indexOf('=');
-    if (eqIndex === -1) {
+    const separatorIndex = line.indexOf('=');
+    if (separatorIndex === -1) {
       continue;
     }
 
-    const key = line.slice(0, eqIndex).trim();
-    const value = line.slice(eqIndex + 1).trim().replace(/^['"]|['"]$/g, '');
+    const key = line.slice(0, separatorIndex).trim();
+    const value = line.slice(separatorIndex + 1).trim().replace(/^['"]|['"]$/g, '');
 
     if (!(key in process.env)) {
       process.env[key] = value;
