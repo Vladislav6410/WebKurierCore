@@ -24,11 +24,15 @@ export class PrettyFormatter {
     }
 
     const modeBadge = this.getModeBadge(metadata.mode, options.color);
-    const modelLabel = options.color ? chalk.gray(`model: ${metadata.model}`) : `model: ${metadata.model}`;
-    lines.push(`${modeBadge} ${modelLabel}`);
+    const modelText = options.color
+      ? chalk.gray(`model: ${metadata.model}`)
+      : `model: ${metadata.model}`;
+
+    lines.push(`${modeBadge} ${modelText}`);
 
     if (typeof options.duration === 'number') {
-      lines.push(options.color ? chalk.gray(`⏱️  ${options.duration}ms`) : `⏱️  ${options.duration}ms`);
+      const durationText = `⏱️  ${options.duration}ms`;
+      lines.push(options.color ? chalk.gray(durationText) : durationText);
     }
 
     lines.push('');
@@ -43,17 +47,17 @@ export class PrettyFormatter {
         const domain = safeHostname(cite.url);
 
         const numLabel = options.color ? chalk.gray(`[${num}]`) : `[${num}]`;
-        const title = options.color ? chalk.blue(cite.title) : cite.title;
-        const url = options.color ? chalk.gray(cite.url) : cite.url;
+        const titleLabel = options.color ? chalk.blue(cite.title) : cite.title;
+        const urlLabel = options.color ? chalk.gray(cite.url) : cite.url;
         const domainLabel = options.color ? chalk.dim(`(${domain})`) : `(${domain})`;
 
-        lines.push(`  ${numLabel} ${title}`);
-        lines.push(`      ${url} ${domainLabel}`);
+        lines.push(`  ${numLabel} ${titleLabel}`);
+        lines.push(`      ${urlLabel} ${domainLabel}`);
       });
 
       if (citations.length > 5) {
-        const more = `... and ${citations.length - 5} more`;
-        lines.push(`  ${options.color ? chalk.gray(more) : more}`);
+        const moreLabel = `... and ${citations.length - 5} more`;
+        lines.push(`  ${options.color ? chalk.gray(moreLabel) : moreLabel}`);
       }
 
       lines.push('');
@@ -62,12 +66,15 @@ export class PrettyFormatter {
     if (options.showMetadata) {
       lines.push(options.color ? chalk.gray('📊 Meta') : '📊 Meta');
       lines.push(`  Mode: ${metadata.mode}`);
+
       if (metadata.tokensUsed !== undefined) {
         lines.push(`  Tokens: ${metadata.tokensUsed}`);
       }
+
       if (metadata.searchQueries?.length) {
         lines.push(`  Sub-queries: ${metadata.searchQueries.join(', ')}`);
       }
+
       lines.push('');
     }
 
@@ -81,33 +88,59 @@ export class PrettyFormatter {
   }
 
   static printDryRun(query: string, config: any, color = true): void {
-    const c = color ? chalk : new NoColorChalk();
+    const title = '\n🧪 Dry Run — Request Preview';
+    const hr = '─'.repeat(60);
 
-    console.log(c.bold.cyan('\n🧪 Dry Run — Request Preview'));
-    console.log(c.gray('─'.repeat(60)));
-    console.log(c.bold('Query:'), query);
-    console.log(c.bold('Mode:'), this.getModeBadge(config.mode, color));
+    console.log(color ? chalk.bold.cyan(title) : title);
+    console.log(color ? chalk.gray(hr) : hr);
+    console.log(color ? chalk.bold('Query:') : 'Query:', query);
+    console.log(color ? chalk.bold('Mode:') : 'Mode:', this.getModeBadge(config.mode, color));
 
     if (config.location) {
-      const parts = [config.location.city, config.location.region, config.location.country].filter(Boolean);
-      console.log(c.bold('Location:'), parts.join(', '));
+      const locationParts = [
+        config.location.city,
+        config.location.region,
+        config.location.country,
+      ].filter(Boolean);
+
+      console.log(
+        color ? chalk.bold('Location:') : 'Location:',
+        locationParts.join(', '),
+      );
     }
 
     if (config.location?.timezone) {
-      console.log(c.bold('Timezone:'), config.location.timezone);
+      console.log(
+        color ? chalk.bold('Timezone:') : 'Timezone:',
+        config.location.timezone,
+      );
     }
 
     if (config.domainFilters?.allowedDomains?.length) {
-      console.log(c.bold('Domains:'), config.domainFilters.allowedDomains.join(', '));
+      console.log(
+        color ? chalk.bold('Domains:') : 'Domains:',
+        config.domainFilters.allowedDomains.join(', '),
+      );
     }
 
+    const liveText = config.liveAccess !== false ? 'yes' : 'cached only';
+    const liveLabel = color
+      ? config.liveAccess !== false
+        ? chalk.green(liveText)
+        : chalk.yellow(liveText)
+      : liveText;
+
+    console.log(color ? chalk.bold('Live Access:') : 'Live Access:', liveLabel);
     console.log(
-      c.bold('Live Access:'),
-      config.liveAccess !== false ? c.green('yes') : c.yellow('cached only'),
+      color ? chalk.bold('Timeout:') : 'Timeout:',
+      `${config.timeoutMs ?? 30000}ms`,
     );
-    console.log(c.bold('Timeout:'), `${config.timeoutMs ?? 30000}ms`);
     console.log('');
-    console.log(c.dim('✅ Run without --dry-run to execute'));
+    console.log(
+      color
+        ? chalk.dim('✅ Run without --dry-run to execute')
+        : '✅ Run without --dry-run to execute',
+    );
   }
 
   private static getModeBadge(mode: SearchMode, color: boolean): string {
@@ -126,28 +159,6 @@ function safeHostname(url: string): string {
     return new URL(url).hostname;
   } catch {
     return 'invalid-url';
-  }
-}
-
-class NoColorChalk {
-  bold = Object.assign((value: string) => value, {
-    cyan: (value: string) => value,
-  });
-
-  gray(value: string) {
-    return value;
-  }
-
-  green(value: string) {
-    return value;
-  }
-
-  yellow(value: string) {
-    return value;
-  }
-
-  dim(value: string) {
-    return value;
   }
 }
 
