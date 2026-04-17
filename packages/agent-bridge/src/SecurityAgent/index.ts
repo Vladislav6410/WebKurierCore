@@ -5,13 +5,12 @@ export { SecuritySearchAdapter } from './SecuritySearchAdapter';
 export { UrlSanitizer } from './services/UrlSanitizer';
 export { RiskCalculator } from './services/RiskCalculator';
 export {
-  CacheManager,
   InMemoryCacheManager,
 } from './services/CacheManager';
-
-// 🔥 Новые сервисы
+export type {
+  CacheManager,
+} from './services/CacheManager';
 export { RedisCacheManager } from './services/RedisCacheManager';
-export { ReputationAggregator } from './services/ReputationAggregator';
 
 // === Types ===
 export type {
