@@ -1,11 +1,75 @@
+import Redis from 'ioredis';
+import type { SecurityCheckResult } from '../types/SecurityCheck';
 import type { CacheManager } from './CacheManager';
 
 export class RedisCacheManager implements CacheManager {
-  async get(): Promise<any> {
-    throw new Error('RedisCacheManager not implemented yet');
+  private readonly redis: Redis;
+
+  constructor(redisUrl?: string) {
+    const url = redisUrl || process.env.REDIS_URL;
+
+    if (!url) {
+      throw new Error('REDIS_URL is required for RedisCacheManager');
+    }
+
+    this.redis = new Redis(url, {
+      lazyConnect: true,
+      maxRetriesPerRequest: 1,
+    });
   }
 
-  async set(): Promise<void> {
-    throw new Error('RedisCacheManager not implemented yet');
+  async get(key: string): Promise<SecurityCheckResult | null> {
+    await this.ensureConnected();
+
+    const raw = await this.redis.get(key);
+    if (!raw) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(raw) as SecurityCheckResult;
+    } catch {
+      await this.redis.del(key);
+      return null;
+    }
+  }
+
+  async set(
+    key: string,
+    value: SecurityCheckResult,
+    ttlSeconds: number,
+  ): Promise<void> {
+    await this.ensureConnected();
+
+    const payload = JSON.stringify(value);
+    const ttl = Math.max(1, ttlSeconds);
+
+    await this.redis.set(key, payload, 'EX', ttl);
+  }
+
+  async delete(key: string): Promise<void> {
+    await this.ensureConnected();
+    await this.redis.del(key);
+  }
+
+  async clear(): Promise<void> {
+    await this.ensureConnected();
+    await this.redis.flushdb();
+  }
+
+  async disconnect(): Promise<void> {
+    if (this.redis.status === 'end') {
+      return;
+    }
+
+    await this.redis.quit();
+  }
+
+  private async ensureConnected(): Promise<void> {
+    if (this.redis.status === 'ready' || this.redis.status === 'connect') {
+      return;
+    }
+
+    await this.redis.connect();
   }
 }
