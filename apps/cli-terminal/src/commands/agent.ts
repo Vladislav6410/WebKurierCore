@@ -17,7 +17,10 @@ import { EXIT_CODES } from '../utils/exitCodes';
 type SecurityCommandOptions = {
   mode?: 'fast' | 'agentic';
   format?: 'pretty' | 'json' | 'table' | 'md' | 'markdown';
+  json?: boolean;
 };
+
+type NormalizedFormat = 'pretty' | 'json' | 'table' | 'md';
 
 export function registerAgentCommand(program: Command): void {
   const agent = program.command('agent').description('Agent bridge commands');
@@ -31,6 +34,7 @@ export function registerAgentCommand(program: Command): void {
     .description('Fast security check for URL or domain')
     .option('-m, --mode <mode>', 'Execution mode: fast | agentic', 'fast')
     .option('-f, --format <format>', 'Output format: pretty | json | table | md', 'pretty')
+    .option('--json', 'Shortcut for --format json', false)
     .action(async (target: string, options: SecurityCommandOptions) => {
       await runSecurityCommand('check', target, options);
     });
@@ -40,6 +44,7 @@ export function registerAgentCommand(program: Command): void {
     .description('Deeper security analysis for URL or domain')
     .option('-m, --mode <mode>', 'Execution mode: fast | agentic', 'agentic')
     .option('-f, --format <format>', 'Output format: pretty | json | table | md', 'pretty')
+    .option('--json', 'Shortcut for --format json', false)
     .action(async (target: string, options: SecurityCommandOptions) => {
       await runSecurityCommand('analyze', target, options);
     });
@@ -57,6 +62,13 @@ export function registerAgentCommand(program: Command): void {
       }
 
       console.log(chalk.green('✅ SecurityAgent environment looks good'));
+
+      if (process.env.REDIS_URL) {
+        console.log(chalk.gray(`Redis: configured (${process.env.REDIS_URL})`));
+      } else {
+        console.log(chalk.gray('Redis: not configured (running without Redis cache)'));
+      }
+
       process.exit(EXIT_CODES.SUCCESS);
     });
 }
@@ -69,9 +81,15 @@ async function runSecurityCommand(
   try {
     const adapter = new SecuritySearchAdapter();
     const mode = normalizeMode(options.mode, action);
-    const format = normalizeFormat(options.format);
+    const format = normalizeFormat(options);
 
     const result = await adapter.check(target, { mode });
+
+    if (format === 'json') {
+      console.log(JSON.stringify(result, null, 2));
+      process.exit(EXIT_CODES.SUCCESS);
+    }
+
     const formatterResponse = mapSecurityResultToFormatterResponse(result);
 
     const formatterOptions = {
@@ -85,9 +103,6 @@ async function runSecurityCommand(
     let output = '';
 
     switch (format) {
-      case 'json':
-        output = JsonFormatter.format(formatterResponse, formatterOptions);
-        break;
       case 'table':
         output = TableFormatter.format(formatterResponse, formatterOptions);
         break;
@@ -122,15 +137,21 @@ function normalizeMode(
   return action === 'analyze' ? 'agentic' : 'fast';
 }
 
-function normalizeFormat(
-  format?: string,
-): 'pretty' | 'json' | 'table' | 'md' {
-  if (format === 'markdown') {
+function normalizeFormat(options: SecurityCommandOptions): NormalizedFormat {
+  if (options.json) {
+    return 'json';
+  }
+
+  if (options.format === 'markdown') {
     return 'md';
   }
 
-  if (format === 'json' || format === 'table' || format === 'md') {
-    return format;
+  if (
+    options.format === 'json' ||
+    options.format === 'table' ||
+    options.format === 'md'
+  ) {
+    return options.format;
   }
 
   return 'pretty';
