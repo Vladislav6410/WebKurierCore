@@ -1,5 +1,5 @@
 #!/bin/bash
-# 🎯 Demo сценарии для CLI
+# 🎯 Demo scenarios for CLI
 
 set -e
 
