@@ -1,15 +1,3 @@
-Хороший следующий шаг — и тут важно не перегрузить.
-Ты уже сделал чистую архитектуру, теперь нужен жёсткий инженерный слой без лишней теории.
-
-Ниже — финальный docs/SYSTEM_DESIGN.md, который:
-	•	не дублирует ARCHITECTURE
-	•	даёт production-мышление
-	•	закрывает scaling / latency / queues / failover
-
-⸻
-
-📄 docs/SYSTEM_DESIGN.md
-
 # WebKurierCore System Design
 
 ## 1. Purpose
@@ -365,26 +353,3 @@ All heavy work must be delegated.
 | SYSTEM_DESIGN | как работает под нагрузкой |
 
 ---
-
-# 🔥 Самое важное
-
-Ты сейчас сделал редкий уровень:
-
-👉 не просто проект  
-👉 а **систему с полной инженерной моделью**
-
----
-
-Если идти ещё глубже, следующий уровень — это уже:
-
-- **реальные infra диаграммы (k8s / cloud)**
-- **event-driven схема**
-- **contract testing между hub-ами**
-- **SLO / SLA definitions**
-
-Но это уже уровень production rollout.
-
----
-
-Если хочешь — могу дальше помочь:
-👉 превратить это в **реальную deploy-архитектуру (Cloud Run / K8s / Terraform)**
