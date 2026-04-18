@@ -10,7 +10,7 @@ Core is responsible for:
 	•	Linking user inputs to appropriate domain hubs
 This repository is the central interaction layer between human users and machine intelligence.
 
-0. Local Development (Codex)
+# 0. Local Development (Codex)
 Prerequisites
 	•	Node.js 18+
 	•	Python 3.10+
@@ -48,7 +48,7 @@ Level 3 — Mobile Apps (iOS/Android)
 Level 4 — Public Site
 Level 5 — Future/X Labs
 
-WebKurierCore acts as the global router:
+# WebKurierCore acts as the global router:
 
 User → Web / Bots / Mobile
      → WebKurierCore (Gateway)
@@ -58,9 +58,9 @@ User → Web / Bots / Mobile
 
 ⸻
 
-2. Repository Structure (High
+# 2. Repository Structure (High
 
- WebKurierCore/
+WebKurierCore/
 ├── index.html                               # Legacy main portal (tiles)
 ├── admin/
 │   ├── terminal.html                        # Legacy admin terminal UI
@@ -244,7 +244,7 @@ User → Web / Bots / Mobile
 
 ⸻
 
-3. Core Responsibilities
+# 3. Core Responsibilities
 
 3.1. User Interaction Layer
 	•	Agent selection portal (index.html)
@@ -271,7 +271,7 @@ User → Web / Bots / Mobile
 
 3.5. System Routing
 
-WebKurierCore makes the decision:
+# WebKurierCore makes the decision:
 
 Does the task belong to:
 • VehicleHub (navigation, geodesy, PV, missions)?
@@ -282,7 +282,7 @@ Does the task belong to:
 
 ⸻
 
-4. Cross-Repository Data Flow
+# 4. Cross-Repository Data Flow
 
 Example: Drone Request
 
@@ -304,7 +304,7 @@ Core is the router, not the executor.
 
 ⸻
 
-5. CI/CD Integration
+# 5. CI/CD Integration
 	•	Core builds are initiated via Hybrid
 	•	No secrets stored in this repository
 	•	Local-only secrets in engine/config/secrets.json
@@ -313,7 +313,7 @@ Core is the router, not the executor.
 
 ⸻
 
-6. Agent Glossary (EN + RU translation only)
+# 6. Agent Glossary (EN + RU translation only)
 
 GeodesyAgent — Геодезист
 DroneAgent — Агент дрона
@@ -353,14 +353,14 @@ CouncilAgent (SecondSelf) — Совет Второго Я
 
 ⸻
 
-7. Security & Entitlements
+# 7. Security & Entitlements
 	•	Access levels defined in entitlements.json
 	•	Sensitive actions require elevated role
 	•	SecondSelf Council behavior changes per tier (Free → Premium)
 
 ⸻
 
-8. Contact & Governance
+# 8. Contact & Governance
 
 WebKurierCore is maintained by
 Vladyslav Hushchyn (VladoExport)
