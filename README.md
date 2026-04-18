@@ -1,4 +1,4 @@
-WebKurierCore — Primary User Gateway & Cognitive Routing Engine
+# WebKurierCore — Primary User Gateway & Cognitive Routing Engine
 WebKurierCore is the main entry point for all user interactions across the WebKurier ecosystem. It provides the Web portal, agent selection interface, terminal environment, SecondSelf Council routing, and cross-domain orchestration between VehicleHub, PhoneCore, Chain, and Security.
 Core is responsible for:
 	•	User-facing UI (web)
