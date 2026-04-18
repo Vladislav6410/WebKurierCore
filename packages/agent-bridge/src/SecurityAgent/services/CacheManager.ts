@@ -1,4 +1,4 @@
-import type { SecurityCheckResult } from '../types/SecurityCheck';
+import type { SecurityCheckResult } from '../types/SecurityCheck.js';
 
 export interface CacheManager {
   get(key: string): Promise<SecurityCheckResult | null>;
@@ -17,16 +17,11 @@ export class InMemoryCacheManager implements CacheManager {
 
   async get(key: string): Promise<SecurityCheckResult | null> {
     const entry = this.store.get(key);
-
-    if (!entry) {
-      return null;
-    }
-
+    if (!entry) return null;
     if (Date.now() > entry.expiresAt) {
       this.store.delete(key);
       return null;
     }
-
     return entry.value;
   }
 
@@ -35,11 +30,9 @@ export class InMemoryCacheManager implements CacheManager {
     value: SecurityCheckResult,
     ttlSeconds: number,
   ): Promise<void> {
-    const ttlMs = Math.max(1, ttlSeconds) * 1000;
-
     this.store.set(key, {
       value,
-      expiresAt: Date.now() + ttlMs,
+      expiresAt: Date.now() + Math.max(1, ttlSeconds) * 1000,
     });
   }
 
