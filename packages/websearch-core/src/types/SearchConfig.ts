@@ -1,87 +1,135 @@
-import { SearchMode } from './SearchMode';
+import crypto from 'node:crypto';
 
-/**
- * Конфигурация пользовательской геолокации
- * @see https://developers.openai.com/api/docs/guides/tools-web-search#user-location
- */
-export interface UserLocation {
-  /** ISO 3166-1 alpha-2 country code (e.g., "DE", "US") */
-  country: string;
-  /** City name (free text) */
-  city?: string;
-  /** Region/state name (free text) */
-  region?: string;
-  /** IANA timezone (e.g., "Europe/Berlin") */
-  timezone?: string;
-}
+import { WebSearchClient, SearchMode } from '@webkurier/websearch-core';
+import type { SearchConfig } from '@webkurier/websearch-core';
+import type {
+  SecurityCheckConfig,
+  SecurityCheckResult,
+  SecurityMode,
+  SecuritySource,
+} from './types/SecurityCheck';
+import { UrlSanitizer } from './services/UrlSanitizer';
+import { RiskCalculator } from './services/RiskCalculator';
+import type { CacheManager } from './services/CacheManager';
+import { RedisCacheManager } from './services/RedisCacheManager';
 
-/**
- * Фильтры доменов для ограничения поиска
- * @see https://developers.openai.com/api/docs/guides/tools-web-search#domain-filtering
- */
-export interface DomainFilters {
-  /** Allow-list доменов (макс. 100). Без http(s):// префикса */
-  allowedDomains?: string[];
-  /** Deny-list доменов (опционально, если поддерживается) */
-  excludedDomains?: string[];
-}
+type AdapterDeps = {
+  cache?: CacheManager;
+  webSearchClient?: WebSearchClient;
+};
 
-/**
- * Основная конфигурация поиска
- */
-export interface SearchConfig {
-  /** Режим поиска (определяет модель и стратегию) */
-  mode: SearchMode;
+export class SecuritySearchAdapter {
+  private readonly cache?: CacheManager;
+  private readonly webSearchClient: WebSearchClient;
 
-  /** Пользовательская геолокация для локализации результатов */
-  location?: UserLocation;
+  constructor(deps: AdapterDeps = {}) {
+    this.cache = deps.cache ?? createDefaultCacheManager();
 
-  /** Фильтрация доменов */
-  domainFilters?: DomainFilters;
+    this.webSearchClient =
+      deps.webSearchClient ??
+      new WebSearchClient({
+        apiKey: process.env.OPENAI_API_KEY ?? '',
+        baseURL: process.env.OPENAI_BASE_URL,
+      });
+  }
 
-  /**
-   * Контроль доступа к "живому" интернету
-   * - true: реальный-time поиск (default)
-   * - false: только кэшированные/индексированные данные
-   * @see https://developers.openai.com/api/docs/guides/tools-web-search#live-internet-access
-   */
-  liveAccess?: boolean;
+  async check(
+    target: string,
+    config: SecurityCheckConfig = {},
+  ): Promise<SecurityCheckResult> {
+    const startedAt = Date.now();
+    const mode = config.mode ?? 'fast';
 
-  /**
-   * Включить возврат полных источников (не только inline-цитаты)
-   * @default false
-   */
-  includeSources?: boolean;
+    const sanitized = UrlSanitizer.sanitize(target);
+    const cacheKey = this.buildCacheKey(sanitized.normalizedTarget);
 
-  /** Таймаут запроса в миллисекундах (для FAST/AGENTIC) */
-  timeoutMs?: number;
-
-  /** Callback для прогресса (для DEEP mode с background execution) */
-  onProgress?: ( { step: string; sourcesCount: number }) => void;
-}
-
-/**
- * Валидация конфигурации
- */
-export function validateSearchConfig(config: SearchConfig): void {
-  if (config.domainFilters?.allowedDomains) {
-    if (config.domainFilters.allowedDomains.length > 100) {
-      throw new Error('allowedDomains limit: 100 URLs maximum');
+    const cached = await this.cache?.get(cacheKey);
+    if (cached) {
+      return {
+        ...cached,
+        metadata: {
+          ...cached.metadata,
+          cache: 'hit',
+        },
+      };
     }
-    // Валидация формата: без http/https префикса
-    for (const domain of config.domainFilters.allowedDomains) {
-      if (/^https?:\/\//.test(domain)) {
-        throw new Error(`Invalid domain format: "${domain}". Omit http(s):// prefix`);
-      }
-    }
+
+    const query = buildSecurityPrompt(sanitized.normalizedTarget, mode);
+
+    // ✅ Типизированный конфиг вместо as any
+    const searchConfig: SearchConfig = {
+      mode: mode === 'agentic' ? SearchMode.AGENTIC : SearchMode.FAST,
+      includeSources: true,
+      timeoutMs: mode === 'agentic' ? 45000 : 12000,
+    };
+
+    const response = await this.webSearchClient.search(query, searchConfig);
+
+    const result = RiskCalculator.calculate({
+      target,
+      normalizedTarget: sanitized.normalizedTarget,
+      mode,
+      text: String(response?.text ?? ''),
+      sources: mapSources(response?.citations),
+      model: response?.metadata?.model,
+      tokensUsed: response?.metadata?.tokensUsed,
+      searchQueries: response?.metadata?.searchQueries ?? [
+        buildHumanReadableQuery(sanitized.normalizedTarget),
+      ],
+      durationMs: Date.now() - startedAt,
+    });
+
+    const ttlSeconds = Number(process.env.SECURITY_CACHE_TTL ?? 3600);
+    await this.cache?.set(cacheKey, result, ttlSeconds);
+
+    return result;
   }
 
-  if (config.location?.country && !/^[A-Z]{2}$/.test(config.location.country)) {
-    throw new Error('Country must be ISO 3166-1 alpha-2 code (e.g., "DE")');
-  }
-
-  if (config.mode === SearchMode.DEEP && config.timeoutMs && config.timeoutMs < 60000) {
-    console.warn('DEEP mode typically requires >60s timeout');
+  private buildCacheKey(target: string): string {
+    const hash = crypto.createHash('sha256').update(target).digest('hex');
+    return `sec:${hash}`;
   }
 }
+
+function createDefaultCacheManager(): CacheManager | undefined {
+  const redisUrl = process.env.REDIS_URL;
+  if (!redisUrl) return undefined;
+  try {
+    return new RedisCacheManager(redisUrl);
+  } catch {
+    return undefined;
+  }
+}
+
+function mapSources(input: unknown): SecuritySource[] {
+  if (!Array.isArray(input)) return [];
+  return input
+    .map((item: unknown) => ({
+      // ✅ item: unknown вместо any
+      title: String((item as Record<string, unknown>)?.title ?? 'Untitled source'),
+      url: String((item as Record<string, unknown>)?.url ?? ''),
+    }))
+    .filter((item) => item.url);
+}
+
+function buildSecurityPrompt(target: string, mode: SecurityMode): string {
+  if (mode === 'agentic') {
+    return [
+      `Perform a security reputation analysis for the target: ${target}.`,
+      'Check for phishing, malware, scam, blacklist, abuse, WHOIS age, and domain reputation signals.',
+      'Prefer trusted sources such as VirusTotal, URLScan, Google Safe Browsing, WHOIS, security vendors, or official threat intelligence sources.',
+      'Return a concise verdict with supporting evidence.',
+    ].join(' ');
+  }
+  return [
+    `Quick security reputation check for: ${target}.`,
+    'Look for phishing, malware, blacklist, abuse, and reputation indicators.',
+    'Prefer trusted sources and return a short verdict.',
+  ].join(' ');
+}
+
+function buildHumanReadableQuery(target: string): string {
+  return `security reputation for ${target}`;
+}
+
 
