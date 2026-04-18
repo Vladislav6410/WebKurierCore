@@ -1,18 +1,13 @@
-// === Core adapter ===
-export { SecuritySearchAdapter } from './SecuritySearchAdapter';
-
-// === Services ===
-export { UrlSanitizer } from './services/UrlSanitizer';
-export { RiskCalculator } from './services/RiskCalculator';
+export { SecuritySearchAdapter } from './SecuritySearchAdapter.js';
+export { UrlSanitizer } from './services/UrlSanitizer.js';
+export { RiskCalculator } from './services/RiskCalculator.js';
 export {
   InMemoryCacheManager,
-} from './services/CacheManager';
+} from './services/CacheManager.js';
 export type {
   CacheManager,
-} from './services/CacheManager';
-export { RedisCacheManager } from './services/RedisCacheManager';
-
-// === Types ===
+} from './services/CacheManager.js';
+export { RedisCacheManager } from './services/RedisCacheManager.js';
 export type {
   SecurityCheckConfig,
   SecurityCheckResult,
@@ -21,4 +16,4 @@ export type {
   SecurityVerdict,
   SecurityFinding,
   SecurityRecommendation,
-} from './types/SecurityCheck';
+} from './types/SecurityCheck.js';
