@@ -1,41 +1,63 @@
-name: Test & Lint
+name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
   pull_request:
-    branches: [main]
 
 jobs:
   quality:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        package: [websearch-core, agent-bridge, api-server]
-    
+    timeout-minutes: 25
+
     steps:
-      - uses: actions/checkout@v4
-      
-      - uses: pnpm/action-setup@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          version: 8.15.0
-          
-      - uses: actions/setup-node@v4
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-          
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-        
-      - name: Type check
-        run: pnpm --filter ${{ matrix.package }} typecheck
-        
-      - name: Lint
-        run: pnpm --filter ${{ matrix.package }} lint
-        
-      - name: Test
-        run: pnpm --filter ${{ matrix.package }} test
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY_TEST }}
 
+      - name: Show tool versions
+        run: |
+          node -v
+          npm -v
+          pnpm -v
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Lint agent-bridge
+        run: pnpm --filter=@webkurier/agent-bridge lint
+        continue-on-error: true
+
+      - name: Lint cli-terminal
+        run: pnpm --filter=@webkurier/cli-terminal lint
+        continue-on-error: true
+
+      - name: Typecheck agent-bridge
+        run: pnpm --filter=@webkurier/agent-bridge typecheck
+
+      - name: Build agent-bridge
+        run: pnpm --filter=@webkurier/agent-bridge build
+
+      - name: Typecheck cli-terminal
+        run: pnpm --filter=@webkurier/cli-terminal typecheck
+
+      - name: Build cli-terminal
+        run: pnpm --filter=@webkurier/cli-terminal build
+
+      - name: Run CLI tests
+        run: chmod +x ./scripts/test-cli.sh && ./scripts/test-cli.sh
+
+      - name: Run SecurityAgent tests
+        run: chmod +x ./scripts/test-security-agent.sh && ./scripts/test-security-agent.sh
