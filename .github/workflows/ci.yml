@@ -2,40 +2,78 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - develop
   pull_request:
 
 jobs:
-  build:
+  quality:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    permissions:
+      contents: read
+      actions: none
+      checks: none
+      deployments: none
+      issues: none
+      packages: none
+      pull-requests: none
+      statuses: none
 
     steps:
-      - name: 📥 Clone repository
+      - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 🟢 Setup Node
+      - name: 🟠 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8.15.0
+
+      - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'npm'
+          node-version: '20'
+
+      - name: 📊 Show tool versions
+        run: |
+          node -v
+          npm -v
+          pnpm -v
 
       - name: 📦 Install dependencies
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
+        run: pnpm install --no-frozen-lockfile
 
-      - name: 🔍 Lint (optional)
-        run: npm run lint || echo "⚠️ no lint script"
+      - name: 🔍 Lint agent-bridge
+        run: pnpm --filter=@webkurier/agent-bridge lint
+        continue-on-error: true
 
-      - name: 🧪 Tests (optional)
-        run: npm test || echo "⚠️ no tests"
+      - name: 🔍 Lint cli-terminal
+        run: pnpm --filter=@webkurier/cli-terminal lint
+        continue-on-error: true
 
-      - name: 🏗 Build (optional)
-        run: npm run build || echo "⚠️ no build step"
+      - name: 🧪 Typecheck agent-bridge
+        run: pnpm --filter=@webkurier/agent-bridge typecheck
 
-      - name: 📊 Show Node version
-        run: node -v
+      - name: 🏗 Build agent-bridge
+        run: pnpm --filter=@webkurier/agent-bridge build
+
+      - name: 🧪 Typecheck websearch-core
+        run: pnpm --filter=@webkurier/websearch-core typecheck
+
+      - name: 🏗 Build websearch-core
+        run: pnpm --filter=@webkurier/websearch-core build
+
+      - name: 🧪 Typecheck cli-terminal
+        run: pnpm --filter=@webkurier/cli-terminal typecheck
+
+      - name: 🏗 Build cli-terminal
+        run: pnpm --filter=@webkurier/cli-terminal build
+
+      - name: 🧪 Run CLI tests
+        run: chmod +x ./scripts/test-cli.sh && ./scripts/test-cli.sh
+
+      - name: 🛡 Run SecurityAgent tests
+        run: chmod +x ./scripts/test-security-agent.sh && ./scripts/test-security-agent.sh
         
