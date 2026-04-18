@@ -759,5 +759,3 @@ Its job is to improve routing quality while remaining:
 	•	safe under failure
 
 ---
-
-Если хочешь, следующим логичным шагом будет собрать **единый финальный пакет `README.md + docs/*` в одной согласованной структуре**.
