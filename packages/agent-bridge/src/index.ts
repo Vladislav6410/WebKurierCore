@@ -1,1 +1,1 @@
-export * from './SecurityAgent';
+export * from './SecurityAgent/index.js';
