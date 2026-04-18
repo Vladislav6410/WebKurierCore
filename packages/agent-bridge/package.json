@@ -2,16 +2,17 @@
   "name": "@webkurier/agent-bridge",
   "version": "1.0.0",
   "description": "Agent bridge package for WebKurier agents",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     },
     "./security": {
-      "types": "./dist/SecurityAgent/index.d.ts",
-      "default": "./dist/SecurityAgent/index.js"
+      "import": "./dist/SecurityAgent/index.js",
+      "types": "./dist/SecurityAgent/index.d.ts"
     }
   },
   "files": [
@@ -20,7 +21,7 @@
   "scripts": {
     "build": "tsc -b",
     "dev": "tsc -b -w",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "pnpm exec tsc --noEmit -p tsconfig.json",
     "test": "vitest run"
   },
   "dependencies": {
@@ -29,7 +30,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
-    "typescript": "^5.3.0",
+    "typescript": "^5.7.0",
     "vitest": "^1.2.0"
   },
   "engines": {
