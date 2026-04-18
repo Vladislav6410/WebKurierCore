@@ -956,4 +956,3 @@ production-мышление: latency, queues, caching, failover, observability, 
 - anti-abuse controls
 - phishing / security scan integration model
 
-Если хочешь, следующим сообщением я соберу тебе **готовый `ARCHITECTURE.md` + `ROUTING.md` + `SECURITY.md` в одном финальном пакете**.
