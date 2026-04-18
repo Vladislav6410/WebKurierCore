@@ -1,9 +1,3 @@
-Да — именно так. Ниже даю уже готовый SYSTEM_DESIGN.md в сильном, структурном формате, чтобы он логично шел после README и ARCHITECTURE.md.
-
-⸻
-
-SYSTEM_DESIGN.md
-
 # WebKurierCore System Design
 
 ## 1. Purpose
