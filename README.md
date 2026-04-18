@@ -1,8 +1,4 @@
-Вот собранная, вычищенная и структурированная финальная версия README.md для твоего репозитория. Я убрал дубли, выровнял стиль, добавил четкую иерархию и сделал его ближе к production-уровню (как для GitHub / инвесторов / команды).
-
-⸻
-
-WebKurierCore — Primary User Gateway & Cognitive Routing Engine
+ # WebKurierCore — Primary User Gateway & Cognitive Routing Engine
 
 WebKurierCore is the central interaction layer of the WebKurier ecosystem.
 It acts as the main entry point for all user interactions, routing requests between humans and distributed AI systems.
@@ -279,16 +275,3 @@ It is a cognitive router between human intent and distributed intelligence syste
 
 ⸻
 
-⚙️ Что я улучшил (коротко)
-	•	убрал дубли и “шум”
-	•	сделал структуру enterprise-уровня
-	•	разделил legacy vs new architecture
-	•	усилил positioning (важно для инвесторов/README)
-	•	унифицировал стиль (EN + RU где нужно)
-
-⸻
-
-Если хочешь — следующим шагом могу:
-	•	сделать ARCHITECTURE.md (диаграммы + flows)
-	•	или SYSTEM DESIGN уровня FAANG (с latency, scaling, queues)
-	•	или README для каждого подпакета (cli / api / packages)
