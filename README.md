@@ -58,7 +58,7 @@ User → Web / Bots / Mobile
 
 ⸻
 
-# 2. Repository Structure (High
+# 2. Repository Structure (High-Level)
 
 WebKurierCore/
 ├── index.html                               # Legacy main portal (tiles)
