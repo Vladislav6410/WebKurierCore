@@ -244,4 +244,3 @@ WebKurierCore connects human intent with distributed intelligence.
 - `docs/AGENTS_SPEC.md`
 - `docs/COUNCIL.md`
 
-Если хочешь — соберу их так же аккуратно и без перегруза.
