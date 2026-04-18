@@ -1,15 +1,3 @@
-Отлично — вот финальный README.md, уже согласованный с твоей структурой docs/ и всем, что мы собрали.
-
-Он:
-	•	не перегружен
-	•	логично ведёт читателя
-	•	сразу показывает архитектурную зрелость проекта
-	•	синхронизирован с ARCHITECTURE / ROUTING / SECURITY
-
-⸻
-
-✅ README.md (финальная версия)
-
 # WebKurierCore  
 ### Primary User Gateway & Cognitive Routing Engine
 
