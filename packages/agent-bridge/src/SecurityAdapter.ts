@@ -1,23 +1,12 @@
 import { WebSearchClient, SearchResponse } from '@webkurier/websearch-core';
-import { SearchMode } from '@webkurier/websearch-core/types/SearchMode';
+import { SearchMode } from '@webkurier/websearch-core';
 
-/**
- * Адаптер Web Search для SecurityAgent
- * 
- * Use cases:
- * - Проверка URL на фишинг/репутацию
- * - Анализ домена через WHOIS/черные списки
- * - Мониторинг упоминаний бренда в негативном контексте
- */
 export class SecuritySearchAdapter {
   constructor(private readonly searchClient: WebSearchClient) {}
 
-  /**
-   * Проверка URL на безопасность через агрегированный поиск
-   */
   async checkUrlSafety(url: string): Promise<{
     isSafe: boolean;
-    riskScore: number; // 0-100
+    riskScore: number;
     findings: Array<{
       source: string;
       verdict: 'safe' | 'suspicious' | 'malicious';
@@ -26,11 +15,10 @@ export class SecuritySearchAdapter {
     }>;
     rawSearch: SearchResponse;
   }> {
-    // Ограничиваем поиск доверенными источниками
     const trustedDomains = [
       'virustotal.com',
       'urlscan.io',
-      'google.com/safebrowsing',
+      'google.com',
       'phishtank.com',
       'whois.domaintools.com',
       'reputation.alienvault.com',
@@ -45,22 +33,31 @@ export class SecuritySearchAdapter {
       timeoutMs: 25000,
     });
 
-    // Парсинг результатов (упрощенный пример)
-    const findings = result.citations.map(citation => {
-      const isSecurityDomain = trustedDomains.some(d => citation.url.includes(d));
+    const findings = result.citations.map((citation) => {
+      const isSecurityDomain = trustedDomains.some((d) =>
+        citation.url.includes(d),
+      );
       return {
         source: new URL(citation.url).hostname,
-        verdict: isSecurityDomain ? this.inferVerdict(citation.title) : 'suspicious',
+        verdict: isSecurityDomain
+          ? this.inferVerdict(citation.title)
+          : ('suspicious' as const),
         summary: citation.title,
         url: citation.url,
       };
     });
 
-    const maliciousCount = findings.filter(f => f.verdict === 'malicious').length;
-    const suspiciousCount = findings.filter(f => f.verdict === 'suspicious').length;
-    
-    // Простой расчет риска
-    const riskScore = Math.min(100, maliciousCount * 40 + suspiciousCount * 15);
+    const maliciousCount = findings.filter(
+      (f) => f.verdict === 'malicious',
+    ).length;
+    const suspiciousCount = findings.filter(
+      (f) => f.verdict === 'suspicious',
+    ).length;
+
+    const riskScore = Math.min(
+      100,
+      maliciousCount * 40 + suspiciousCount * 15,
+    );
 
     return {
       isSafe: riskScore < 25,
@@ -70,51 +67,56 @@ export class SecuritySearchAdapter {
     };
   }
 
-  /**
-   * Мониторинг упоминаний бренда с фильтрацией по тональности
-   */
   async monitorBrandMentions(
     brand: string,
     options: {
       timeWindow?: '24h' | '7d' | '30d';
       sentiment?: 'negative' | 'neutral' | 'positive';
       sources?: string[];
-    } = {}
-  ): Promise<Array<{
-    title: string;
-    url: string;
-    publishedDate?: string;
-    sentiment: 'negative' | 'neutral' | 'positive';
-    source: string;
-  }>> {
-    const timeFilter = options.timeWindow === '24h' ? 'today' : 
-                       options.timeWindow === '7d' ? 'this week' : 'this month';
-    
-    const sentimentFilter = options.sentiment ? `${options.sentiment} sentiment` : '';
-    
+    } = {},
+  ): Promise<
+    Array<{
+      title: string;
+      url: string;
+      publishedDate?: string;
+      sentiment: 'negative' | 'neutral' | 'positive';
+      source: string;
+    }>
+  > {
+    const timeFilter =
+      options.timeWindow === '24h'
+        ? 'today'
+        : options.timeWindow === '7d'
+          ? 'this week'
+          : 'this month';
+
+    const sentimentFilter = options.sentiment
+      ? `${options.sentiment} sentiment`
+      : '';
+
     const query = `${brand} ${sentimentFilter} news ${timeFilter} review complaint`;
 
-    const domainFilter = options.sources?.length 
-      ? { allowedDomains: options.sources } 
+    const domainFilter = options.sources?.length
+      ? { allowedDomains: options.sources }
       : undefined;
 
     const result = await this.searchClient.search(query, {
       mode: SearchMode.AGENTIC,
       domainFilters: domainFilter,
-      location: { country: 'DE' }, // Пример: фокус на немецкий рынок
+      location: { country: 'DE' },
       timeoutMs: 20000,
     });
 
-    // В продакшене здесь был бы NLP-парсинг тональности
-    // Для демо: эвристика по ключевым словам
-    return result.citations.map(c => {
+    return result.citations.map((c) => {
       const titleLower = c.title.toLowerCase();
       const negativeKeywords = ['scam', 'fraud', 'complaint', 'warning', 'issue'];
       const positiveKeywords = ['recommended', 'excellent', 'trusted', 'award'];
-      
-      const sentiment = negativeKeywords.some(k => titleLower.includes(k)) ? 'negative' :
-                        positiveKeywords.some(k => titleLower.includes(k)) ? 'positive' :
-                        'neutral';
+
+      const sentiment = negativeKeywords.some((k) => titleLower.includes(k))
+        ? ('negative' as const)
+        : positiveKeywords.some((k) => titleLower.includes(k))
+          ? ('positive' as const)
+          : ('neutral' as const);
 
       return {
         title: c.title,
@@ -126,9 +128,9 @@ export class SecuritySearchAdapter {
   }
 
   private inferVerdict(title: string): 'safe' | 'suspicious' | 'malicious' {
-    const t = title.toLowerCase();
-    if (/malicious|phishing|malware|blacklist|blocked/i.test(t)) return 'malicious';
-    if (/suspicious|caution|unverified|risk/i.test(t)) return 'suspicious';
+    if (/malicious|phishing|malware|blacklist|blocked/i.test(title))
+      return 'malicious';
+    if (/suspicious|caution|unverified|risk/i.test(title)) return 'suspicious';
     return 'safe';
   }
 }
