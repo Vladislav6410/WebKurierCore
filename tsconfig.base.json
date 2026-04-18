@@ -6,16 +6,11 @@
     "lib": ["ES2022"],
     "strict": true,
     "skipLibCheck": true,
-    "esModuleInterop": true,
+    "esModuleInterop": false,
     "resolveJsonModule": true,
     "declaration": true,
+    "declarationMap": true,
     "sourceMap": true,
-    "baseUrl": ".",
-    "paths": {
-      "@webkurier/websearch-core": ["packages/websearch-core/src/index.ts"],
-      "@webkurier/websearch-core/*": ["packages/websearch-core/src/*"],
-      "@webkurier/agent-bridge": ["packages/agent-bridge/src/index.ts"],
-      "@webkurier/agent-bridge/*": ["packages/agent-bridge/src/*"]
-    }
+    "forceConsistentCasingInFileNames": true
   }
 }
