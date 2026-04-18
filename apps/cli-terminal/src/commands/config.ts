@@ -1,16 +1,36 @@
-import chalk from 'chalk';
 import { Command } from 'commander';
+import {
+  maskSecret,
+  printHealthReport,
+  type HealthCheck,
+} from '../lib/diagnostics/HealthReport';
 import { EXIT_CODES } from '../utils/exitCodes';
 
-const SAFE_ENV_KEYS = [
-  'OPENAI_API_KEY',
-  'OPENAI_BASE_URL',
-  'DEFAULT_LOCATION_COUNTRY',
-  'DEFAULT_LOCATION_CITY',
-  'DEFAULT_LOCATION_REGION',
-  'DEFAULT_LOCATION_TIMEZONE',
-  'SEARCH_ALLOWED_DOMAINS',
+const CONFIG_KEYS = [
+  { key: 'OPENAI_API_KEY', required: true, secret: true },
+  { key: 'OPENAI_BASE_URL', required: false, secret: false },
+  { key: 'DEFAULT_SEARCH_MODE', required: false, secret: false },
+  { key: 'DEFAULT_SEARCH_TIMEOUT_MS', required: false, secret: false },
+  { key: 'DEFAULT_LIVE_ACCESS', required: false, secret: false },
+  { key: 'DEFAULT_LOCATION_COUNTRY', required: false, secret: false },
+  { key: 'DEFAULT_LOCATION_CITY', required: false, secret: false },
+  { key: 'DEFAULT_LOCATION_TIMEZONE', required: false, secret: false },
+  { key: 'SEARCH_ALLOWED_DOMAINS', required: false, secret: false },
+  { key: 'SEARCH_RATE_LIMIT_PER_MINUTE', required: false, secret: false },
+  { key: 'SEARCH_RATE_LIMIT_BURST', required: false, secret: false },
+  { key: 'SECURITY_CACHE_TTL', required: false, secret: false },
+  { key: 'SECURITY_BLOCK_THRESHOLD', required: false, secret: false },
+  { key: 'SECURITY_RATE_LIMIT_PER_MINUTE', required: false, secret: false },
+  { key: 'SECURITY_TRUSTED_SOURCES', required: false, secret: false },
+  { key: 'REDIS_URL', required: false, secret: false },
+  { key: 'LOG_LEVEL', required: false, secret: false },
+  { key: 'PORT', required: false, secret: false },
+  { key: 'NODE_ENV', required: false, secret: false },
 ] as const;
+
+type RootProgramOptions = {
+  color: boolean;
+};
 
 export function registerConfigCommand(program: Command): void {
   const config = program
@@ -21,17 +41,39 @@ export function registerConfigCommand(program: Command): void {
     .command('show')
     .description('Show resolved environment configuration')
     .action(() => {
-      console.log(chalk.bold.cyan('\n⚙️ WebKurier Config'));
-      console.log(chalk.gray('─'.repeat(60)));
+      const rootOptions = program.opts<RootProgramOptions>();
 
-      for (const key of SAFE_ENV_KEYS) {
-        const raw = process.env[key];
-        const value = maskIfNeeded(key, raw);
-        console.log(`${chalk.bold(key)}=${value ?? chalk.gray('(not set)')}`);
-      }
+      const checks: HealthCheck[] = CONFIG_KEYS.map((item) => {
+        const rawValue = process.env[item.key];
 
-      console.log('');
-      process.exit(EXIT_CODES.SUCCESS);
+        if (!rawValue) {
+          return {
+            name: item.key,
+            status: item.required ? 'fail' : 'warn',
+            required: item.required,
+            details: 'Not set',
+          };
+        }
+
+        return {
+          name: item.key,
+          status: 'ok',
+          required: item.required,
+          details: item.secret ? maskSecret(rawValue) : rawValue,
+        };
+      });
+
+      const report = printHealthReport(
+        '⚙️ WebKurier Config',
+        checks,
+        rootOptions.color,
+      );
+
+      process.exit(
+        report.hasBlockingFailures
+          ? EXIT_CODES.CONFIG_ERROR
+          : EXIT_CODES.SUCCESS,
+      );
     });
 
   config
@@ -41,27 +83,11 @@ export function registerConfigCommand(program: Command): void {
       const value = process.env[key];
 
       if (value === undefined) {
-        console.error(chalk.red(`❌ "${key}" is not set`));
+        console.error(`❌ "${key}" is not set`);
         process.exit(EXIT_CODES.CONFIG_ERROR);
       }
 
-      console.log(maskIfNeeded(key, value));
+      console.log(key.toUpperCase().includes('KEY') ? maskSecret(value) : value);
       process.exit(EXIT_CODES.SUCCESS);
     });
-}
-
-function maskIfNeeded(key: string, value?: string): string | undefined {
-  if (!value) {
-    return value;
-  }
-
-  if (key === 'OPENAI_API_KEY') {
-    if (value.length <= 10) {
-      return '***';
-    }
-
-    return `${value.slice(0, 6)}***${value.slice(-4)}`;
-  }
-
-  return value;
 }
