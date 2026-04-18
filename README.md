@@ -81,32 +81,37 @@ User → Web / Bots / Mobile
 
 ⸻
 
-2. Repository Structure (High-Level)
+2. Repository Structure (High
 
 WebKurierCore/
-├── index.html                     # Main agent portal (tiles)
+├── index.html                               # Legacy main portal (tiles)
 ├── admin/
-│   ├── terminal.html              # Admin terminal
-│   └── logs.html                  # System logs viewer
-├── engine/
+│   ├── terminal.html                        # Legacy admin terminal UI
+│   └── logs.html                            # Legacy logs viewer
+│
+├── engine/                                  # Legacy runtime / UI layer
 │   ├── config/
-│   │   ├── agents_map.json        # Agent groups & routing map
-│   │   ├── entitlements.json      # Access tiers & roles
-│   │   └── secrets.json           # Local-only secrets (not in git)
+│   │   ├── agents_map.json                  # Agent groups & routing map
+│   │   ├── entitlements.json                # Access tiers & roles
+│   │   └── secrets.json                     # Local-only secrets (not in git)
+│   │
 │   ├── api/
-│   │   ├── secondself_rest.py     # REST endpoint: /secondself/query
-│   │   └── secondself_ws.py       # WS endpoint: /secondself/stream
+│   │   ├── secondself_rest.py               # Legacy REST endpoint
+│   │   └── secondself_ws.py                 # Legacy WS endpoint
+│   │
 │   ├── perception/
-│   │   ├── stereo_input_adapter.js  # Wearable stereo camera input
-│   │   ├── mic_stream_adapter.js    # Microphone input handler
-│   │   └── translator_rt.js         # Real-time subtitles/translation
+│   │   ├── stereo_input_adapter.js
+│   │   ├── mic_stream_adapter.js
+│   │   └── translator_rt.js
+│   │
 │   ├── terminal/
-│   │   ├── terminal_agent.js      # Main terminal logic
-│   │   └── commands_map.json      # Command → agent routing
+│   │   ├── terminal_agent.js
+│   │   └── commands_map.json
+│   │
 │   ├── agents/
-│   │   ├── geodesy/               # Geodesy interface
-│   │   ├── drone/                 # Drone interface
-│   │   ├── autopilot/             # Autopilot interface
+│   │   ├── geodesy/
+│   │   ├── drone/
+│   │   ├── autopilot/
 │   │   ├── pilot/
 │   │   ├── geoviz3d/
 │   │   ├── pv-planner/
@@ -122,37 +127,143 @@ WebKurierCore/
 │   │   ├── marketing/
 │   │   ├── romantic/
 │   │   ├── engineer/
+│   │   │   ├── engineer-agent.js
+│   │   │   ├── engineer-config.json
+│   │   │   ├── prompts/
+│   │   │   │   └── engineer-system.prompt.txt
+│   │   │   ├── ui/
+│   │   │   │   ├── engineer-core.html
+│   │   │   │   └── engineer-ui.js
+│   │   │   ├── api/
+│   │   │   │   └── engineer-api.js
+│   │   │   └── README.md
 │   │   ├── programmer/
 │   │   ├── designer/
 │   │   ├── editor/
 │   │   ├── tools/
 │   │   ├── dream/
-│   │   ├── security/
+│   │   ├── security/                        # Legacy security agent UI/runtime
 │   │   ├── legal/
 │   │   ├── memory/
 │   │   ├── admin-terminal/
 │   │   ├── master/
-│   │   ├── second-self/           # SecondSelf Council UI
-│   │   └── cafe/                  # Cafe/Menu/Booking
+│   │   ├── second-self/
+│   │   └── cafe/
+│   │
 │   └── js/
-│       └── agents-menu.js         # Dynamic UI tile loader
-└── docs/
-    └── *.html                     # Documentation pages
-
-WebKurierCore/
-└── engine/
-    └── agents/
-        └── engineer/
-            ├── engineer-agent.js
-            ├── engineer-config.json
-            ├── prompts/
-            │   └── engineer-system.prompt.txt
-            ├── ui/
-            │   ├── engineer-core.html
-            │   └── engineer-ui.js
-            ├── api/
-            │   └── engineer-api.js
-            └── README.md
+│       └── agents-menu.js
+│
+├── docs/
+│   └── *.html
+│
+├── apps/                                    # New application layer
+│   ├── cli-terminal/                        # ✅ CLI shell for search/repo/agent
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   ├── README.md
+│   │   └── src/
+│   │       ├── index.ts
+│   │       ├── commands/
+│   │       │   ├── search.ts
+│   │       │   ├── config.ts
+│   │       │   ├── doctor.ts
+│   │       │   ├── agent.ts
+│   │       │   └── repo.ts
+│   │       ├── lib/
+│   │       │   ├── config/
+│   │       │   │   ├── EnvLoader.ts
+│   │       │   │   └── CliConfig.ts
+│   │       │   ├── diagnostics/
+│   │       │   │   └── HealthReport.ts
+│   │       │   ├── interactive/
+│   │       │   │   ├── PromptEngine.ts
+│   │       │   │   └── Spinner.ts
+│   │       │   └── output/
+│   │       │       ├── PrettyFormatter.ts
+│   │       │       ├── JsonFormatter.ts
+│   │       │       ├── TableFormatter.ts
+│   │       │       └── MarkdownFormatter.ts
+│   │       └── utils/
+│   │           └── exitCodes.ts
+│   │
+│   └── api-server/                          # ✅ Backend API layer
+│       ├── package.json
+│       ├── tsconfig.json
+│       ├── README.md
+│       ├── Dockerfile
+│       └── src/
+│           ├── index.ts
+│           ├── app.ts
+│           ├── routes/
+│           │   ├── health.ts
+│           │   └── agent.ts                # POST /api/v1/agent/security
+│           ├── middleware/
+│           │   ├── errorHandler.ts
+│           │   ├── requestLogger.ts
+│           │   └── rateLimit.ts
+│           └── utils/
+│               └── logger.ts
+│
+├── packages/                                # New shared packages
+│   ├── websearch-core/                      # ✅ OpenAI/Web Search client
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   └── src/
+│   │       ├── index.ts
+│   │       ├── WebSearchClient.ts
+│   │       └── types/
+│   │           ├── SearchMode.ts
+│   │           └── SearchConfig.ts
+│   │
+│   ├── agent-bridge/                        # ✅ Shared agent adapters
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   └── src/
+│   │       ├── index.ts
+│   │       └── SecurityAgent/
+│   │           ├── index.ts
+│   │           ├── SecuritySearchAdapter.ts
+│   │           ├── types/
+│   │           │   └── SecurityCheck.ts
+│   │           ├── services/
+│   │           │   ├── UrlSanitizer.ts
+│   │           │   ├── RiskCalculator.ts
+│   │           │   ├── CacheManager.ts
+│   │           │   ├── RedisCacheManager.ts
+│   │           │   └── ReputationAggregator.ts
+│   │           └── utils/
+│   │               └── domain-parser.ts
+│   │
+│   └── eslint-config/                       # optional shared config package
+│       └── package.json
+│
+├── docker/
+│   ├── docker-compose.yml
+│   └── .env.example
+│
+├── scripts/
+│   ├── test-cli.sh
+│   ├── test-security-agent.sh
+│   ├── seed-demo.sh
+│   ├── seed-threat-samples.sh
+│   └── deploy.sh
+│
+├── .github/
+│   └── workflows/
+│       ├── test.yml
+│       ├── deploy.yml
+│       ├── security.yml
+│       ├── pages.yml
+│       └── update-modes.yml
+│
+├── .gitignore
+├── .env                                     # local only, not in git
+├── package.json                             # root monorepo
+├── pnpm-workspace.yaml
+├── pnpm-lock.yaml
+├── turbo.json
+├── tsconfig.base.json
+└── README.md
 
 ⸻
 
