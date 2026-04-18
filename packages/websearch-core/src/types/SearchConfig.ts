@@ -7,15 +7,21 @@ import type {
   SecurityCheckResult,
   SecurityMode,
   SecuritySource,
-} from './types/SecurityCheck';
-import { UrlSanitizer } from './services/UrlSanitizer';
-import { RiskCalculator } from './services/RiskCalculator';
-import type { CacheManager } from './services/CacheManager';
-import { RedisCacheManager } from './services/RedisCacheManager';
+} from './types/SecurityCheck.js';
+import { UrlSanitizer } from './services/UrlSanitizer.js';
+import { RiskCalculator } from './services/RiskCalculator.js';
+import type { CacheManager } from './services/CacheManager.js';
+import { RedisCacheManager } from './services/RedisCacheManager.js';
 
 type AdapterDeps = {
   cache?: CacheManager;
   webSearchClient?: WebSearchClient;
+};
+
+// Маппинг SecurityMode → SearchMode
+const SECURITY_TO_SEARCH_MODE: Record<SecurityMode, SearchMode> = {
+  fast: SearchMode.FAST,
+  agentic: SearchMode.AGENTIC,
 };
 
 export class SecuritySearchAdapter {
@@ -38,7 +44,7 @@ export class SecuritySearchAdapter {
     config: SecurityCheckConfig = {},
   ): Promise<SecurityCheckResult> {
     const startedAt = Date.now();
-    const mode = config.mode ?? 'fast';
+    const mode: SecurityMode = config.mode ?? 'fast';
 
     const sanitized = UrlSanitizer.sanitize(target);
     const cacheKey = this.buildCacheKey(sanitized.normalizedTarget);
@@ -56,11 +62,10 @@ export class SecuritySearchAdapter {
 
     const query = buildSecurityPrompt(sanitized.normalizedTarget, mode);
 
-    // ✅ Типизированный конфиг вместо as any
     const searchConfig: SearchConfig = {
-      mode: mode === 'agentic' ? SearchMode.AGENTIC : SearchMode.FAST,
+      mode: SECURITY_TO_SEARCH_MODE[mode],
       includeSources: true,
-      timeoutMs: mode === 'agentic' ? 45000 : 12000,
+      timeoutMs: mode === 'agentic' ? 45_000 : 12_000,
     };
 
     const response = await this.webSearchClient.search(query, searchConfig);
@@ -104,12 +109,14 @@ function createDefaultCacheManager(): CacheManager | undefined {
 function mapSources(input: unknown): SecuritySource[] {
   if (!Array.isArray(input)) return [];
   return input
-    .map((item: unknown) => ({
-      // ✅ item: unknown вместо any
-      title: String((item as Record<string, unknown>)?.title ?? 'Untitled source'),
-      url: String((item as Record<string, unknown>)?.url ?? ''),
-    }))
-    .filter((item) => item.url);
+    .map((item: unknown) => {
+      const record = item as Record<string, unknown>;
+      return {
+        title: String(record?.title ?? 'Untitled source'),
+        url: String(record?.url ?? ''),
+      };
+    })
+    .filter((item) => item.url.length > 0);
 }
 
 function buildSecurityPrompt(target: string, mode: SecurityMode): string {
@@ -131,5 +138,6 @@ function buildSecurityPrompt(target: string, mode: SecurityMode): string {
 function buildHumanReadableQuery(target: string): string {
   return `security reputation for ${target}`;
 }
+
 
 
