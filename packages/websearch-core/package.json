@@ -2,8 +2,23 @@
   "name": "@webkurier/websearch-core",
   "version": "1.0.0",
   "description": "Core Web Search client for WebKurier",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./types/SearchMode": {
+      "import": "./dist/types/SearchMode.js",
+      "types": "./dist/types/SearchMode.d.ts"
+    },
+    "./types/SearchConfig": {
+      "import": "./dist/types/SearchConfig.js",
+      "types": "./dist/types/SearchConfig.d.ts"
+    }
+  },
   "files": [
     "dist"
   ],
@@ -13,7 +28,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
-  "dependencies": {},
+  "dependencies": {
+    "openai": "^4.47.0"
+  },
   "devDependencies": {
     "@types/node": "^20.11.0",
     "typescript": "^5.3.0",
