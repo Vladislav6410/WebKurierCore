@@ -1,4 +1,4 @@
-# ☁️ WebKurierCore — Deploy в Google Cloud Run (EU, 5–10 минут)
+# WebKurierCore — Deploy в Google Cloud Run (EU, 5–10 минут)
 
 Этот гид разворачивает Docker-образ WebKurierCore на **Cloud Run (fully managed)**:
 - автоскейл, HTTPS, без VM;
@@ -14,7 +14,7 @@
 
 ---
 
-## 1) Что уже есть в репозиторииWebKurierCore/
+## 1) Что уже есть в репозитории WebKurierCore/
 ├─ Dockerfile
 ├─ requirements.txt
 ├─ engine/startup_loader.py      # FastAPI + Basic-Auth (/ , /status, /healthz)
