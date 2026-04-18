@@ -1,6 +1,3 @@
-
-**Содержимое файла (скопировать):**
-```md
 # RL Training Strategy for WebKurierPhoneCore
 
 ---
