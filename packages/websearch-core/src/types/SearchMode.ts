@@ -24,17 +24,18 @@ export enum SearchMode {
    * - Многошаговое исследование, 10-100+ источников
    * - Латентность: 1-5 мин, стоимость: высокая
    * - Use case: бизнес-анализ, технические исследования
-   * - Требует модель: o3-deep-research или gpt-5 с reasoning=high
    */
   DEEP = 'deep',
 }
 
-export const SEARCH_MODE_CONFIG: Record<SearchMode, {
+export type SearchModeConfig = {
   model: string;
   reasoningEffort?: 'low' | 'medium' | 'high';
   maxTokens: number;
   backgroundMode: boolean;
-}> = {
+};
+
+export const SEARCH_MODE_CONFIG: Record<SearchMode, SearchModeConfig> = {
   [SearchMode.FAST]: {
     model: 'gpt-5-mini',
     maxTokens: 4096,
