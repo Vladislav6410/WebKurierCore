@@ -20,9 +20,6 @@ jobs:
       contents: read
       packages: write
 
-    outputs:
-      image_tag: ${{ steps.meta.outputs.version }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -36,13 +33,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
+
+      - name: Show tool versions
+        run: |
+          node -v
+          npm -v
+          pnpm -v
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
       - name: Build agent-bridge
         run: pnpm --filter=@webkurier/agent-bridge build
+
+      - name: Build websearch-core
+        run: pnpm --filter=@webkurier/websearch-core build
 
       - name: Build cli-terminal
         run: pnpm --filter=@webkurier/cli-terminal build
@@ -85,7 +90,6 @@ jobs:
         run: |
           echo "Deploy staging image: ghcr.io/${{ github.repository }}:staging"
           echo "Add your staging deploy command here"
-          echo "Examples: ssh, docker compose pull/up, kubectl set image, helm upgrade"
 
   deploy-production:
     if: github.ref == 'refs/heads/main'
@@ -99,4 +103,3 @@ jobs:
         run: |
           echo "Deploy production image: ghcr.io/${{ github.repository }}:latest"
           echo "Add your production deploy command here"
-          echo "Examples: ssh, docker compose pull/up, kubectl set image, helm upgrade"
