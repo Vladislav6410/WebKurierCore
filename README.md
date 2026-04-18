@@ -44,7 +44,7 @@ It acts as the **entry point between human users and distributed AI systems**, r
 User → Core → Domain Hub / Agent → Core → User
 
 Domains:
-- VehicleHub
+- WebKurierDrone
 - PhoneCore
 - Chain
 - Security
