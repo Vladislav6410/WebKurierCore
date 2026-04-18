@@ -1,19 +1,4 @@
-Лучший порядок такой:
-	1.	ARCHITECTURE.md
-Сначала фиксируем реальную архитектуру: слои, роутинг, зависимости, legacy vs new layer, data flow между Core и hub-ами.
-	2.	SYSTEM DESIGN
-Потом уже раскладываем production-аспекты: latency, scaling, queues, stateless/stateful parts, caching, failover, observability, security boundaries.
-	3.	README для подпакетов
-И только после этого делаем локальные README, чтобы они не противоречили общей архитектуре.
-
-Для WebKurierCore это самый сильный маршрут, потому что:
-	•	главный README уже позиционирует проект как gateway / routing engine
-	•	без ARCHITECTURE.md подпакетные README будут выглядеть разрозненно
-	•	SYSTEM DESIGN логично строить уже на зафиксированной архитектурной карте
-
-Рекомендую следующим шагом делать именно:
-
-ARCHITECTURE.md
+# ARCHITECTURE.md
 
 Внутри него должны быть такие разделы:
 	•	1. Purpose
