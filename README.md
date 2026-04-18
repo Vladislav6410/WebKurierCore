@@ -60,7 +60,7 @@ User → Web / Bots / Mobile
 
 2. Repository Structure (High
 
-WebKurierCore/
+ WebKurierCore/
 ├── index.html                               # Legacy main portal (tiles)
 ├── admin/
 │   ├── terminal.html                        # Legacy admin terminal UI
