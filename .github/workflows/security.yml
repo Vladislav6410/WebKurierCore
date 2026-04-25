@@ -10,6 +10,7 @@ jobs:
 
     permissions:
       contents: read
+      security-events: write
 
     steps:
       - name: Checkout code
@@ -29,17 +30,46 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Audit
+      - name: Audit (non-blocking)
         run: pnpm audit || true
+
+      - name: Audit (high severity only)
+        run: pnpm audit --audit-level=high
+
+      - name: Syntax check (safe)
+        run: |
+          if [ -f server.js ]; then
+            node -c server.js
+          else
+            echo "server.js not found, skipping syntax check"
+          fi
 
       - name: Secret pattern check
         run: |
           echo "Checking exposed secrets..."
-          if grep -RInE "(OPENAI_API_KEY|TELEGRAM_BOT_TOKEN|DROPBOX_TOKEN|HANDYMAN_TELEGRAM_TOKEN|HANDYMAN_ADMIN_TOKEN|ADMIN_API_TOKEN)=" . \
+          if grep -RInE "(OPENAI_API_KEY|TELEGRAM_BOT_TOKEN|DROPBOX_TOKEN|HANDYMAN_TELEGRAM_TOKEN|HANDYMAN_ADMIN_TOKEN|ADMIN_API_TOKEN|PRIVATE_KEY|SECRET_KEY)=" . \
             --exclude-dir=node_modules \
             --exclude-dir=.git \
             --exclude=".env.example"; then
-            echo "Potential exposed secret found."
+            echo "❌ Potential exposed secret found."
             exit 1
           fi
-          echo "No exposed secrets found."
+          echo "✅ No exposed secrets found."
+
+      - name: Check for .env leaks
+        run: |
+          echo "Checking for .env files..."
+          if find . -name ".env" -not -path "./node_modules/*" | grep .; then
+            echo "❌ .env file found in repo!"
+            exit 1
+          fi
+          echo "✅ No .env files found."
+
+      - name: Check large files (possible dumps)
+        run: |
+          echo "Checking for large files..."
+          if find . -type f -size +5M -not -path "./node_modules/*" | grep .; then
+            echo "⚠️ Large files detected (check manually)"
+          else
+            echo "✅ No suspicious large files"
+          fi
