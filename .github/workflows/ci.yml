@@ -8,6 +8,9 @@ jobs:
   scan:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,10 +24,31 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
       - name: Audit
         run: pnpm audit || true
+
+      - name: Syntax check
+        run: |
+          if [ -f server.js ]; then
+            node -c server.js
+          else
+            echo "server.js not found, skipping syntax check"
+          fi
+
+      - name: Secret pattern check
+        run: |
+          echo "Checking exposed secrets..."
+          if grep -RInE "(OPENAI_API_KEY|TELEGRAM_BOT_TOKEN|DROPBOX_TOKEN|HANDYMAN_TELEGRAM_TOKEN|HANDYMAN_ADMIN_TOKEN|ADMIN_API_TOKEN)=" . \
+            --exclude-dir=node_modules \
+            --exclude-dir=.git \
+            --exclude=".env.example"; then
+            echo "Potential exposed secret found."
+            exit 1
+          fi
+          echo "No exposed secrets found."
         
